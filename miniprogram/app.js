@@ -1,20 +1,41 @@
 // app.js
 App({
-  onLaunch: function () {
-    this.globalData = {
-      // env 参数说明：
-      //   env 参数决定接下来小程序发起的云开发调用（wx.cloud.xxx）会默认请求到哪个云环境的资源
-      //   此处请填入环境 ID, 环境 ID 可打开云控制台查看
-      //   如不填则使用默认环境（第一个创建的环境）
-      env: ""
-    };
-    if (!wx.cloud) {
-      console.error("请使用 2.2.3 或以上的基础库以使用云能力");
-    } else {
-      wx.cloud.init({
-        env: this.globalData.env,
-        traceUser: true,
+  onLaunch() {
+    console.log('轻燃应用启动');
+    
+    // 初始化全局数据
+    this.initGlobalData();
+  },
+
+  initGlobalData() {
+    // 初始化用户信息（后续应从本地存储或云端获取）
+    if (!wx.getStorageSync('userInfo')) {
+      wx.setStorageSync('userInfo', {
+        gender: '男',
+        age: 28,
+        height: 175,
+        weight: 75,
+        goal: '减脂',
+        targetPeriod: 90, // 天
+        targetWeight: 70,
+        activityLevel: '轻度活动',
+        dietaryPreferences: ['不吃辣', '少油'],
+        allergens: []
       });
     }
+
+    // 初始化饮食记录
+    if (!wx.getStorageSync('dietRecords')) {
+      wx.setStorageSync('dietRecords', []);
+    }
   },
+
+  globalData: {
+    userInfo: null,
+    dailyCalorieGoal: 1800, // 每日热量目标
+    dailyProteinGoal: 120,  // 每日蛋白质目标(克)
+    dailyCarbGoal: 180,     // 每日碳水目标(克)
+    dailyFatGoal: 50        // 每日脂肪目标(克)
+  }
 });
+

@@ -1,14 +1,24 @@
-# Windows
-[Dd]esktop.ini
-Thumbs.db
-$RECYCLE.BIN/
+# .gitignore
 
-# macOS
-.DS_Store
-.fseventsd
-.Spotlight-V100
-.TemporaryItems
-.Trashes
-
-# Node.js
+# 微信小程序
+miniprogram_npm/
 node_modules/
+
+# 项目配置
+project.private.config.json
+
+# 日志
+*.log
+npm-debug.log*
+
+# 编辑器
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 临时文件
+*.tmp
+.temp/
+
