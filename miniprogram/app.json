@@ -1,16 +1,17 @@
 {
   "pages": [
-    "pages/recipe-recommend/index",
-    "pages/recipe-detail/index",
-    "pages/ai-suggestion/index"
+    "pages/home/index",
+    "pages/index/index",
+    "pages/example/index"
   ],
   "window": {
+    "backgroundColor": "#F6F6F6",
     "backgroundTextStyle": "light",
-    "navigationBarBackgroundColor": "#FF6B35",
-    "navigationBarTitleText": "轻燃 - 食谱推荐",
-    "navigationBarTextStyle": "white"
+    "navigationBarBackgroundColor": "#F6F6F6",
+    "navigationBarTitleText": "云开发 QuickStart",
+    "navigationBarTextStyle": "black"
   },
+  "sitemapLocation": "sitemap.json",
   "style": "v2",
-  "sitemapLocation": "sitemap.json"
+  "lazyCodeLoading": "requiredComponents"
 }
-

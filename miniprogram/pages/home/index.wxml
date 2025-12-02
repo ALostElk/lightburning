@@ -1,0 +1,22 @@
+<view class="container">
+  <view class="goal-section">
+    <text>每日热量目标：{{dailyGoal}} 大卡</text>
+    <button 
+      size="mini" 
+      bindtap="onRegeneratePlan"
+      loading="{{loading}}"
+    >重新生成</button>
+  </view>
+  
+  <button 
+    type="primary" 
+    bindtap="onAdjustPlan"
+    loading="{{adjustLoading}}"
+    disabled="{{!dailyGoal}}"
+  >智能调整计划</button>
+
+  <view wx:if="{{adjustment !== null}}" class="adjust-result">
+    <view>建议调整：{{adjustment}} 大卡</view>
+    <view>新目标：{{dailyGoal + adjustment}} 大卡/日</view>
+  </view>
+</view>
