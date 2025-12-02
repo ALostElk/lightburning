@@ -1,0 +1,15 @@
+{
+  "name": "food-recognition-qwen",
+  "version": "1.0.0",
+  "description": "Qwen-VL food recognition cloud function",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"No tests\""
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "openai": "^4.9.1",
+    "wx-server-sdk": "~2.4.0"
+  }
+}
