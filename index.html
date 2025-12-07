@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>轻燃 - 运动计划管理</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- 导航栏 -->
+        <nav class="navbar">
+            <div class="navbar-content">
+                <h1 class="logo">🔥 轻燃</h1>
+                <div class="nav-links">
+                    <button class="nav-btn active" data-page="profile">个人信息</button>
+                    <button class="nav-btn" data-page="generate">生成计划</button>
+                    <button class="nav-btn" data-page="details">计划详情</button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- 主内容区 -->
+        <main class="main-content">
+            <!-- 个人信息页面 -->
+            <section id="profile" class="page active">
+                <div class="page-header">
+                    <h2>个人信息</h2>
+                    <p>管理您的基本信息和健身目标</p>
+                </div>
+                <div class="profile-container">
+                    <form id="profileForm" class="profile-form">
+                        <div class="form-group">
+                            <label for="username">昵称</label>
+                            <input type="text" id="username" name="username" placeholder="请输入昵称" required>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="age">年龄</label>
+                                <input type="number" id="age" name="age" min="10" max="100" placeholder="请输入年龄" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="gender">性别</label>
+                                <select id="gender" name="gender" required>
+                                    <option value="">请选择性别</option>
+                                    <option value="male">男</option>
+                                    <option value="female">女</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="height">身高 (cm)</label>
+                                <input type="number" id="height" name="height" min="100" max="250" placeholder="请输入身高" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="weight">体重 (kg)</label>
+                                <input type="number" id="weight" name="weight" min="20" max="300" step="0.1" placeholder="请输入体重" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="targetWeight">目标体重 (kg)</label>
+                                <input type="number" id="targetWeight" name="targetWeight" min="20" max="300" step="0.1" placeholder="请输入目标体重" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="fitness_level">健身水平</label>
+                                <select id="fitness_level" name="fitness_level" required>
+                                    <option value="">请选择健身水平</option>
+                                    <option value="beginner">初级</option>
+                                    <option value="intermediate">中级</option>
+                                    <option value="advanced">高级</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="health_conditions">健康状况</label>
+                            <textarea id="health_conditions" name="health_conditions" rows="3" placeholder="描述任何健康问题或限制（可选）"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="preferred_exercises">偏好运动项目</label>
+                            <div class="exercise-checkboxes">
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="exercise" value="running"> 跑步
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="exercise" value="swimming"> 游泳
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="exercise" value="cycling"> 骑行
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="exercise" value="gym"> 健身房
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="exercise" value="yoga"> 瑜伽
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="exercise" value="basketball"> 篮球
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="daily_calorie_target">每日卡路里目标差</label>
+                            <select id="daily_calorie_target" name="daily_calorie_target" required>
+                                <option value="">请选择每日卡路里目标差</option>
+                                <option value="-300">-300 kcal（温和减重）</option>
+                                <option value="-500">-500 kcal（积极减重）</option>
+                                <option value="0">0 kcal（维持体重）</option>
+                                <option value="300">300 kcal（缓慢增肌）</option>
+                                <option value="500">500 kcal（快速增肌）</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-lg">保存个人信息</button>
+                        <div id="profileMessage" class="message"></div>
+                    </form>
+
+                    <div class="profile-stats">
+                        <h3>您的数据</h3>
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-label">BMI</div>
+                                <div class="stat-value" id="bmiValue">--</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">当前状态</div>
+                                <div class="stat-value" id="bmiStatus">--</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">需减重</div>
+                                <div class="stat-value" id="weightDiff">--</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 生成计划页面 -->
+            <section id="generate" class="page">
+                <div class="page-header">
+                    <h2>生成运动计划</h2>
+                    <p>根据您的信息智能生成长期运动计划</p>
+                </div>
+                <div class="generate-container">
+                    <div class="plan-preview">
+                        <div class="plan-card">
+                            <h3>📋 您的长期计划</h3>
+                            <div id="planContent" class="plan-content">
+                                <p class="placeholder">请先完成个人信息设置，然后点击"生成计划"按钮</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="generate-actions">
+                        <button id="generatePlanBtn" class="btn btn-primary btn-lg">
+                            🚀 生成我的计划
+                        </button>
+                        <button id="getPlanBtn" class="btn btn-secondary" style="display:none;">
+                            📖 查看我的计划
+                        </button>
+                        <div id="generateMessage" class="message"></div>
+                        <div class="loading-spinner" id="loadingSpinner" style="display:none;">
+                            <div class="spinner"></div>
+                            <p>正在生成计划...</p>
+                        </div>
+                    </div>
+
+                    <div class="plan-tips">
+                        <h4>💡 生成计划提示</h4>
+                        <ul>
+                            <li>计划基于您的身体数据和目标自动生成</li>
+                            <li>包含4周的运动周期和每周目标</li>
+                            <li>建议根据实际情况调整运动强度</li>
+                            <li>保持一致性是成功的关键</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 计划详情页面 -->
+            <section id="details" class="page">
+                <div class="page-header">
+                    <h2>计划详情</h2>
+                    <p>查看和管理您的运动计划</p>
+                </div>
+                <div class="details-container">
+                    <div id="planDetails" class="plan-details">
+                        <p class="placeholder">暂无计划详情，请先生成计划</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="api.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
