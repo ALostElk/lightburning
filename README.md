@@ -1,190 +1,702 @@
-# 轻燃 - 健康管理小程序
+# 轻燃 LightBurning
 
-一个基于微信小程序云开发的智能健康管理系统，整合AI食物识别、个性化计划生成、营养分析等功能。
+<div align="center">
 
-> ⚠️ **重要更新**（2025-12-09）：已完成接口整合优化，统一使用 `cloudApi.js` 调用云函数，移除了前端的 API Key 暴露风险。详见 [接口整合文档.md](接口整合文档.md)
+**智能健康管理小程序**
 
-## 项目结构
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![WeChat MiniProgram](https://img.shields.io/badge/WeChat-MiniProgram-brightgreen)](https://developers.weixin.qq.com/miniprogram/dev/framework/)
+[![Node.js](https://img.shields.io/badge/Node.js-18.15-green)](https://nodejs.org/)
+
+*基于微信小程序云开发的智能健康管理系统*
+
+集成 AI 食物识别 | 个性化计划生成 | 营养分析 | 运动推荐
+
+</div>
+
+---
+
+## 📖 目录
+
+- [项目简介](#-项目简介)
+- [核心功能](#-核心功能)
+- [技术架构](#-技术架构)
+- [快速开始](#-快速开始)
+- [部署指南](#-部署指南)
+- [开发文档](#-开发文档)
+- [项目结构](#-项目结构)
+
+---
+
+## 🎯 项目简介
+
+**轻燃（LightBurning）** 是一个基于微信小程序云开发的智能健康管理系统，通过 AI 技术帮助用户科学管理饮食、运动和体重。
+
+### ✨ 特色亮点
+
+- 🤖 **AI 拍照识食**：基于通义千问视觉模型，一拍即识
+- 🔍 **三层食物搜索**：本地数据库 + AI 估算 + Open Food Facts API
+- 📊 **智能营养分析**：自动计算 BMR/TDEE，生成个性化计划
+- 🎯 **红绿灯系统**：直观展示每日热量差和营养状况
+- 💪 **运动推荐**：根据目标智能推荐运动方案
+
+### 🚀 最新更新
+
+> ⚠️ **v2.0 版本**（2025-12-09）
+> - ✅ 完成前端架构重构，模块化设计
+> - ✅ 统一云函数调用接口（`cloudApi.js`）
+> - ✅ 移除前端 API Key 暴露风险
+> - ✅ 优化食物搜索算法，支持常用食物智能置顶
+> - 📚 详见 [接口整合文档.md](接口整合文档.md)
+
+---
+
+## 📂 项目结构
 
 ```
 lightburning/
-├── cloudfunctions/          # 云函数
-│   ├── healthService/       # 健康管理服务（用户信息、计划、评价、运动）
-│   ├── dietService/         # 饮食管理服务（食物搜索、识别、记录）
-│   ├── qwenAI/             # AI建议生成
-│   └── foodRecognitionQwen/ # 食物图片识别
-│
-├── miniprogram/            # 小程序前端
-│   ├── pages/             # 页面
-│   │   ├── home/         # 首页
-│   │   ├── profile/      # 个人信息
-│   │   ├── plan/         # 计划管理
-│   │   ├── diet/         # 饮食管理
-│   │   ├── exercise/     # 运动管理
-│   │   ├── report/       # 每日评价
-│   │   ├── stats/        # 数据统计
-│   │   ├── ai-suggestion/ # AI建议
-│   │   ├── recipe-recommend/ # 食谱推荐
-│   │   └── mine/         # 个人中心
+├── 📁 cloudfunctions/           # 云函数（后端服务）
+│   ├── healthService/           # 健康管理服务
+│   │   ├── index.js            # 用户信息、计划、评价、运动
+│   │   ├── package.json        # 依赖：wx-server-sdk
+│   │   └── config.json         # 运行配置
 │   │
-│   ├── utils/            # 工具函数
-│   │   ├── cloudApi.js   # ⭐ 云函数统一调用接口
-│   │   ├── calculator.js # 健康计算工具
-│   │   ├── recipeEngine.js # 食谱推荐引擎
-│   │   └── recipeData.js # 食谱数据
+│   ├── dietService/            # 饮食管理服务
+│   │   ├── index.js           # 食物搜索、识别、记录
+│   │   ├── package.json       # 依赖：wx-server-sdk, axios
+│   │   └── config.json        # 运行配置（超时120s）
 │   │
-│   ├── components/       # 组件
-│   ├── images/          # 图片资源
-│   ├── app.js           # 小程序入口
-│   └── app.json         # 小程序配置
+│   ├── qwenAI/                # AI 建议生成
+│   │   ├── index.js          # 营养分析、建议生成
+│   │   ├── package.json      # 依赖：wx-server-sdk
+│   │   └── config.json       # 运行配置
+│   │
+│   └── foodRecognitionQwen/   # 食物图片识别
+│       ├── index.js          # 通义千问视觉模型调用
+│       ├── package.json      # 依赖：wx-server-sdk, openai
+│       └── config.json       # 运行配置
 │
-├── 接口整合文档.md            # ⭐ 完整接口文档（必读）
-├── 前端功能设计与任务分组.md  # 详细功能设计文档
-└── 重构说明.md                # 代码重构说明
+├── 📁 miniprogram/              # 小程序前端
+│   ├── 📁 pages/               # 页面模块
+│   │   ├── home/              # 🏠 首页（数据概览）
+│   │   ├── profile/           # 👤 个人信息设置
+│   │   ├── plan/              # 📋 计划管理
+│   │   │   ├── generate/     # 生成新计划
+│   │   │   └── detail/       # 计划详情
+│   │   ├── diet/              # 🍽️ 饮食管理
+│   │   │   ├── index/        # 饮食记录首页
+│   │   │   ├── camera/       # 拍照识别
+│   │   │   ├── search/       # 搜索食物
+│   │   │   ├── manual/       # 手动输入
+│   │   │   ├── custom-dishes/ # 自定义菜品
+│   │   │   └── favorites/    # 常用食物
+│   │   ├── exercise/          # 💪 运动管理
+│   │   │   ├── index/        # 运动记录
+│   │   │   └── recommend/    # 运动推荐
+│   │   ├── report/            # 📊 每日评价
+│   │   │   └── daily/        # 每日报告
+│   │   ├── stats/             # 📈 数据统计
+│   │   │   └── index/        # 统计图表
+│   │   ├── recipe-recommend/  # 🥗 食谱推荐
+│   │   ├── recipe-detail/     # 食谱详情
+│   │   ├── ai-suggestion/     # 🤖 AI 建议
+│   │   └── mine/              # 👥 个人中心
+│   │
+│   ├── 📁 utils/               # 工具模块
+│   │   ├── cloudApi.js        # ⭐ 云函数统一调用（核心）
+│   │   ├── calculator.js      # 健康计算工具（BMR/TDEE/BMI）
+│   │   ├── recipeEngine.js    # 食谱推荐引擎
+│   │   ├── recipeData.js      # 食谱数据
+│   │   └── README.md          # 工具函数使用文档
+│   │
+│   ├── 📁 components/          # 自定义组件
+│   │   └── cloudTipModal/     # 云开发提示组件
+│   │
+│   ├── 📁 images/              # 图片资源
+│   │   └── icons/             # 图标资源
+│   │
+│   ├── app.js                 # 小程序入口
+│   ├── app.json               # 全局配置
+│   └── app.wxss               # 全局样式
+│
+├── 📄 接口整合文档.md            # ⭐ API 接口完整文档（必读）
+├── 📄 exercise_db.json         # 运动数据库
+├── 📄 api.env                  # 环境变量配置
+├── 📄 package.json             # 项目依赖
+└── 📄 project.config.json      # 微信开发者工具配置
 ```
 
-## 核心功能
+## 🎨 核心功能
 
-### 1. 用户管理
-- 个人信息管理（性别、年龄、身高、体重等）
-- 自动计算BMI、BMR、TDEE等健康指标
-- 目标设置与活动等级配置
+### 1️⃣ 用户画像管理
 
-### 2. 计划管理
-- 智能生成减重/增重计划
-- 动态调整每日热量目标
-- 计划健康性评估
+<table>
+<tr>
+<td width="50%">
 
-### 3. 饮食管理
-- **AI拍照识别食物**（基于通义千问视觉模型）
-- 三层食物搜索（本地数据库 + AI估算 + Open Food Facts API）
-- 饮食记录按餐次管理
-- 用户自定义菜品
-- 常用食物智能推荐
+**📝 个人信息管理**
+- 性别、年龄、身高、体重
+- 目标设置（减脂/增肌/维持）
+- 活动等级选择
 
-### 4. 运动管理
-- 运动记录与推荐
-- 运动消耗计算
-- 运动库浏览
+</td>
+<td width="50%">
 
-### 5. 每日评价
-- 热量差分析（红绿灯系统）
-- 营养评分（0-100分）
-- AI生成个性化建议
+**📊 健康指标计算**
+- BMI（身体质量指数）
+- BMR（基础代谢率）
+- TDEE（每日总能量消耗）
 
-### 6. 数据统计
-- 体重变化趋势图
-- 营养素摄入统计
-- 达标率分析
+</td>
+</tr>
+</table>
 
-### 7. AI智能建议
-- 基于历史数据的营养分析
-- 个性化饮食建议
-- 食谱智能推荐
+---
 
-## 技术栈
+### 2️⃣ 智能计划生成
 
-### 前端
-- 微信小程序原生开发
-- 云开发能力（云函数、云数据库、云存储）
+<table>
+<tr>
+<td width="50%">
 
-### 后端（云函数）
-- Node.js
-- 微信云开发SDK
-- 通义千问 API（AI能力）
-- Open Food Facts API（食物数据）
+**🎯 计划创建**
+- 输入目标体重变化
+- 设置计划周期
+- 自动计算每日热量目标
 
-### 数据库
-- 云数据库
-  - UserProfiles：用户信息
-  - Plans：减重计划
-  - DietLog：饮食记录
-  - FoodDB：食物数据库
-  - UserDishes：用户自定义菜品
-  - ExerciseLog：运动记录
-  - DailyEvaluations：每日评价
+</td>
+<td width="50%">
 
-## 快速开始
+**🔄 动态调整**
+- 根据实际执行情况调整
+- 健康性智能评估
+- 进度可视化追踪
 
-### 1. 环境准备
-- 安装[微信开发者工具](https://developers.weixin.qq.com/miniprogram/dev/devtools/download.html)
-- 注册微信小程序账号并开通云开发
+</td>
+</tr>
+</table>
 
-### 2. 配置云开发
-1. 在`miniprogram/app.js`中配置云开发环境ID
-2. 在云函数中配置通义千问API Key（环境变量）
+---
 
-### 3. 部署云函数
+### 3️⃣ 饮食管理系统
+
+#### 🔍 三层智能搜索策略
+
+```
+第一层：本地数据库（极速响应 < 100ms）
+   ↓ 未找到
+第二层：AI 智能估算（准确度 85%+）
+   ↓ 失败
+第三层：Open Food Facts API（海量数据）
+```
+
+#### 📸 AI 拍照识食
+
+- 基于**通义千问视觉大模型**
+- 支持多食物同时识别
+- 自动计算营养成分
+- 可编辑调整份量
+
+#### 📋 记录管理
+
+- ✅ 按餐次分类（早/午/晚/加餐）
+- ✅ 自定义菜品库
+- ✅ 常用食物智能置顶
+- ✅ 热量/营养素实时汇总
+
+---
+
+### 4️⃣ 运动管理
+
+<table>
+<tr>
+<td width="50%">
+
+**💪 运动记录**
+- 运动类型选择
+- 时长/消耗记录
+- 按日期查看历史
+
+</td>
+<td width="50%">
+
+**🎯 智能推荐**
+- 根据热量差推荐运动
+- 多种运动方案可选
+- 消耗量精准计算
+
+</td>
+</tr>
+</table>
+
+---
+
+### 5️⃣ 每日评价系统
+
+#### 🚦 红绿灯评价系统
+
+| 颜色 | 热量差偏差 | 状态 |
+|------|-----------|------|
+| 🟢 绿灯 | ≤ 100 kcal | 完美 |
+| 🟡 黄灯 | 100-300 kcal | 良好 |
+| 🔴 红灯 | > 300 kcal | 需调整 |
+
+#### 📈 营养评分（0-100分）
+
+- 蛋白质摄入评分（40分）
+- 碳水化合物评分（35分）
+- 脂肪摄入评分（25分）
+- 🤖 AI 生成个性化建议
+
+---
+
+### 6️⃣ 数据可视化
+
+```
+📊 体重趋势图
+├─ 折线图展示体重变化
+├─ 目标对比
+└─ 达标率计算
+
+📉 营养统计
+├─ 三大营养素占比
+├─ 热量摄入趋势
+└─ 营养均衡分析
+```
+
+---
+
+### 7️⃣ AI 智能助手
+
+**🤖 基于通义千问 AI**
+
+- 📝 **营养分析**：分析近7日饮食数据，识别营养缺口
+- 🥗 **食谱推荐**：根据偏好和目标推荐食谱
+- 💡 **建议生成**：提供可执行的改善建议
+- 🎯 **个性化定制**：适配不同健康目标
+
+---
+
+## 🏗️ 技术架构
+
+### 整体架构
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                     微信小程序前端                        │
+│  ┌──────────┬──────────┬──────────┬──────────┐          │
+│  │  首页    │  饮食    │  运动    │  统计    │          │
+│  └────┬─────┴────┬─────┴────┬─────┴────┬─────┘          │
+│       │          │          │          │                 │
+│       └──────────┴──────────┴──────────┘                 │
+│                  │                                       │
+│            utils/cloudApi.js (统一调用层)                │
+└───────────────────┼──────────────────────────────────────┘
+                    │
+        ┌───────────┼───────────┐
+        │           │           │
+        ▼           ▼           ▼
+  ┌─────────┐ ┌──────────┐ ┌──────────┐
+  │ health  │ │  diet    │ │  qwen    │  ← 云函数
+  │ Service │ │ Service  │ │   AI     │
+  └────┬────┘ └────┬─────┘ └────┬─────┘
+       │           │            │
+       └───────────┴────────────┘
+                   │
+            ┌──────┴──────┐
+            │             │
+            ▼             ▼
+      ┌──────────┐  ┌──────────┐
+      │ 云数据库  │  │ 云存储    │
+      └──────────┘  └──────────┘
+```
+
+### 前端技术栈
+
+| 技术 | 版本 | 用途 |
+|------|------|------|
+| 微信小程序 | 最新 | 前端框架 |
+| ES6+ | - | JavaScript语法 |
+| WXML/WXSS | - | 页面结构与样式 |
+| 微信云开发SDK | 3.12.1+ | 云能力调用 |
+
+### 后端技术栈（云函数）
+
+| 云函数 | 技术栈 | 依赖包 | 功能 |
+|--------|--------|--------|------|
+| **healthService** | Node.js 18.15 | `wx-server-sdk@2.6.3` | 用户信息、计划、评价、运动 |
+| **dietService** | Node.js 18.15 | `wx-server-sdk@2.4.0`<br>`axios@1.6.0` | 食物搜索、识别、记录、热量计算 |
+| **qwenAI** | Node.js 18.15 | `wx-server-sdk@2.6.3` | AI分析、建议生成 |
+| **foodRecognitionQwen** | Node.js 18.15 | `wx-server-sdk@2.4.0`<br>`openai@4.9.1` | 图片识别（通义千问VL） |
+
+### 数据库设计
+
+#### 集合列表
+
+| 集合名 | 说明 | 权限 | 关键字段 |
+|--------|------|------|----------|
+| **UserProfiles** | 用户信息 | 仅创建者可读写 | gender, age, height, weight, bmr, tdee, bmi |
+| **Plans** | 减重计划 | 仅创建者可读写 | targetWeightChange, totalDays, dailyDeficit |
+| **DietLog** | 饮食记录 | 仅创建者可读写 | name, calories, protein, fat, carbs, mealType |
+| **ExerciseLog** | 运动记录 | 仅创建者可读写 | name, duration, calories, date |
+| **FoodDB** | 食物数据库 | 所有用户可读<br>仅创建者可写 | name, calories, protein, fat, carbs, source |
+| **UserDishes** | 自定义菜品 | 仅创建者可读写 | name, calories, ingredients, servingSize |
+| **DailyEvaluations** | 每日评价 | 仅创建者可读写 | date, actualDeficit, nutritionScore, suggestions |
+
+### 外部 API 集成
+
+```
+┌─────────────────────────────────────────┐
+│  通义千问 API (DashScope)                │
+│  ├─ 视觉模型 (qwen-vl-max)              │
+│  │  └─ 食物图片识别                     │
+│  └─ 文本模型 (qwen-turbo)               │
+│     └─ 营养分析、建议生成                │
+└─────────────────────────────────────────┘
+
+┌─────────────────────────────────────────┐
+│  Open Food Facts API                    │
+│  └─ 食物营养数据查询（兜底方案）          │
+└─────────────────────────────────────────┘
+```
+
+---
+
+## 🚀 快速开始
+
+### 环境准备
+
+#### 1. 安装开发工具
+
+- [微信开发者工具](https://developers.weixin.qq.com/miniprogram/dev/devtools/download.html) （最新稳定版）
+- Node.js 16+ （用于云函数依赖安装）
+
+#### 2. 注册账号
+
+1. 注册[微信小程序账号](https://mp.weixin.qq.com/wxopen/waregister?action=step1)
+2. 开通[云开发服务](https://developers.weixin.qq.com/miniprogram/dev/wxcloud/basis/getting-started.html)（免费版即可）
+
+#### 3. 获取 API Key
+
+申请[通义千问 API Key](https://dashscope.aliyuncs.com/)（用于 AI 功能）
+
+---
+
+### 部署步骤
+
+#### 第一步：克隆项目
+
 ```bash
-# 在微信开发者工具中右键云函数文件夹，选择"上传并部署"
+git clone https://github.com/ALostElk/lightburning.git
+cd lightburning
 ```
 
-### 4. 初始化数据库
-调用云函数初始化内置食物数据：
+#### 第二步：配置云开发环境
+
+1. 用微信开发者工具打开项目
+2. 修改 `miniprogram/app.js`，配置您的云开发环境 ID：
+
 ```javascript
-wx.cloud.callFunction({
-  name: 'dietService',
-  data: {
-    action: 'initBuiltinFoods'
+App({
+  onLaunch() {
+    wx.cloud.init({
+      env: 'your-env-id',  // ← 改为您的环境ID
+      traceUser: true 
+    })
   }
 })
 ```
 
+#### 第三步：配置 API Key
+
+在云开发控制台设置环境变量：
+
+1. 打开**云开发控制台** → **设置** → **环境变量**
+2. 添加以下变量：
+
+| 变量名 | 值 | 用途 |
+|--------|-----|------|
+| `DASHSCOPE_API_KEY` | `sk-xxxxx` | 通义千问 API Key |
+
+#### 第四步：部署云函数
+
+**重要：必须选择"云端安装依赖"！**
+
+在微信开发者工具中，对以下 4 个云函数依次操作：
+
+1. 右键点击云函数文件夹
+2. 选择 **"上传并部署：云端安装依赖"**
+3. 等待部署完成
+
+需部署的云函数：
+- ✅ `healthService`
+- ✅ `dietService`
+- ✅ `qwenAI`
+- ✅ `foodRecognitionQwen`
+
+#### 第五步：创建数据库集合
+
+在云开发控制台 → 数据库，创建以下集合：
+
+```bash
+# 用户相关
+UserProfiles          # 权限：仅创建者可读写
+Plans                 # 权限：仅创建者可读写
+
+# 记录相关
+DietLog               # 权限：仅创建者可读写
+ExerciseLog           # 权限：仅创建者可读写
+exercise_records      # 权限：仅创建者可读写（备用）
+
+# 数据库
+FoodDB                # 权限：所有用户可读，仅创建者可写
+UserDishes            # 权限：仅创建者可读写
+
+# 评价相关
+DailyEvaluations      # 权限：仅创建者可读写
+```
+
+#### 第六步：初始化食物数据
+
+在微信开发者工具的 Console 控制台执行：
+
+```javascript
+wx.cloud.callFunction({
+  name: 'dietService',
+  data: { action: 'initBuiltinFoods' }
+}).then(res => {
+  console.log('初始化成功:', res);
+});
+```
+
+成功后会看到类似提示：
+```
+已添加 45 条食物数据
+```
+
+#### 第七步：运行小程序
+
+点击**编译**按钮，即可在模拟器中体验！
+
+---
+
 ## 📚 开发文档
 
-- [⭐ 接口整合文档](接口整合文档.md) - **必读**！所有API接口的详细使用说明
-- [工具模块说明](miniprogram/utils/README.md) - Utils 工具函数使用指南
-- [前端功能设计与任务分组](前端功能设计与任务分组.md) - 详细的功能设计和任务划分
-- [重构说明](重构说明.md) - 代码重构的背景和原则
+| 文档 | 说明 | 重要性 |
+|------|------|--------|
+| [⭐ 接口整合文档](接口整合文档.md) | 所有 API 接口详细说明 | ⭐⭐⭐⭐⭐ |
+| [工具模块说明](miniprogram/utils/README.md) | Utils 工具函数使用指南 | ⭐⭐⭐⭐ |
 
-## API 快速参考
+### API 快速参考
 
-详见 [接口整合文档.md](接口整合文档.md)
+#### 健康服务 (healthService)
 
-主要API包括：
+```javascript
+import * as api from '../../utils/cloudApi.js';
 
-### 健康服务
-- `api.updateProfile(data)` - 更新用户信息
-- `api.getProfile()` - 获取用户信息
-- `api.generatePlan(targetWeightChange, totalDays)` - 生成减重计划
-- `api.evaluateDaily(date)` - 每日评价
-- `api.recommendExercise()` - 推荐运动
-- `api.logExercise(data)` - 记录运动
+// 更新用户信息
+await api.updateProfile({ 
+  gender: 'male', 
+  age: 25, 
+  height: 175, 
+  weight: 70 
+});
 
-### 饮食服务
-- `api.searchFood(keyword)` - 搜索食物
-- `api.recognizeFood(input)` - 拍照识别食物
-- `api.addDietLog(record)` - 添加饮食记录
-- `api.getDietLogs(date)` - 获取饮食记录
-- `api.addCustomDish(dish)` - 添加自定义菜品
+// 获取用户信息
+const profile = await api.getProfile();
 
-### AI 服务
-- `api.analyzeAndRecommend(...)` - AI分析并生成建议
-- `api.generateRecipeReason(...)` - 生成食谱推荐理由
+// 生成减重计划（目标减5kg，60天完成）
+await api.generatePlan(-5, 60);
 
-### 食谱推荐
-- `api.getRecommendedRecipes(options)` - 获取推荐食谱
-- `api.analyzeNutritionGap(days)` - 分析营养缺口
+// 每日评价
+const evaluation = await api.evaluateDaily('2025-12-09');
 
-## 开发说明
+// 推荐运动
+const exercises = await api.recommendExercise();
 
-### 目录规范
-- 页面文件：每个页面包含 `.js`, `.wxml`, `.wxss`, `.json` 四个文件
-- 云函数：每个云函数包含 `index.js`, `package.json`, `config.json`
-- 工具函数：放在 `utils/` 目录下
+// 记录运动
+await api.logExercise({
+  name: '慢跑',
+  duration: 30,
+  calories: 300
+});
+```
+
+#### 饮食服务 (dietService)
+
+```javascript
+// 搜索食物
+const result = await api.searchFood('鸡胸肉');
+
+// 拍照识别食物
+const foods = await api.recognizeFood({ 
+  fileID: 'cloud://xxx.jpg' 
+});
+
+// 添加饮食记录
+await api.addDietLog({
+  name: '鸡胸肉',
+  calories: 165,
+  protein: 31,
+  fat: 3.6,
+  carbs: 0,
+  amount: 150,
+  unit: 'g',
+  mealType: 'lunch'
+});
+
+// 获取今日饮食记录
+const logs = await api.getDietLogs('2025-12-09');
+
+// 添加自定义菜品
+await api.addCustomDish({
+  name: '我的特制沙拉',
+  calories: 320,
+  protein: 25,
+  fat: 10,
+  carbs: 35
+});
+```
+
+#### AI 服务 (qwenAI)
+
+```javascript
+// AI 营养分析与建议
+const suggestion = await api.analyzeAndRecommend(
+  userData,      // 用户信息
+  dietRecords,   // 饮食记录
+  nutritionGap   // 营养缺口
+);
+
+// 生成食谱推荐理由
+const reason = await api.generateRecipeReason(
+  recipe,        // 食谱信息
+  userData,      // 用户信息
+  nutritionGap   // 营养缺口
+);
+```
+
+#### 食谱推荐
+
+```javascript
+// 获取推荐食谱
+const recipes = await api.getRecommendedRecipes({
+  type: 'goal',   // 'goal' | 'preference' | 'ai'
+  limit: 5
+});
+
+// 分析营养缺口（近7天）
+const gap = await api.analyzeNutritionGap(7);
+
+// 获取常吃食材
+const ingredients = await api.getFavoriteIngredients(10);
+```
+
+---
+
+## 💻 开发规范
 
 ### 代码规范
-- 使用ES6+语法
-- ⭐ **所有云函数调用必须通过 `utils/cloudApi.js`**，禁止直接调用 `wx.cloud.callFunction()`
-- 健康计算统一使用 `utils/calculator.js` 中的方法
-- 错误处理使用统一的 `api.handleError()` 方法
-- 成功提示使用统一的 `api.showSuccess()` 方法
 
-### 安全注意事项
-- ❌ 不要在前端代码中直接使用 API Key
-- ✅ 所有 AI 调用必须通过云函数进行
-- ✅ 已移除前端的 `qwenService.js`，避免 API Key 泄露
+✅ **必须遵守**
 
-## 许可
+1. 所有云函数调用**必须通过** `utils/cloudApi.js`
+   ```javascript
+   // ❌ 错误
+   wx.cloud.callFunction({ name: 'healthService', ... })
+   
+   // ✅ 正确
+   import * as api from '../../utils/cloudApi.js';
+   await api.getProfile();
+   ```
 
-MIT License
+2. 健康计算使用 `utils/calculator.js`
+   ```javascript
+   import { calculateBMR, calculateTDEE } from '../../utils/calculator.js';
+   ```
+
+3. 统一错误处理
+   ```javascript
+   try {
+     await api.updateProfile(data);
+     api.showSuccess('保存成功');
+   } catch (error) {
+     api.handleError(error, '保存失败');
+   }
+   ```
+
+### 文件命名规范
+
+```
+pages/
+  ├── module-name/
+  │   ├── index.js      # 页面逻辑
+  │   ├── index.wxml    # 页面结构
+  │   ├── index.wxss    # 页面样式
+  │   └── index.json    # 页面配置
+```
+
+### Git 提交规范
+
+```bash
+feat: 新功能
+fix: 修复bug
+docs: 文档更新
+style: 代码格式调整
+refactor: 重构
+perf: 性能优化
+test: 测试相关
+```
+
+---
+
+## ⚠️ 安全注意事项
+
+### ❌ 严禁以下操作
+
+1. **前端代码中直接使用 API Key**
+2. **跳过云函数直接调用第三方 API**
+3. **在代码中硬编码敏感信息**
+
+### ✅ 安全实践
+
+1. **API Key 存储在云函数环境变量中**
+2. **所有 AI 调用通过云函数中转**
+3. **数据库权限使用"仅创建者可读写"**
+
+---
+
+## 🤝 贡献指南
+
+欢迎提交 Issue 和 Pull Request！
+
+### 开发流程
+
+1. Fork 本仓库
+2. 创建特性分支 (`git checkout -b feature/AmazingFeature`)
+3. 提交更改 (`git commit -m 'feat: Add some AmazingFeature'`)
+4. 推送到分支 (`git push origin feature/AmazingFeature`)
+5. 提交 Pull Request
+
+---
+
+## 📄 许可证
+
+本项目采用 [MIT License](https://opensource.org/licenses/MIT) 开源协议。
+
+---
+
+## 📮 联系方式
+
+- **项目地址**: [https://github.com/ALostElk/lightburning](https://github.com/ALostElk/lightburning)
+- **问题反馈**: [Issues](https://github.com/ALostElk/lightburning/issues)
+
+---
+
+<div align="center">
+
+**⭐ 如果这个项目对您有帮助，请给个 Star 支持一下！⭐**
+
+Made with ❤️ by LightBurning Team
+
+</div>
