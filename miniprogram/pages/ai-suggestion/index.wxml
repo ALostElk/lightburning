@@ -152,28 +152,28 @@
         <view class="analysis-item">
           <text class="analysis-label">蛋白质缺口</text>
           <text class="analysis-value {{nutritionGap.proteinDeficit > 0 ? 'deficit' : 'surplus'}}">
-            {{nutritionGap.proteinDeficit > 0 ? '-' : '+'}}{{Math.round(nutritionGap.proteinDeficit > 0 ? nutritionGap.proteinDeficit : nutritionGap.proteinExcess)}}g
+            {{nutritionGapDisplay.protein.sign}}{{nutritionGapDisplay.protein.value}}g
           </text>
         </view>
 
         <view class="analysis-item">
           <text class="analysis-label">碳水缺口</text>
           <text class="analysis-value {{nutritionGap.carbsDeficit > 0 ? 'deficit' : 'surplus'}}">
-            {{nutritionGap.carbsDeficit > 0 ? '-' : '+'}}{{Math.round(nutritionGap.carbsDeficit > 0 ? nutritionGap.carbsDeficit : nutritionGap.carbsExcess)}}g
+            {{nutritionGapDisplay.carbs.sign}}{{nutritionGapDisplay.carbs.value}}g
           </text>
         </view>
 
         <view class="analysis-item">
           <text class="analysis-label">脂肪缺口</text>
           <text class="analysis-value {{nutritionGap.fatDeficit > 0 ? 'deficit' : 'surplus'}}">
-            {{nutritionGap.fatDeficit > 0 ? '-' : '+'}}{{Math.round(nutritionGap.fatDeficit > 0 ? nutritionGap.fatDeficit : nutritionGap.fatExcess)}}g
+            {{nutritionGapDisplay.fat.sign}}{{nutritionGapDisplay.fat.value}}g
           </text>
         </view>
 
         <view class="analysis-item">
           <text class="analysis-label">热量缺口</text>
           <text class="analysis-value {{nutritionGap.caloriesDeficit > 0 ? 'deficit' : 'surplus'}}">
-            {{nutritionGap.caloriesDeficit > 0 ? '-' : '+'}}{{Math.round(nutritionGap.caloriesDeficit > 0 ? nutritionGap.caloriesDeficit : nutritionGap.caloriesExcess)}}卡
+            {{nutritionGapDisplay.calories.sign}}{{nutritionGapDisplay.calories.value}}卡
           </text>
         </view>
       </view>

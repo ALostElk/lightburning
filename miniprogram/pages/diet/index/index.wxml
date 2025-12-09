@@ -1,0 +1,68 @@
+<view class="diet-container">
+  <view class="header">
+    <view class="date-nav">
+      <view class="date-selector">
+        <text class="current-date">{{currentDate}}</text>
+      </view>
+    </view>
+    
+    <view class="daily-summary">
+      <view class="summary-item">
+        <text class="label">已摄入</text>
+        <text class="value primary">{{consumedCalories}}</text>
+        <text class="unit">千卡</text>
+      </view>
+      <view class="divider"></view>
+      <view class="summary-item">
+        <text class="label">目标</text>
+        <text class="value">{{targetCalories}}</text>
+        <text class="unit">千卡</text>
+      </view>
+      <view class="divider"></view>
+      <view class="summary-item">
+        <text class="label">剩余</text>
+        <text class="value {{remaining >= 0 ? 'success' : 'danger'}}">{{remaining}}</text>
+        <text class="unit">千卡</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="action-buttons">
+    <view class="action-btn" bindtap="goToCamera">
+      <view class="btn-icon-text">📷</view>
+      <text class="btn-text">拍照识别</text>
+    </view>
+    <view class="action-btn" bindtap="goToSearch">
+      <view class="btn-icon-text">🔍</view>
+      <text class="btn-text">搜索食物</text>
+    </view>
+    <view class="action-btn" bindtap="goToManual">
+      <view class="btn-icon-text">➕</view>
+      <text class="btn-text">手动添加</text>
+    </view>
+  </view>
+
+  <view class="meals-section">
+    <view class="meal-group" wx:for="{{meals}}" wx:key="type">
+      <view class="meal-header">
+        <text class="meal-name">{{item.name}}</text>
+        <text class="meal-calories">{{item.calories}} 千卡</text>
+      </view>
+      <view class="food-list" wx:if="{{item.foods.length > 0}}">
+        <view class="food-item" wx:for="{{item.foods}}" wx:key="id" wx:for-item="food">
+          <view class="food-info">
+            <text class="food-name">{{food.name}}</text>
+            <text class="food-detail">{{food.amount}}{{food.unit}} · {{food.calories}}千卡</text>
+          </view>
+          <view class="food-actions">
+            <text class="action-text" bindtap="editFood" data-meal="{{item.type}}" data-id="{{food.id}}">编辑</text>
+            <text class="action-text delete" bindtap="deleteFood" data-meal="{{item.type}}" data-id="{{food.id}}">删除</text>
+          </view>
+        </view>
+      </view>
+      <view class="empty-meal" wx:else bindtap="addMeal" data-type="{{item.type}}">
+        <text class="empty-text">点击添加{{item.name}}食物</text>
+      </view>
+    </view>
+  </view>
+</view>

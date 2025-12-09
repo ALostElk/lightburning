@@ -2,16 +2,16 @@
  * 食谱推荐核心算法
  * 基于用户目标、偏好和营养摄入情况进行智能推荐
  * 集成通义千问AI进行智能分析
+ * 
+ * 注意：本模块已优化为统一通过云函数调用，不再直接调用AI服务
  */
 
-const { QwenAIService } = require('./qwenService.js');
+const api = require('./cloudApi.js');
 
 class RecipeRecommendEngine {
   constructor() {
     this.app = getApp();
-    this.aiService = new QwenAIService();
     this.useAI = true; // 是否启用AI分析
-    this.useCloudFunction = true; // 是否使用云函数（推荐）
   }
 
   /**
@@ -230,12 +230,16 @@ class RecipeRecommendEngine {
    * @returns {Promise<array>} - AI生成的建议列表
    */
   async generateAISuggestion(nutritionGap) {
-    // 如果启用AI且使用云函数
-    if (this.useAI && this.useCloudFunction) {
+    // 如果启用AI，统一通过云函数调用
+    if (this.useAI) {
       try {
-        const aiResult = await this.getAIAnalysisFromCloud(nutritionGap);
-        if (aiResult.success && aiResult.data.suggestions) {
-          return aiResult.data.suggestions.map(s => ({
+        const userData = wx.getStorageSync('userInfo') || {};
+        const dietRecords = this.getRecentDietRecords(7);
+        
+        const res = await api.analyzeAndRecommend(userData, dietRecords, nutritionGap);
+        
+        if (res.result && res.result.success && res.result.data.suggestions) {
+          return res.result.data.suggestions.map(s => ({
             type: s.type || 'general',
             message: s.message,
             title: s.title || '',
@@ -251,47 +255,6 @@ class RecipeRecommendEngine {
 
     // 降级到默认规则生成
     return this.generateDefaultSuggestions(nutritionGap);
-  }
-
-  /**
-   * 使用云函数获取AI分析
-   */
-  async getAIAnalysisFromCloud(nutritionGap) {
-    return new Promise((resolve, reject) => {
-      wx.cloud.callFunction({
-        name: 'qwenAI',
-        data: {
-          action: 'analyzeAndRecommend',
-          userData: wx.getStorageSync('userInfo') || {},
-          dietRecords: this.getRecentDietRecords(7),
-          nutritionGap: nutritionGap
-        },
-        success: (res) => {
-          if (res.result && res.result.success) {
-            resolve(res.result);
-          } else {
-            reject(new Error('云函数返回失败'));
-          }
-        },
-        fail: (err) => {
-          reject(err);
-        }
-      });
-    });
-  }
-
-  /**
-   * 直接调用AI服务（备用方案）
-   */
-  async getAIAnalysisDirect(nutritionGap) {
-    const userData = wx.getStorageSync('userInfo') || {};
-    const dietRecords = this.getRecentDietRecords(7);
-    
-    return await this.aiService.analyzeAndRecommend(
-      userData,
-      dietRecords,
-      nutritionGap
-    );
   }
 
   /**
@@ -371,34 +334,12 @@ class RecipeRecommendEngine {
       const userData = wx.getStorageSync('userInfo') || {};
       const nutritionGap = this.analyzeNutritionGap(7);
 
-      if (this.useCloudFunction) {
-        return new Promise((resolve, reject) => {
-          wx.cloud.callFunction({
-            name: 'qwenAI',
-            data: {
-              action: 'generateRecipeReason',
-              recipe: recipe,
-              userData: userData,
-              nutritionGap: nutritionGap
-            },
-            success: (res) => {
-              if (res.result && res.result.success) {
-                resolve(res.result.reason);
-              } else {
-                resolve(null);
-              }
-            },
-            fail: () => resolve(null)
-          });
-        });
-      } else {
-        const result = await this.aiService.generateRecipeReason(
-          recipe,
-          userData,
-          nutritionGap
-        );
-        return result;
+      const res = await api.generateRecipeReason(recipe, userData, nutritionGap);
+      
+      if (res.result && res.result.success) {
+        return res.result.reason;
       }
+      return null;
     } catch (error) {
       console.warn('生成推荐理由失败:', error);
       return null;

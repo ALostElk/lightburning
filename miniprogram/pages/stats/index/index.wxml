@@ -1,0 +1,94 @@
+<!--pages/stats/index/index.wxml-->
+<view class="container">
+  <view class="header">
+    <text class="title">数据统计</text>
+  </view>
+
+  <!-- 时间范围选择 -->
+  <view class="time-range">
+    <view class="range-btn {{timeRange === 7 ? 'active' : ''}}" data-range="7" bindtap="onTimeRangeChange">7天</view>
+    <view class="range-btn {{timeRange === 30 ? 'active' : ''}}" data-range="30" bindtap="onTimeRangeChange">30天</view>
+    <view class="range-btn {{timeRange === 90 ? 'active' : ''}}" data-range="90" bindtap="onTimeRangeChange">90天</view>
+  </view>
+
+  <!-- 饮食统计 -->
+  <view class="card">
+    <view class="card-title">📊 饮食统计</view>
+    
+    <view class="summary-grid">
+      <view class="summary-item">
+        <text class="summary-value primary">{{dietSummary.totalCalories}}</text>
+        <text class="summary-label">总热量(kcal)</text>
+      </view>
+      <view class="summary-item">
+        <text class="summary-value">{{dietSummary.avgCalories}}</text>
+        <text class="summary-label">日均热量</text>
+      </view>
+      <view class="summary-item">
+        <text class="summary-value protein">{{dietSummary.totalProtein}}g</text>
+        <text class="summary-label">蛋白质</text>
+      </view>
+      <view class="summary-item">
+        <text class="summary-value carbs">{{dietSummary.totalCarbs}}g</text>
+        <text class="summary-label">碳水</text>
+      </view>
+      <view class="summary-item">
+        <text class="summary-value fat">{{dietSummary.totalFat}}g</text>
+        <text class="summary-label">脂肪</text>
+      </view>
+      <view class="summary-item">
+        <text class="summary-value">{{dietLogs.length}}</text>
+        <text class="summary-label">记录次数</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 运动统计 -->
+  <view class="card">
+    <view class="card-title">💪 运动统计</view>
+    
+    <view class="summary-grid">
+      <view class="summary-item">
+        <text class="summary-value primary">{{exerciseSummary.totalDuration}}</text>
+        <text class="summary-label">总时长(分钟)</text>
+      </view>
+      <view class="summary-item">
+        <text class="summary-value">{{exerciseSummary.totalCalories}}</text>
+        <text class="summary-label">总消耗(kcal)</text>
+      </view>
+      <view class="summary-item">
+        <text class="summary-value">{{exerciseSummary.avgCalories}}</text>
+        <text class="summary-label">平均消耗</text>
+      </view>
+      <view class="summary-item">
+        <text class="summary-value">{{exerciseSummary.count}}</text>
+        <text class="summary-label">运动次数</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 体重变化 -->
+  <view class="card" wx:if="{{weightRecords.length > 0}}">
+    <view class="card-title">⚖️ 体重变化</view>
+    
+    <view class="weight-change">
+      <text class="weight-value {{weightChange < 0 ? 'decrease' : 'increase'}}">
+        {{weightChange > 0 ? '+' : ''}}{{weightChange}}kg
+      </text>
+      <text class="weight-label">近{{timeRange}}天变化</text>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{dietLogs.length === 0 && exerciseLogs.length === 0 && !loading}}">
+    <text class="empty-icon">📊</text>
+    <text class="empty-text">暂无统计数据</text>
+    <text class="empty-hint">开始记录饮食和运动吧</text>
+  </view>
+
+  <!-- 加载状态 -->
+  <view class="loading-state" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+</view>
+

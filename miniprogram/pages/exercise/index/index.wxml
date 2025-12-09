@@ -1,0 +1,70 @@
+<!--pages/exercise/index/index.wxml-->
+<view class="container">
+  <view class="header">
+    <text class="title">运动管理</text>
+  </view>
+
+  <!-- 今日运动概览 -->
+  <view class="card summary-card">
+    <view class="summary-item">
+      <text class="summary-label">总时长</text>
+      <text class="summary-value">{{todayTotal.duration}}分钟</text>
+    </view>
+    <view class="summary-item">
+      <text class="summary-label">总消耗</text>
+      <text class="summary-value">{{todayTotal.calories}}kcal</text>
+    </view>
+  </view>
+
+  <!-- 快捷操作 -->
+  <view class="action-buttons">
+    <view class="action-btn" bindtap="goToLibrary">
+      <text class="action-icon">📚</text>
+      <text class="action-text">运动库</text>
+    </view>
+    <view class="action-btn" bindtap="goToRecommend">
+      <text class="action-icon">🎯</text>
+      <text class="action-text">智能推荐</text>
+    </view>
+  </view>
+
+  <!-- 今日运动记录 -->
+  <view class="card" wx:if="{{logs.length > 0}}">
+    <view class="card-title">今日记录</view>
+    
+    <view class="log-list">
+      <view class="log-item" wx:for="{{logs}}" wx:key="_id">
+        <view class="log-info">
+          <text class="log-name">{{item.name}}</text>
+          <text class="log-meta">{{item.duration}}分钟 · {{item.calories}}kcal</text>
+        </view>
+        <view class="log-action" data-id="{{item._id}}" bindtap="deleteLog">
+          <text>删除</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 推荐运动 -->
+  <view class="card" wx:if="{{recommended.length > 0}}">
+    <view class="card-title">推荐运动</view>
+    
+    <view class="exercise-list">
+      <view class="exercise-item" wx:for="{{recommended}}" wx:key="id">
+        <view class="exercise-info">
+          <text class="exercise-name">{{item.name}}</text>
+          <text class="exercise-meta">{{item.duration}}分钟 · {{item.calories}}kcal</text>
+        </view>
+        <button class="add-btn" data-exercise="{{item}}" bindtap="onAddExercise">记录</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{logs.length === 0 && !loading}}">
+    <text class="empty-icon">💪</text>
+    <text class="empty-text">今天还没有运动记录</text>
+    <text class="empty-hint">点击上方按钮开始记录</text>
+  </view>
+</view>
+

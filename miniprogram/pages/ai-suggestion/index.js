@@ -1,11 +1,18 @@
 // pages/ai-suggestion/index.js
 const { RecipeRecommendEngine } = require('../../utils/recipeEngine.js');
 const { generateMockDietRecords } = require('../../utils/recipeData.js');
+const api = require('../../utils/cloudApi.js');
 
 Page({
   data: {
     loading: true,
     nutritionGap: null,
+    nutritionGapDisplay: {
+      protein: { sign: '', value: 0 },
+      carbs: { sign: '', value: 0 },
+      fat: { sign: '', value: 0 },
+      calories: { sign: '', value: 0 }
+    },
     suggestions: [],
     recommendedRecipes: [],
     weeklyStats: null,
@@ -62,9 +69,13 @@ Page({
 
       // 计算每周统计
       const weeklyStats = this.calculateWeeklyStats();
+      
+      // 格式化营养缺口显示数据
+      const nutritionGapDisplay = this.formatNutritionGap(nutritionGap);
 
       this.setData({
         nutritionGap,
+        nutritionGapDisplay,
         suggestions,
         recommendedRecipes,
         weeklyStats,
@@ -88,15 +99,45 @@ Page({
         limit: 6
       });
       const weeklyStats = this.calculateWeeklyStats();
+      
+      // 格式化营养缺口显示数据
+      const nutritionGapDisplay = this.formatNutritionGap(nutritionGap);
 
       this.setData({
         nutritionGap,
+        nutritionGapDisplay,
         suggestions,
         recommendedRecipes,
         weeklyStats,
         loading: false
       });
     }
+  },
+
+  /**
+   * 格式化营养缺口显示数据
+   */
+  formatNutritionGap(gap) {
+    if (!gap) return this.data.nutritionGapDisplay;
+    
+    return {
+      protein: {
+        sign: gap.proteinDeficit > 0 ? '-' : '+',
+        value: Math.round(gap.proteinDeficit > 0 ? gap.proteinDeficit : gap.proteinExcess)
+      },
+      carbs: {
+        sign: gap.carbsDeficit > 0 ? '-' : '+',
+        value: Math.round(gap.carbsDeficit > 0 ? gap.carbsDeficit : gap.carbsExcess)
+      },
+      fat: {
+        sign: gap.fatDeficit > 0 ? '-' : '+',
+        value: Math.round(gap.fatDeficit > 0 ? gap.fatDeficit : gap.fatExcess)
+      },
+      calories: {
+        sign: gap.caloriesDeficit > 0 ? '-' : '+',
+        value: Math.round(gap.caloriesDeficit > 0 ? gap.caloriesDeficit : gap.caloriesExcess)
+      }
+    };
   },
 
   /**

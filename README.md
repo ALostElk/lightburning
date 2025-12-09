@@ -1,224 +1,190 @@
-# 轻燃 - 前端应用
+# 轻燃 - 健康管理小程序
 
-## 📋 项目说明
+一个基于微信小程序云开发的智能健康管理系统，整合AI食物识别、个性化计划生成、营养分析等功能。
 
-这是一个结合饮食记录与运动记录的微信小程序的前端部分，包含以下三个主要模块：
+> ⚠️ **重要更新**（2025-12-09）：已完成接口整合优化，统一使用 `cloudApi.js` 调用云函数，移除了前端的 API Key 暴露风险。详见 [接口整合文档.md](接口整合文档.md)
 
-### 1. 个人信息页面 (Profile)
-- 管理用户基本信息：昵称、年龄、性别、身高、体重等
-- 设置健身目标：目标体重、健身水平、每日卡路里目标差
-- 选择偏好运动项目
-- 实时计算 BMI 和减重目标
-- 数据本地存储和后端同步
-
-### 2. 计划生成页面 (Generate)
-- 基于个人信息智能生成长期运动计划
-- 调用后端 AI 模型生成个性化计划
-- 展示计划预览
-- 一键跳转到计划详情
-
-### 3. 计划详情页面 (Details)
-- 展示完整的运动计划
-- 包含周计划和具体运动安排
-- 支持查看个人概览和计划信息
-
-## 🛠️ 技术栈
-
-- **前端框架**: 原生 HTML5 + CSS3 + JavaScript (ES6+)
-- **数据存储**: LocalStorage（本地存储）
-- **API 通信**: Fetch API
-- **样式**: 现代化设计，响应式布局
-- **兼容性**: 支持 PC 和移动端
-
-## 📂 文件结构
+## 项目结构
 
 ```
-frontend/
-├── index.html      # 主页面 HTML
-├── styles.css      # 样式表
-├── api.js         # API 请求和数据管理
-├── app.js         # 应用逻辑和交互
-└── README.md      # 本文件
+lightburning/
+├── cloudfunctions/          # 云函数
+│   ├── healthService/       # 健康管理服务（用户信息、计划、评价、运动）
+│   ├── dietService/         # 饮食管理服务（食物搜索、识别、记录）
+│   ├── qwenAI/             # AI建议生成
+│   └── foodRecognitionQwen/ # 食物图片识别
+│
+├── miniprogram/            # 小程序前端
+│   ├── pages/             # 页面
+│   │   ├── home/         # 首页
+│   │   ├── profile/      # 个人信息
+│   │   ├── plan/         # 计划管理
+│   │   ├── diet/         # 饮食管理
+│   │   ├── exercise/     # 运动管理
+│   │   ├── report/       # 每日评价
+│   │   ├── stats/        # 数据统计
+│   │   ├── ai-suggestion/ # AI建议
+│   │   ├── recipe-recommend/ # 食谱推荐
+│   │   └── mine/         # 个人中心
+│   │
+│   ├── utils/            # 工具函数
+│   │   ├── cloudApi.js   # ⭐ 云函数统一调用接口
+│   │   ├── calculator.js # 健康计算工具
+│   │   ├── recipeEngine.js # 食谱推荐引擎
+│   │   └── recipeData.js # 食谱数据
+│   │
+│   ├── components/       # 组件
+│   ├── images/          # 图片资源
+│   ├── app.js           # 小程序入口
+│   └── app.json         # 小程序配置
+│
+├── 接口整合文档.md            # ⭐ 完整接口文档（必读）
+├── 前端功能设计与任务分组.md  # 详细功能设计文档
+└── 重构说明.md                # 代码重构说明
 ```
 
-## 🚀 快速开始
+## 核心功能
 
-### 1. 安装和运行
+### 1. 用户管理
+- 个人信息管理（性别、年龄、身高、体重等）
+- 自动计算BMI、BMR、TDEE等健康指标
+- 目标设置与活动等级配置
 
-需要先启动后端服务器 (server.js)：
+### 2. 计划管理
+- 智能生成减重/增重计划
+- 动态调整每日热量目标
+- 计划健康性评估
 
+### 3. 饮食管理
+- **AI拍照识别食物**（基于通义千问视觉模型）
+- 三层食物搜索（本地数据库 + AI估算 + Open Food Facts API）
+- 饮食记录按餐次管理
+- 用户自定义菜品
+- 常用食物智能推荐
+
+### 4. 运动管理
+- 运动记录与推荐
+- 运动消耗计算
+- 运动库浏览
+
+### 5. 每日评价
+- 热量差分析（红绿灯系统）
+- 营养评分（0-100分）
+- AI生成个性化建议
+
+### 6. 数据统计
+- 体重变化趋势图
+- 营养素摄入统计
+- 达标率分析
+
+### 7. AI智能建议
+- 基于历史数据的营养分析
+- 个性化饮食建议
+- 食谱智能推荐
+
+## 技术栈
+
+### 前端
+- 微信小程序原生开发
+- 云开发能力（云函数、云数据库、云存储）
+
+### 后端（云函数）
+- Node.js
+- 微信云开发SDK
+- 通义千问 API（AI能力）
+- Open Food Facts API（食物数据）
+
+### 数据库
+- 云数据库
+  - UserProfiles：用户信息
+  - Plans：减重计划
+  - DietLog：饮食记录
+  - FoodDB：食物数据库
+  - UserDishes：用户自定义菜品
+  - ExerciseLog：运动记录
+  - DailyEvaluations：每日评价
+
+## 快速开始
+
+### 1. 环境准备
+- 安装[微信开发者工具](https://developers.weixin.qq.com/miniprogram/dev/devtools/download.html)
+- 注册微信小程序账号并开通云开发
+
+### 2. 配置云开发
+1. 在`miniprogram/app.js`中配置云开发环境ID
+2. 在云函数中配置通义千问API Key（环境变量）
+
+### 3. 部署云函数
 ```bash
-npm install
-npm start
+# 在微信开发者工具中右键云函数文件夹，选择"上传并部署"
 ```
 
-后端服务器会运行在 `http://localhost:3000`
-
-### 2. 打开前端应用
-
-在浏览器中打开：
-```
-file:///path/to/frontend/index.html
-```
-
-或者使用 VS Code 的 Live Server 扩展：
-- 右键点击 `index.html`
-- 选择 "Open with Live Server"
-
-### 3. 使用应用
-
-1. **填写个人信息**
-   - 进入"个人信息"页面
-   - 填写所有必填项
-   - 点击"保存个人信息"
-
-2. **生成运动计划**
-   - 进入"生成计划"页面
-   - 点击"🚀 生成我的计划"按钮
-   - 等待 AI 生成您的个性化计划
-
-3. **查看计划详情**
-   - 进入"计划详情"页面
-   - 查看您的长期运动计划
-   - 了解每周的具体安排
-
-## 📱 功能特性
-
-### 个人信息管理
-- ✅ 完整的用户档案
-- ✅ BMI 自动计算
-- ✅ 体重目标追踪
-- ✅ 运动偏好选择
-- ✅ 健康状况记录
-
-### 计划生成
-- ✅ AI 智能计划生成
-- ✅ 基于健身水平的难度调整
-- ✅ 个性化卡路里目标
-- ✅ 实时加载反馈
-
-### 数据管理
-- ✅ 本地数据持久化
-- ✅ 后端数据同步
-- ✅ 用户隐私保护
-- ✅ 自动备份
-
-## 🔌 API 接口
-
-应用使用以下后端 API：
-
-### 1. 保存个人信息 + 生成长期计划
-```
-POST /api/user/profile
-Content-Type: application/json
-
-{
-  "userId": "user_123",
-  "username": "张三",
-  "age": 25,
-  "gender": "male",
-  "height": 180,
-  "weight": 75,
-  "targetWeight": 70,
-  "fitness_level": "intermediate",
-  "daily_calorie_target": -500,
-  "exercises": ["running", "gym"],
-  "health_conditions": ""
-}
-```
-
-### 2. 获取长期运动计划
-```
-POST /api/plan/longterm
-Content-Type: application/json
-
-{
-  "userId": "user_123"
-}
-```
-
-### 3. 生成每日运动计划
-```
-POST /api/plan/daily
-Content-Type: application/json
-
-{
-  "userId": "user_123",
-  "calorieDeficit": -500,
-  "date": "2025-12-07"
-}
-```
-
-### 4. 获取 AI 建议
-```
-POST /api/agent/advise
-Content-Type: application/json
-
-{
-  "userId": "user_123",
-  "prompt": "我应该怎样增加运动强度？"
-}
-```
-
-## 🎨 UI 设计特点
-
-- **现代化设计**: 渐变色背景和卡片式布局
-- **响应式布局**: 完美适配 PC、平板和手机
-- **用户友好**: 清晰的导航和直观的交互
-- **视觉反馈**: 加载动画、成功/错误提示
-- **无障碍设计**: 适当的颜色对比度和字体大小
-
-## 💾 数据存储
-
-应用使用浏览器的 LocalStorage 保存：
-- 用户ID
-- 个人信息
-- 长期计划
-- 每日计划
-
+### 4. 初始化数据库
+调用云函数初始化内置食物数据：
 ```javascript
-// 示例：访问本地存储
-const userInfo = Storage.getUserInfo();
-const plan = Storage.getLongTermPlan();
+wx.cloud.callFunction({
+  name: 'dietService',
+  data: {
+    action: 'initBuiltinFoods'
+  }
+})
 ```
 
-## 🔐 数据验证
+## 📚 开发文档
 
-所有用户输入都经过验证：
-- 年龄范围：10-100 岁
-- 身高范围：100-250 cm
-- 体重范围：20-300 kg
-- 必填项检查
-- 业务逻辑验证
+- [⭐ 接口整合文档](接口整合文档.md) - **必读**！所有API接口的详细使用说明
+- [工具模块说明](miniprogram/utils/README.md) - Utils 工具函数使用指南
+- [前端功能设计与任务分组](前端功能设计与任务分组.md) - 详细的功能设计和任务划分
+- [重构说明](重构说明.md) - 代码重构的背景和原则
 
-## 🐛 常见问题
+## API 快速参考
 
-### Q: 数据保存失败？
-A: 检查后端服务器是否运行在 `http://localhost:3000`
+详见 [接口整合文档.md](接口整合文档.md)
 
-### Q: 计划生成超时？
-A: AI 模型生成计划可能需要几秒钟，请耐心等待
+主要API包括：
 
-### Q: 如何清除所有数据？
-A: 在浏览器控制台执行 `Storage.clearAll()`
+### 健康服务
+- `api.updateProfile(data)` - 更新用户信息
+- `api.getProfile()` - 获取用户信息
+- `api.generatePlan(targetWeightChange, totalDays)` - 生成减重计划
+- `api.evaluateDaily(date)` - 每日评价
+- `api.recommendExercise()` - 推荐运动
+- `api.logExercise(data)` - 记录运动
 
-### Q: 支持跨设备同步吗？
-A: 目前版本使用本地存储，不支持跨设备同步。可以扩展后端添加云同步功能。
+### 饮食服务
+- `api.searchFood(keyword)` - 搜索食物
+- `api.recognizeFood(input)` - 拍照识别食物
+- `api.addDietLog(record)` - 添加饮食记录
+- `api.getDietLogs(date)` - 获取饮食记录
+- `api.addCustomDish(dish)` - 添加自定义菜品
 
-## 🚧 未来改进方向
+### AI 服务
+- `api.analyzeAndRecommend(...)` - AI分析并生成建议
+- `api.generateRecipeReason(...)` - 生成食谱推荐理由
 
-- [ ] 添加每日计划管理功能
-- [ ] 集成运动历史记录
-- [ ] 支持云端数据同步
-- [ ] 添加运动数据可视化图表
-- [ ] 实时通知和提醒功能
-- [ ] 社交分享功能
-- [ ] 深色模式支持
+### 食谱推荐
+- `api.getRecommendedRecipes(options)` - 获取推荐食谱
+- `api.analyzeNutritionGap(days)` - 分析营养缺口
 
-## 📞 技术支持
+## 开发说明
 
-如有问题，请参考后端 API 文档或联系开发团队。
+### 目录规范
+- 页面文件：每个页面包含 `.js`, `.wxml`, `.wxss`, `.json` 四个文件
+- 云函数：每个云函数包含 `index.js`, `package.json`, `config.json`
+- 工具函数：放在 `utils/` 目录下
 
-## 📄 许可证
+### 代码规范
+- 使用ES6+语法
+- ⭐ **所有云函数调用必须通过 `utils/cloudApi.js`**，禁止直接调用 `wx.cloud.callFunction()`
+- 健康计算统一使用 `utils/calculator.js` 中的方法
+- 错误处理使用统一的 `api.handleError()` 方法
+- 成功提示使用统一的 `api.showSuccess()` 方法
+
+### 安全注意事项
+- ❌ 不要在前端代码中直接使用 API Key
+- ✅ 所有 AI 调用必须通过云函数进行
+- ✅ 已移除前端的 `qwenService.js`，避免 API Key 泄露
+
+## 许可
 
 MIT License

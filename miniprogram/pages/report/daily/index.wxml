@@ -1,0 +1,86 @@
+<!--pages/report/daily/index.wxml-->
+<view class="container">
+  <view class="header">
+    <text class="title">每日报告</text>
+    <view class="date-selector">
+      <view class="date-btn" data-delta="{{-1}}" bindtap="changeDate">
+        <text>←</text>
+      </view>
+      <text class="date">{{date}}</text>
+      <view class="date-btn" data-delta="{{1}}" bindtap="changeDate">
+        <text>→</text>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{evaluation && !loading}}">
+    <!-- 红绿灯状态 -->
+    <view class="card traffic-light-card" style="background-color: {{evaluation.trafficLight.color}}15; border-color: {{evaluation.trafficLight.color}}">
+      <view class="traffic-light-icon" style="color: {{evaluation.trafficLight.color}}">
+        ●
+      </view>
+      <view class="traffic-light-info">
+        <text class="traffic-light-status">{{evaluation.trafficLight.status === 'green' ? '完美' : evaluation.trafficLight.status === 'yellow' ? '良好' : '需改进'}}</text>
+        <text class="traffic-light-desc">{{evaluation.trafficLight.description}}</text>
+      </view>
+    </view>
+
+    <!-- 热量分析 -->
+    <view class="card">
+      <view class="card-title">热量分析</view>
+      <view class="calorie-item">
+        <text class="label">基础代谢</text>
+        <text class="value">{{evaluation.tdee}} kcal</text>
+      </view>
+      <view class="calorie-item">
+        <text class="label">饮食摄入</text>
+        <text class="value">{{evaluation.dietCalories}} kcal</text>
+      </view>
+      <view class="calorie-item">
+        <text class="label">运动消耗</text>
+        <text class="value">{{evaluation.exerciseCalories}} kcal</text>
+      </view>
+      <view class="calorie-item highlight">
+        <text class="label">实际热量差</text>
+        <text class="value {{evaluation.actualDeficit < 0 ? 'deficit' : 'surplus'}}">{{evaluation.actualDeficit}} kcal</text>
+      </view>
+      <view class="calorie-item">
+        <text class="label">目标热量差</text>
+        <text class="value">{{evaluation.targetDeficit}} kcal</text>
+      </view>
+    </view>
+
+    <!-- 营养评分 -->
+    <view class="card">
+      <view class="card-title">营养评分</view>
+      <view class="score-circle">
+        <text class="score-value">{{evaluation.nutritionScore}}</text>
+        <text class="score-label">分</text>
+      </view>
+      <progress class="progress-bar" percent="{{evaluation.nutritionScore}}" stroke-width="10" activeColor="#51CF66" backgroundColor="#f0f0f0" />
+    </view>
+
+    <!-- AI建议 -->
+    <view class="card">
+      <view class="card-title">AI建议</view>
+      <view class="suggestions">
+        <view class="suggestion-item" wx:for="{{evaluation.suggestions}}" wx:key="index">
+          <text class="suggestion-icon">💡</text>
+          <text class="suggestion-text">{{item}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 加载状态 -->
+  <view class="loading-state" wx:if="{{loading}}">
+    <text class="loading-text">正在生成报告...</text>
+  </view>
+
+  <!-- 操作按钮 -->
+  <view class="action-buttons" wx:if="{{!loading && evaluation}}">
+    <button class="action-btn secondary" bindtap="onRefresh">刷新评价</button>
+    <button class="action-btn primary" bindtap="adjustPlan">调整计划</button>
+  </view>
+</view>
+

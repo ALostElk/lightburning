@@ -1,0 +1,192 @@
+/* pages/profile/index.wxss */
+.container {
+  min-height: 100vh;
+  background: #f5f5f5;
+  padding: 20rpx 30rpx 40rpx;
+}
+
+/* 标题 */
+.header {
+  margin-bottom: 30rpx;
+}
+
+.title {
+  display: block;
+  font-size: 48rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10rpx;
+}
+
+.subtitle {
+  display: block;
+  font-size: 26rpx;
+  color: #999;
+}
+
+/* 卡片 */
+.card {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
+}
+
+.card-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 25rpx;
+}
+
+/* 表单项 */
+.form-item {
+  display: flex;
+  align-items: center;
+  min-height: 80rpx;
+  padding: 10rpx 0;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.form-item:last-child {
+  border-bottom: none;
+}
+
+.label {
+  flex: 0 0 180rpx;
+  font-size: 28rpx;
+  color: #666;
+}
+
+.input {
+  flex: 1;
+  height: 60rpx;
+  padding: 0 20rpx;
+  font-size: 28rpx;
+  color: #333;
+  background: #f8f8f8;
+  border-radius: 8rpx;
+}
+
+.picker {
+  flex: 1;
+  padding: 0 20rpx;
+  height: 60rpx;
+  line-height: 60rpx;
+  font-size: 28rpx;
+  color: #333;
+  background: #f8f8f8;
+  border-radius: 8rpx;
+}
+
+.unit {
+  flex: 0 0 60rpx;
+  text-align: right;
+  font-size: 26rpx;
+  color: #999;
+}
+
+/* 健康指标 */
+.indicator {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.indicator:last-child {
+  border-bottom: none;
+}
+
+.indicator-label {
+  display: flex;
+  flex-direction: column;
+}
+
+.indicator-label text:first-child {
+  font-size: 28rpx;
+  color: #333;
+  font-weight: bold;
+  margin-bottom: 5rpx;
+}
+
+.indicator-desc {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.indicator-value {
+  display: flex;
+  align-items: baseline;
+}
+
+.value {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+  margin-right: 10rpx;
+}
+
+.category {
+  font-size: 26rpx;
+  font-weight: bold;
+}
+
+.unit-text {
+  font-size: 24rpx;
+  color: #999;
+}
+
+/* 营养素推荐 */
+.macro-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18rpx 0;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.macro-item:last-child {
+  border-bottom: none;
+}
+
+.macro-label {
+  font-size: 28rpx;
+  color: #666;
+}
+
+.macro-value {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #51CF66;
+}
+
+/* 按钮组 */
+.button-group {
+  display: flex;
+  gap: 20rpx;
+  margin-top: 40rpx;
+}
+
+.btn-primary,
+.btn-secondary {
+  flex: 1;
+  height: 90rpx;
+  line-height: 90rpx;
+  border-radius: 45rpx;
+  font-size: 30rpx;
+  font-weight: bold;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
+  color: #fff;
+}
+
+.btn-secondary {
+  background: #f0f0f0;
+  color: #666;
+}
+

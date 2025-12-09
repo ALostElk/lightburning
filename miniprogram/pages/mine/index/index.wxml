@@ -1,0 +1,76 @@
+<!--pages/mine/index/index.wxml-->
+<view class="container">
+  <!-- 用户信息卡片 -->
+  <view class="user-card">
+    <view class="user-avatar">
+      <image wx:if="{{userInfo}}" src="{{userInfo.avatarUrl}}" mode="aspectFill"></image>
+      <text wx:else>👤</text>
+    </view>
+    <view class="user-info" wx:if="{{profile}}">
+      <text class="user-name">{{userInfo.nickName || '健康用户'}}</text>
+      <view class="user-stats">
+        <text class="stat-item">{{profile.height}}cm</text>
+        <text class="stat-divider">·</text>
+        <text class="stat-item">{{profile.weight}}kg</text>
+        <text class="stat-divider">·</text>
+        <text class="stat-item">{{profile.goal}}</text>
+      </view>
+    </view>
+    <view class="edit-btn" bindtap="onEditProfile">
+      <text>编辑</text>
+    </view>
+  </view>
+
+  <!-- 今日数据 -->
+  <view class="today-stats">
+    <view class="stat-card">
+      <text class="stat-value">{{todayStats.dietCalories}}</text>
+      <text class="stat-label">今日摄入(kcal)</text>
+    </view>
+    <view class="stat-card">
+      <text class="stat-value">{{todayStats.exerciseCalories}}</text>
+      <text class="stat-label">今日消耗(kcal)</text>
+    </view>
+    <view class="stat-card">
+      <text class="stat-value">{{todayStats.records}}</text>
+      <text class="stat-label">记录次数</text>
+    </view>
+  </view>
+
+  <!-- 健康指标 -->
+  <view class="indicators-card" wx:if="{{profile}}">
+    <view class="indicator">
+      <text class="indicator-label">BMI</text>
+      <text class="indicator-value">{{profile.bmi}}</text>
+    </view>
+    <view class="indicator">
+      <text class="indicator-label">BMR</text>
+      <text class="indicator-value">{{profile.bmr}}</text>
+    </view>
+    <view class="indicator">
+      <text class="indicator-label">TDEE</text>
+      <text class="indicator-value">{{profile.tdee}}</text>
+    </view>
+  </view>
+
+  <!-- 功能菜单 -->
+  <view class="menu-list">
+    <view class="menu-item" wx:for="{{menuItems}}" wx:key="title" data-url="{{item.url}}" data-action="{{item.action}}" bindtap="onMenuItemClick">
+      <view class="menu-left">
+        <text class="menu-icon">{{item.icon}}</text>
+        <view class="menu-text">
+          <text class="menu-title">{{item.title}}</text>
+          <text class="menu-desc">{{item.desc}}</text>
+        </view>
+      </view>
+      <text class="menu-arrow">›</text>
+    </view>
+  </view>
+
+  <!-- 关于 -->
+  <view class="about-section">
+    <text class="app-name">轻燃健康管理</text>
+    <text class="app-version">v1.0.0</text>
+  </view>
+</view>
+

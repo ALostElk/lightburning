@@ -1,0 +1,91 @@
+/* miniprogram/pages/plan/detail/index.wxss */
+.plan-detail-container {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  padding: 20rpx;
+}
+
+.plan-header {
+  background: linear-gradient(135deg, #FF6B6B 0%, #FF8E8E 100%);
+  border-radius: 20rpx;
+  padding: 40rpx;
+  color: white;
+  margin-bottom: 20rpx;
+}
+
+.plan-title {
+  font-size: 36rpx;
+  font-weight: bold;
+  margin-bottom: 20rpx;
+}
+
+.plan-meta {
+  display: flex;
+  gap: 30rpx;
+  font-size: 26rpx;
+  opacity: 0.9;
+}
+
+.plan-content {
+  background-color: white;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 20rpx;
+  padding-left: 20rpx;
+  border-left: 6rpx solid #FF6B6B;
+}
+
+.plan-item {
+  padding: 20rpx 0;
+  border-bottom: 2rpx solid #f0f0f0;
+}
+
+.plan-item:last-child {
+  border-bottom: none;
+}
+
+.item-title {
+  font-size: 28rpx;
+  color: #333;
+  margin-bottom: 10rpx;
+}
+
+.item-description {
+  font-size: 26rpx;
+  color: #666;
+  line-height: 1.6;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 20rpx;
+  padding: 20rpx;
+}
+
+.action-btn {
+  flex: 1;
+  height: 88rpx;
+  line-height: 88rpx;
+  text-align: center;
+  border-radius: 44rpx;
+  font-size: 30rpx;
+}
+
+.primary-btn {
+  background: linear-gradient(135deg, #FF6B6B 0%, #FF8E8E 100%);
+  color: white;
+}
+
+.secondary-btn {
+  background-color: white;
+  color: #FF6B6B;
+  border: 2rpx solid #FF6B6B;
+}
+

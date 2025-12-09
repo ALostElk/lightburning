@@ -1,0 +1,74 @@
+<!--pages/exercise/recommend/index.wxml-->
+<view class="container">
+  <view class="header">
+    <text class="title">运动推荐</text>
+    <text class="subtitle">根据您的目标智能推荐</text>
+  </view>
+
+  <!-- 难度选择 -->
+  <view class="level-selector">
+    <view 
+      wx:for="{{levels}}" 
+      wx:key="value"
+      class="level-item {{selectedLevel === item.value ? 'active' : ''}}"
+      data-level="{{item.value}}"
+      bindtap="selectLevel"
+    >
+      <text class="level-icon">{{item.icon}}</text>
+      <text class="level-label">{{item.label}}</text>
+    </view>
+  </view>
+
+  <!-- 推荐列表 -->
+  <view class="exercise-list">
+    <view 
+      wx:for="{{recommendations}}" 
+      wx:key="id"
+      class="exercise-card"
+      data-exercise="{{item}}"
+      bindtap="viewDetail"
+    >
+      <view class="card-header">
+        <view class="exercise-name-section">
+          <text class="exercise-name">{{item.name}}</text>
+          <view class="exercise-tags">
+            <text class="tag" wx:if="{{item.category}}">{{item.category}}</text>
+            <text class="tag intensity">{{item.intensity || '中等'}}</text>
+          </view>
+        </view>
+        <view class="quick-add-btn" data-exercise="{{item}}" catchtap="quickAdd">
+          <text>+</text>
+        </view>
+      </view>
+
+      <view class="exercise-stats">
+        <view class="stat-item">
+          <text class="stat-icon">⏱️</text>
+          <text class="stat-value">{{item.duration}}分钟</text>
+        </view>
+        <view class="stat-item">
+          <text class="stat-icon">🔥</text>
+          <text class="stat-value">{{item.calories}}kcal</text>
+        </view>
+        <view class="stat-item" wx:if="{{item.equipment}}">
+          <text class="stat-icon">🏋️</text>
+          <text class="stat-value">{{item.equipment}}</text>
+        </view>
+      </view>
+
+      <text class="exercise-desc" wx:if="{{item.description}}">{{item.description}}</text>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{recommendations.length === 0 && !loading}}">
+    <text class="empty-icon">💪</text>
+    <text class="empty-text">暂无推荐运动</text>
+  </view>
+
+  <!-- 加载中 -->
+  <view class="loading-state" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+</view>
+

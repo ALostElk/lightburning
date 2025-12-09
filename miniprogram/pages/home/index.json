@@ -1,3 +1,5 @@
 {
+  "navigationBarTitleText": "轻燃",
+  "enablePullDownRefresh": true,
   "usingComponents": {}
 }
