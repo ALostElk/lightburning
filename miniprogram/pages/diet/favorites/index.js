@@ -192,12 +192,12 @@ Page({
 
       if (fullFood) {
         wx.navigateTo({
-          url: `/pages/diet-manual/index?food=${encodeURIComponent(JSON.stringify(fullFood))}&mealType=${this.data.selectedMealType}&date=${this.data.targetDate}`
+          url: `/pages/diet/manual/index?food=${encodeURIComponent(JSON.stringify(fullFood))}&mealType=${this.data.selectedMealType}&date=${this.data.targetDate}`
         });
       } else {
         // 无法获取完整数据，跳转到搜索页
         wx.navigateTo({
-          url: `/pages/diet-search/index?mealType=${this.data.selectedMealType}&date=${this.data.targetDate}&keyword=${encodeURIComponent(food.name)}`
+          url: `/pages/diet/search/index?mealType=${this.data.selectedMealType}&date=${this.data.targetDate}&keyword=${encodeURIComponent(food.name)}`
         });
       }
     } catch (err) {
@@ -205,7 +205,7 @@ Page({
       console.error('获取食物详情失败:', err);
       // 跳转到搜索页兜底
       wx.navigateTo({
-        url: `/pages/diet-search/index?mealType=${this.data.selectedMealType}&date=${this.data.targetDate}&keyword=${encodeURIComponent(food.name)}`
+        url: `/pages/diet/search/index?mealType=${this.data.selectedMealType}&date=${this.data.targetDate}&keyword=${encodeURIComponent(food.name)}`
       });
     }
   },
@@ -228,7 +228,7 @@ Page({
     };
 
     wx.navigateTo({
-      url: `/pages/diet-manual/index?food=${encodeURIComponent(JSON.stringify(food))}&mealType=${this.data.selectedMealType}&date=${this.data.targetDate}`
+      url: `/pages/diet/manual/index?food=${encodeURIComponent(JSON.stringify(food))}&mealType=${this.data.selectedMealType}&date=${this.data.targetDate}`
     });
   },
 
@@ -236,7 +236,7 @@ Page({
   editDish(e) {
     const dish = e.currentTarget.dataset.dish;
     wx.navigateTo({
-      url: `/pages/diet-custom/index?dish=${encodeURIComponent(JSON.stringify(dish))}`
+      url: `/pages/diet/custom-dishes/index?dish=${encodeURIComponent(JSON.stringify(dish))}`
     });
   },
 
@@ -279,14 +279,14 @@ Page({
   // 跳转到添加自定义菜品
   goToAddCustom() {
     wx.navigateTo({
-      url: `/pages/diet-custom/index?mealType=${this.data.selectedMealType}&date=${this.data.targetDate}`
+      url: `/pages/diet/custom-dishes/index?mealType=${this.data.selectedMealType}&date=${this.data.targetDate}`
     });
   },
 
   // 跳转到搜索
   goToSearch() {
     wx.navigateTo({
-      url: `/pages/diet-search/index?mealType=${this.data.selectedMealType}&date=${this.data.targetDate}`
+      url: `/pages/diet/search/index?mealType=${this.data.selectedMealType}&date=${this.data.targetDate}`
     });
   },
 

@@ -1,0 +1,181 @@
+/**
+ * SpotlightCard 组件样式
+ * 日光未来主义设计 - 玻璃态卡片
+ *
+ * 修复版本：简化结构，确保内部元素可点击
+ */
+
+/* ============ 基础卡片样式 ============ */
+.spotlight-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 48rpx;
+
+  /* 玻璃态背景 */
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(40rpx);
+  -webkit-backdrop-filter: blur(40rpx);
+
+  /* 柔和边框 */
+  border: 2rpx solid rgba(255, 255, 255, 0.6);
+
+  /* 增强浮动阴影 */
+  box-shadow:
+    0 8rpx 32rpx rgba(31, 38, 135, 0.15),
+    0 4rpx 16rpx rgba(0, 0, 0, 0.08),
+    0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+
+  /* 平滑过渡 */
+  transition:
+    transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.3s ease,
+    border-color 0.3s ease;
+
+  /* GPU 加速 */
+  transform: translateZ(0);
+}
+
+/* ============ 触摸激活状态 ============ */
+.spotlight-card.touch-active {
+  transform: scale(0.98) translateZ(0);
+  border-color: rgba(255, 255, 255, 0.9);
+  box-shadow:
+    0 4rpx 16rpx rgba(31, 38, 135, 0.2),
+    0 2rpx 8rpx rgba(0, 0, 0, 0.1);
+}
+
+/* ============ 反射高光层 ============ */
+.reflection-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.5) 0%,
+    rgba(255, 255, 255, 0.2) 30%,
+    transparent 60%
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ============ 内容层 - 最高层级，可点击 ============ */
+.content-layer {
+  position: relative;
+  z-index: 10;
+}
+
+/* ============ 尺寸变体 ============ */
+.spotlight-card.size-sm {
+  border-radius: 32rpx;
+}
+
+.spotlight-card.size-lg {
+  border-radius: 56rpx;
+}
+
+/* ============ 主题变体 ============ */
+/* 主色调 (橙色) - 添加微妙的色彩 */
+.spotlight-card.theme-primary {
+  border-color: rgba(255, 107, 53, 0.2);
+}
+
+.spotlight-card.theme-primary.touch-active {
+  border-color: rgba(255, 107, 53, 0.4);
+  box-shadow:
+    0 4rpx 20rpx rgba(255, 107, 53, 0.15),
+    0 2rpx 8rpx rgba(0, 0, 0, 0.1);
+}
+
+/* 蓝色调 */
+.spotlight-card.theme-blue {
+  border-color: rgba(61, 155, 255, 0.2);
+}
+
+.spotlight-card.theme-blue.touch-active {
+  border-color: rgba(61, 155, 255, 0.4);
+  box-shadow:
+    0 4rpx 20rpx rgba(61, 155, 255, 0.15),
+    0 2rpx 8rpx rgba(0, 0, 0, 0.1);
+}
+
+/* 绿色调 */
+.spotlight-card.theme-green {
+  border-color: rgba(82, 196, 26, 0.2);
+}
+
+.spotlight-card.theme-green.touch-active {
+  border-color: rgba(82, 196, 26, 0.4);
+  box-shadow:
+    0 4rpx 20rpx rgba(82, 196, 26, 0.15),
+    0 2rpx 8rpx rgba(0, 0, 0, 0.1);
+}
+
+/* ============ 无边框变体 ============ */
+.spotlight-card.no-border {
+  border: none;
+}
+
+/* ============ 实心背景变体 ============ */
+.spotlight-card.solid {
+  background: #FFFFFF;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+/* ============ 无阴影变体 ============ */
+.spotlight-card.flat {
+  box-shadow: none;
+}
+
+.spotlight-card.flat.touch-active {
+  box-shadow: none;
+}
+
+/* ============ 强调阴影变体 ============ */
+.spotlight-card.elevated {
+  box-shadow:
+    0 24rpx 80rpx -16rpx rgba(31, 38, 135, 0.18),
+    0 12rpx 40rpx -8rpx rgba(0, 0, 0, 0.12),
+    0 4rpx 16rpx rgba(0, 0, 0, 0.06);
+}
+
+.spotlight-card.elevated.touch-active {
+  box-shadow:
+    0 12rpx 40rpx -8rpx rgba(31, 38, 135, 0.2),
+    0 6rpx 20rpx -4rpx rgba(0, 0, 0, 0.1);
+}
+
+/* ============ 全息效果变体 (Holo) ============ */
+.spotlight-card.holo {
+  box-shadow:
+    0 20rpx 60rpx -10rpx rgba(255, 107, 53, 0.35),
+    0 12rpx 30rpx -8rpx rgba(255, 107, 53, 0.2),
+    0 4rpx 12rpx rgba(0, 0, 0, 0.08);
+}
+
+.spotlight-card.holo.touch-active {
+  box-shadow:
+    0 10rpx 30rpx -5rpx rgba(255, 107, 53, 0.4),
+    0 6rpx 15rpx -4rpx rgba(255, 107, 53, 0.25);
+}
+
+/* ============ 动画关键帧 ============ */
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow:
+      0 20rpx 60rpx -10rpx rgba(255, 107, 53, 0.35),
+      0 12rpx 30rpx -8rpx rgba(255, 107, 53, 0.2);
+  }
+  50% {
+    box-shadow:
+      0 24rpx 70rpx -10rpx rgba(255, 107, 53, 0.45),
+      0 16rpx 35rpx -8rpx rgba(255, 107, 53, 0.25);
+  }
+}
+
+.spotlight-card.pulse {
+  animation: pulse-glow 2s ease-in-out infinite;
+}

@@ -1,12 +1,25 @@
 <!--
   拍照识别页面 - diet-camera/index
+  设计语言: Daylight Futurism (日光未来主义)
+  集成云函数: dietService (recognizeAndSearch)
 -->
 <view class="page-container">
+  <!-- ============ 自定义导航栏 ============ -->
+  <view class="nav-header" style="padding-top: {{statusBarHeight}}px;">
+    <view class="nav-content">
+      <view class="nav-back" bindtap="goBack">
+        <text class="back-icon">‹</text>
+      </view>
+      <text class="nav-title">AI 智能识别</text>
+      <view class="nav-placeholder"></view>
+    </view>
+  </view>
+
   <!-- ============ 主内容区 ============ -->
   <view class="main-content">
     <!-- ====== 未拍照状态：上传区域 ====== -->
     <view wx:if="{{!imagePreview}}" class="upload-section animate-fade-in">
-      <view class="card-wrapper upload-card">
+      <spotlight-card customClass="upload-card" holo="{{true}}">
         <view class="upload-card-content">
           <!-- 图标区域 -->
           <view class="upload-icon-wrapper">
@@ -43,7 +56,7 @@
             </view>
           </view>
         </view>
-      </view>
+      </spotlight-card>
 
       <!-- 提示文字 -->
       <view class="tips-section">
@@ -61,7 +74,7 @@
     <!-- ====== 已拍照状态：结果区域 ====== -->
     <view wx:else class="result-section">
       <!-- 图片预览卡片 -->
-      <view class="card-wrapper preview-card">
+      <spotlight-card customClass="preview-card" theme="primary">
         <view class="preview-wrapper">
           <image
             src="{{imagePreview}}"
@@ -94,7 +107,7 @@
             <text class="badge-text">识别完成</text>
           </view>
         </view>
-      </view>
+      </spotlight-card>
 
       <!-- 错误提示 -->
       <view wx:if="{{error}}" class="error-banner animate-shake">
@@ -108,9 +121,10 @@
       </view>
 
       <!-- 识别结果卡片 -->
-      <view
+      <spotlight-card
         wx:if="{{recognizedFoods.length > 0}}"
-        class="card-wrapper results-card animate-slide-up"
+        customClass="results-card animate-slide-up"
+        holo="{{true}}"
       >
         <view class="results-content">
           <!-- 结果头部 -->
@@ -207,12 +221,12 @@
             </view>
           </view>
         </view>
-      </view>
+      </spotlight-card>
 
       <!-- 餐次选择卡片 -->
-      <view
+      <spotlight-card
         wx:if="{{recognizedFoods.length > 0}}"
-        class="card-wrapper meal-card animate-slide-up"
+        customClass="meal-card animate-slide-up"
       >
         <view class="meal-content">
           <view class="meal-header">
@@ -238,11 +252,11 @@
             </view>
           </view>
         </view>
-      </view>
+      </spotlight-card>
 
       <!-- 摘要与提交 -->
       <view wx:if="{{recognizedFoods.length > 0 && hasSelectedFoods}}" class="summary-section animate-slide-up">
-        <view class="card-wrapper summary-card">
+        <spotlight-card customClass="summary-card" theme="primary">
           <view class="summary-content">
             <!-- 摘要信息 -->
             <view class="summary-stats">
@@ -272,16 +286,15 @@
               </view>
             </view>
           </view>
-        </view>
+        </spotlight-card>
 
         <!-- 提交按钮 -->
-        <view class="glow-button {{isSubmitting ? 'loading' : ''}}" bindtap="submit">
-          <view class="button-content">
-            <text class="button-title">{{isSubmitting ? '保存中...' : '确认添加'}}</text>
-            <text class="button-subtitle">{{selectedCount}} 项食物将添加到{{mealTypeLabels[selectedMealType]}}</text>
-          </view>
-          <view class="button-glow"></view>
-        </view>
+        <glow-button
+          title="{{isSubmitting ? '保存中...' : '确认添加'}}"
+          subtitle="{{selectedCount}} 项食物将添加到{{mealTypeLabels[selectedMealType]}}"
+          loading="{{isSubmitting}}"
+          bindtap="submit"
+        />
       </view>
     </view>
 

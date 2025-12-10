@@ -11,6 +11,7 @@
     "pages/diet/search/index",
     "pages/diet/manual/index",
     "pages/diet/custom-dishes/index",
+    "pages/diet/favorites/index",
     "pages/exercise/index/index",
     "pages/report/daily/index",
     "pages/stats/index/index",

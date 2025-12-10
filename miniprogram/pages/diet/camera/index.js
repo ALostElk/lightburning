@@ -149,8 +149,10 @@ Page({
 
         foods.forEach((food, i) => {
           selected[i] = true;
-          // 使用 AI 估算的重量，如果没有则默认 100g
-          amounts[i] = food.amount || 100;
+          // 使用 AI 估算的重量，支持多种字段名
+          // AI可能返回 amount、weight、servingSize、estimatedWeight 等字段
+          const estimatedAmount = food.amount || food.weight || food.estimatedWeight || food.servingSize || food.portion;
+          amounts[i] = estimatedAmount ? Math.round(estimatedAmount) : 100;
         });
 
         this.setData({
@@ -325,7 +327,7 @@ Page({
   // 跳转到手动搜索
   goToSearch() {
     wx.navigateTo({
-      url: `/pages/diet-search/index?mealType=${this.data.selectedMealType}&date=${this.data.targetDate}`
+      url: `/pages/diet/search/index?mealType=${this.data.selectedMealType}&date=${this.data.targetDate}`
     });
   },
 

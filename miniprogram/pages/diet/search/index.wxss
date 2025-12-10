@@ -4,6 +4,7 @@
   min-height: 100vh;
   background: linear-gradient(180deg, #FFF5EB 0%, #FEF0E3 15%, #F8F4FF 50%, #EEF4FF 100%);
   position: relative;
+  padding-top: 88rpx; /* 状态栏高度适配 */
 }
 
 /* 背景装饰 */
@@ -12,7 +13,7 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 240rpx;
+  height: 320rpx;
   background: linear-gradient(135deg, #FF8C42 0%, #FF6B35 50%, #FF9A56 100%);
   border-radius: 0 0 60rpx 60rpx;
   z-index: 0;
@@ -21,7 +22,7 @@
 .search-header {
   display: flex;
   align-items: center;
-  padding: 20rpx 30rpx;
+  padding: 24rpx 30rpx;
   position: relative;
   z-index: 1;
 }

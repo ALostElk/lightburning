@@ -1,67 +1,477 @@
-<view class="diet-container">
-  <view class="header">
-    <view class="date-nav">
-      <view class="date-selector">
-        <text class="current-date">{{currentDate}}</text>
+<!--
+  饮食记录主页 - diet/index
+  设计语言: Daylight Futurism (日光未来主义)
+  功能: 折叠餐次 + 日历选择
+-->
+<view class="page-container">
+  <!-- ============ 粘性头部 ============ -->
+  <view class="sticky-header" style="padding-top: {{statusBarHeight}}px;">
+    <view class="header-content">
+      <!-- 左侧：用户信息 -->
+      <view class="user-info">
+        <view class="avatar-wrapper">
+          <image
+            class="user-avatar"
+            src="{{userInfo.avatarUrl || '/images/default-avatar.png'}}"
+            mode="aspectFill"
+          />
+          <view class="status-dot"></view>
+        </view>
+        <view class="user-text">
+          <text class="greeting">{{greeting}}</text>
+          <text class="user-name">{{userInfo.nickName || '健康达人'}}</text>
+        </view>
       </view>
-    </view>
-    
-    <view class="daily-summary">
-      <view class="summary-item">
-        <text class="label">已摄入</text>
-        <text class="value primary">{{consumedCalories}}</text>
-        <text class="unit">千卡</text>
-      </view>
-      <view class="divider"></view>
-      <view class="summary-item">
-        <text class="label">目标</text>
-        <text class="value">{{targetCalories}}</text>
-        <text class="unit">千卡</text>
-      </view>
-      <view class="divider"></view>
-      <view class="summary-item">
-        <text class="label">剩余</text>
-        <text class="value {{remaining >= 0 ? 'success' : 'danger'}}">{{remaining}}</text>
-        <text class="unit">千卡</text>
-      </view>
+
+      <!-- 右侧：AI 洞察按钮 -->
+      <border-beam-button
+        text="AI 洞察"
+        icon="✨"
+        loading="{{isAnalyzing}}"
+        bindtap="onAIInsight"
+      />
     </view>
   </view>
 
-  <view class="action-buttons">
-    <view class="action-btn" bindtap="goToCamera">
-      <view class="btn-icon-text">📷</view>
-      <text class="btn-text">拍照识别</text>
-    </view>
-    <view class="action-btn" bindtap="goToSearch">
-      <view class="btn-icon-text">🔍</view>
-      <text class="btn-text">搜索食物</text>
-    </view>
-    <view class="action-btn" bindtap="goToManual">
-      <view class="btn-icon-text">➕</view>
-      <text class="btn-text">手动添加</text>
-    </view>
-  </view>
-
-  <view class="meals-section">
-    <view class="meal-group" wx:for="{{meals}}" wx:key="type">
-      <view class="meal-header">
-        <text class="meal-name">{{item.name}}</text>
-        <text class="meal-calories">{{item.calories}} 千卡</text>
+  <!-- ============ 主内容区 ============ -->
+  <view class="main-content">
+    <!-- AI 分析横幅（条件渲染） -->
+    <view class="ai-banner animate-fade-in-up" wx:if="{{aiInsight}}">
+      <view class="ai-banner-content">
+        <view class="ai-icon-wrapper">
+          <text class="ai-icon">🧠</text>
+        </view>
+        <view class="ai-text">
+          <text class="ai-title">AI 智能分析</text>
+          <text class="ai-message">{{aiInsight}}</text>
+        </view>
       </view>
-      <view class="food-list" wx:if="{{item.foods.length > 0}}">
-        <view class="food-item" wx:for="{{item.foods}}" wx:key="id" wx:for-item="food">
-          <view class="food-info">
-            <text class="food-name">{{food.name}}</text>
-            <text class="food-detail">{{food.amount}}{{food.unit}} · {{food.calories}}千卡</text>
+      <view class="ai-close" bindtap="closeAIBanner">
+        <text>×</text>
+      </view>
+    </view>
+
+    <!-- ============ 仪表盘卡片 ============ -->
+    <spotlight-card customClass="dashboard-card" holo="{{true}}" customStyle="background: linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%)">
+      <view class="dashboard-content">
+        <!-- 热量环形图 + 核心数据 -->
+        <view class="calories-dashboard">
+          <!-- 左侧：环形进度图 -->
+          <view class="donut-chart-wrapper">
+            <view class="donut-chart">
+              <view
+                class="donut-ring"
+                style="background: conic-gradient(#FF6B35 0deg {{consumedDegrees}}deg, #E5E7EB {{consumedDegrees}}deg 360deg);"
+              ></view>
+              <view class="donut-center">
+                <text class="donut-value">{{stats.remainingCalories}}</text>
+                <text class="donut-label">剩余</text>
+              </view>
+            </view>
           </view>
-          <view class="food-actions">
-            <text class="action-text" bindtap="editFood" data-meal="{{item.type}}" data-id="{{food.id}}">编辑</text>
-            <text class="action-text delete" bindtap="deleteFood" data-meal="{{item.type}}" data-id="{{food.id}}">删除</text>
+
+          <!-- 右侧：详细数据 -->
+          <view class="calories-details">
+            <view class="calorie-row">
+              <view class="calorie-indicator in"></view>
+              <text class="calorie-label">已摄入</text>
+              <text class="calorie-value">{{stats.totalCalories}}</text>
+            </view>
+            <view class="calorie-row">
+              <view class="calorie-indicator out"></view>
+              <text class="calorie-label">已消耗</text>
+              <text class="calorie-value">{{stats.burnedCalories}}</text>
+            </view>
+            <view class="calorie-row goal">
+              <view class="calorie-indicator goal-ind"></view>
+              <text class="calorie-label">目标</text>
+              <text class="calorie-value">{{stats.targetCalories}}</text>
+            </view>
+          </view>
+        </view>
+
+        <!-- 宏量营养素条 -->
+        <view class="macros-section">
+          <view class="macro-bar">
+            <view class="macro-info">
+              <text class="macro-name">碳水</text>
+              <text class="macro-values">{{stats.carbs}}g / {{stats.carbsTarget}}g</text>
+            </view>
+            <view class="macro-progress-bg">
+              <view
+                class="macro-progress-fill carbs"
+                style="width: {{stats.carbsPercentage > 100 ? 100 : stats.carbsPercentage}}%"
+              ></view>
+            </view>
+          </view>
+
+          <view class="macro-bar">
+            <view class="macro-info">
+              <text class="macro-name">蛋白质</text>
+              <text class="macro-values">{{stats.protein}}g / {{stats.proteinTarget}}g</text>
+            </view>
+            <view class="macro-progress-bg">
+              <view
+                class="macro-progress-fill protein"
+                style="width: {{stats.proteinPercentage > 100 ? 100 : stats.proteinPercentage}}%"
+              ></view>
+            </view>
+          </view>
+
+          <view class="macro-bar">
+            <view class="macro-info">
+              <text class="macro-name">脂肪</text>
+              <text class="macro-values">{{stats.fat}}g / {{stats.fatTarget}}g</text>
+            </view>
+            <view class="macro-progress-bg">
+              <view
+                class="macro-progress-fill fat"
+                style="width: {{stats.fatPercentage > 100 ? 100 : stats.fatPercentage}}%"
+              ></view>
+            </view>
           </view>
         </view>
       </view>
-      <view class="empty-meal" wx:else bindtap="addMeal" data-type="{{item.type}}">
-        <text class="empty-text">点击添加{{item.name}}食物</text>
+    </spotlight-card>
+
+    <!-- ============ 每日挑战按钮 ============ -->
+    <view class="challenge-section">
+      <glow-button
+        title="开启每日挑战"
+        subtitle="赢取 50 积分"
+        bindtap="onStartChallenge"
+      />
+    </view>
+
+    <!-- ============ 饮食时间线 ============ -->
+    <view class="timeline-section">
+      <view class="section-header">
+        <text class="section-title">今日饮食</text>
+        <view class="header-right">
+          <!-- 编辑模式按钮 -->
+          <view class="edit-btn {{isEditMode ? 'active' : ''}}" catchtap="toggleEditMode">
+            <text>{{isEditMode ? '完成' : '编辑'}}</text>
+          </view>
+          <view class="date-badge" catchtap="showCalendar">
+            <text class="calendar-icon">📅</text>
+            <text>{{dateDisplay}}</text>
+            <text class="date-arrow">›</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 时间线容器 -->
+      <view class="timeline-container">
+        <block wx:for="{{meals}}" wx:key="id">
+          <!-- 时间线节点 -->
+          <view class="timeline-item">
+            <!-- 时间线 -->
+            <view class="timeline-track">
+              <view class="timeline-dot {{item.totalCalories > 0 ? 'active' : ''}}">
+                <text class="dot-icon">{{item.emojiIcon}}</text>
+              </view>
+              <view class="timeline-line" wx:if="{{index < meals.length - 1}}"></view>
+            </view>
+
+            <!-- 餐次卡片 -->
+            <view class="meal-card-wrapper">
+              <spotlight-card
+                customClass="meal-card {{item.type}} {{item.totalCalories > 0 ? 'has-data' : ''}}"
+                customStyle="{{item.bgStyle}}"
+              >
+                <view class="meal-card-content">
+                  <!-- 卡片头部 - 点击可折叠 -->
+                  <view class="meal-header">
+                    <view class="meal-title-group" catchtap="toggleMealCollapse" data-mealtype="{{item.type}}">
+                      <text class="meal-title">{{item.title}}</text>
+                      <text class="meal-time">{{item.suggestMin}}-{{item.suggestMax}} kcal</text>
+                    </view>
+                    <view class="meal-right-section">
+                      <!-- 单餐编辑按钮 -->
+                      <view
+                        class="meal-edit-btn {{item.isEditing ? 'active' : ''}}"
+                        catchtap="toggleMealEdit"
+                        data-mealtype="{{item.type}}"
+                        wx:if="{{item.items.length > 0}}"
+                      >
+                        <text>{{item.isEditing ? '完成' : '编辑'}}</text>
+                      </view>
+                      <view class="meal-calories" wx:if="{{item.totalCalories > 0}}">
+                        <text class="cal-number">{{item.totalCalories}}</text>
+                        <text class="cal-unit">kcal</text>
+                      </view>
+                      <!-- 折叠/展开图标 -->
+                      <view class="collapse-icon {{item.collapsed ? 'collapsed' : ''}}" catchtap="toggleMealCollapse" data-mealtype="{{item.type}}">
+                        <text>▼</text>
+                      </view>
+                    </view>
+                  </view>
+
+                  <!-- 进度条 -->
+                  <view class="meal-progress-wrapper">
+                    <view class="meal-progress-bar">
+                      <view
+                        class="meal-progress-fill {{item.percentage > 100 ? 'over' : ''}}"
+                        style="width: {{item.percentage > 100 ? 100 : item.percentage}}%"
+                      ></view>
+                    </view>
+                    <text class="meal-progress-text">{{item.percentage}}%</text>
+                  </view>
+
+                  <!-- 可折叠的食物列表 -->
+                  <view class="collapsible-content {{item.collapsed ? 'collapsed' : ''}}">
+                    <!-- 食物列表 -->
+                    <view class="food-items" wx:if="{{item.items.length > 0}}">
+                      <block wx:for="{{item.items}}" wx:for-item="food" wx:key="uniqueId">
+                        <!-- 左滑删除容器 -->
+                        <view class="food-item-wrapper">
+                          <view
+                            class="food-item {{food.swiped ? 'swiped' : ''}}"
+                            bindtouchstart="onFoodTouchStart"
+                            bindtouchmove="onFoodTouchMove"
+                            bindtouchend="onFoodTouchEnd"
+                            data-id="{{food.id}}"
+                            data-mealtype="{{item.type}}"
+                          >
+                            <!-- 编辑模式选择框（全局或单餐） -->
+                            <view class="food-checkbox {{isEditMode || item.isEditing ? 'show' : ''}}" catchtap="toggleFoodSelect" data-id="{{food.id}}" data-mealtype="{{item.type}}">
+                              <view class="checkbox-inner {{food.selected ? 'checked' : ''}}">
+                                <text wx:if="{{food.selected}}">✓</text>
+                              </view>
+                            </view>
+                            <view class="food-left" catchtap="{{isEditMode || item.isEditing ? '' : 'openFoodEdit'}}" data-food="{{food}}" data-mealtype="{{item.type}}">
+                              <text class="food-emoji">{{food.emoji}}</text>
+                              <view class="food-info">
+                                <text class="food-name">{{food.name}}</text>
+                                <text class="food-portion">{{food.portion}}</text>
+                              </view>
+                            </view>
+                            <view class="food-right" catchtap="{{isEditMode || item.isEditing ? '' : 'openFoodEdit'}}" data-food="{{food}}" data-mealtype="{{item.type}}">
+                              <text class="food-cal">{{food.calories}}</text>
+                              <text class="food-cal-unit">kcal</text>
+                            </view>
+                          </view>
+                          <!-- 左滑删除按钮 -->
+                          <view class="swipe-delete-btn" catchtap="deleteSingleFood" data-id="{{food.id}}">
+                            <text>删除</text>
+                          </view>
+                        </view>
+                      </block>
+
+                      <!-- 添加更多 -->
+                      <view
+                        class="add-meal-btn-large"
+                        catchtap="addFood"
+                        data-mealtype="{{item.type}}"
+                        wx:if="{{!isEditMode && !item.isEditing}}"
+                      >
+                        <text class="add-icon">+</text>
+                        <text class="add-text">添加{{item.title}}</text>
+                      </view>
+                    </view>
+
+                    <!-- 空状态 -->
+                    <view class="empty-state" wx:if="{{item.items.length === 0}}">
+                      <text class="empty-hint">{{item.emptyText}}</text>
+                      <view
+                        class="add-meal-btn-large"
+                        catchtap="addFood"
+                        data-mealtype="{{item.type}}"
+                      >
+                        <text class="add-icon">+</text>
+                        <text class="add-text">添加{{item.title}}</text>
+                      </view>
+                    </view>
+                  </view>
+                </view>
+              </spotlight-card>
+            </view>
+          </view>
+        </block>
+      </view>
+    </view>
+
+    <!-- 底部安全区域 -->
+    <view class="bottom-spacer"></view>
+  </view>
+
+  <!-- ============ 批量操作栏 ============ -->
+  <view class="batch-action-bar {{(isEditMode || hasAnyMealEditing) && selectedCount > 0 ? 'show' : ''}}">
+    <view class="batch-info">
+      <text class="selected-count">已选择 {{selectedCount}} 项</text>
+      <text class="selected-calories">共 {{selectedCalories}} kcal</text>
+    </view>
+    <view class="batch-actions">
+      <view class="batch-btn select-all" catchtap="toggleSelectAll">
+        <text>{{isAllSelected ? '取消全选' : '全选'}}</text>
+      </view>
+      <view class="batch-btn delete" catchtap="deleteSelectedFoods">
+        <text>🗑️ 删除</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- ============ 浮动相机按钮 ============ -->
+  <floating-fab
+    icon="📷"
+    position="bottom-center"
+    theme="glass"
+    safeArea="{{true}}"
+    bindtap="goToCamera"
+  />
+
+  <!-- ============ 日历选择器弹窗 ============ -->
+  <view class="calendar-modal {{showCalendarModal ? 'show' : ''}}" catchtap="hideCalendar">
+    <view class="calendar-content" catchtap="stopPropagation">
+      <view class="calendar-header">
+        <view class="calendar-nav" bindtap="prevMonth">
+          <text>‹</text>
+        </view>
+        <text class="calendar-title">{{calendarYear}}年{{calendarMonth}}月</text>
+        <view class="calendar-nav" bindtap="nextMonth">
+          <text>›</text>
+        </view>
+      </view>
+
+      <!-- 星期头 -->
+      <view class="calendar-weekdays">
+        <text class="weekday">日</text>
+        <text class="weekday">一</text>
+        <text class="weekday">二</text>
+        <text class="weekday">三</text>
+        <text class="weekday">四</text>
+        <text class="weekday">五</text>
+        <text class="weekday">六</text>
+      </view>
+
+      <!-- 日期网格 -->
+      <view class="calendar-days">
+        <block wx:for="{{calendarDays}}" wx:key="date">
+          <view
+            class="calendar-day {{item.isCurrentMonth ? '' : 'other-month'}} {{item.isToday ? 'today' : ''}} {{item.isSelected ? 'selected' : ''}} {{item.hasRecord ? 'has-record' : ''}} {{item.isFuture ? 'future' : ''}}"
+            bindtap="{{item.isFuture ? '' : 'selectCalendarDay'}}"
+            data-date="{{item.date}}"
+          >
+            <text class="day-number">{{item.day}}</text>
+            <view class="record-dot" wx:if="{{item.hasRecord}}"></view>
+          </view>
+        </block>
+      </view>
+
+      <!-- 快捷选项 -->
+      <view class="calendar-shortcuts">
+        <view class="shortcut-btn" bindtap="selectToday">今天</view>
+        <view class="shortcut-btn" bindtap="selectYesterday">昨天</view>
+        <view class="shortcut-btn" bindtap="selectThisWeek">本周</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- ============ 加载遮罩 ============ -->
+  <view class="loading-overlay" wx:if="{{isLoading}}">
+    <view class="loading-content">
+      <view class="loading-spinner"></view>
+      <text class="loading-text">加载中...</text>
+    </view>
+  </view>
+
+  <!-- ============ 食物编辑弹窗 ============ -->
+  <view class="food-edit-modal {{showFoodEditModal ? 'show' : ''}}" catchtap="closeFoodEdit">
+    <view class="food-edit-content" catchtap="stopPropagation">
+      <!-- 弹窗头部 -->
+      <view class="food-edit-header">
+        <text class="food-edit-title">编辑食物</text>
+        <view class="food-edit-close" bindtap="closeFoodEdit">
+          <text>×</text>
+        </view>
+      </view>
+
+      <!-- 食物信息 -->
+      <view class="food-edit-info">
+        <view class="food-edit-avatar">
+          <text class="food-edit-emoji">{{editingFood.emoji || '🍽️'}}</text>
+        </view>
+        <view class="food-edit-name">{{editingFood.name}}</view>
+      </view>
+
+      <!-- 克数输入 -->
+      <view class="food-edit-form">
+        <!-- 份量显示 -->
+        <view class="amount-header">
+          <text class="form-label">选择份量</text>
+          <view class="amount-display">
+            <text class="amount-value">{{editingFood.grams}}</text>
+            <text class="amount-unit-text">克</text>
+          </view>
+        </view>
+
+        <!-- 滑动条区域 -->
+        <view class="slider-container">
+          <view class="slider-track">
+            <view class="slider-fill" style="width: {{(editingFood.grams / 500) * 100}}%"></view>
+          </view>
+          <slider class="amount-slider"
+                  min="10"
+                  max="500"
+                  step="5"
+                  value="{{editingFood.grams}}"
+                  activeColor="transparent"
+                  backgroundColor="transparent"
+                  block-size="0"
+                  bindchange="onSliderChange"
+                  bindchanging="onSliderChanging" />
+          <!-- 滑块图标 -->
+          <view class="slider-thumb" style="left: {{(editingFood.grams / 500) * 100}}%">
+            <view class="thumb-icon">
+              <text>{{editingFood.emoji || '🍽️'}}</text>
+            </view>
+          </view>
+          <!-- 刻度标记 -->
+          <view class="slider-marks">
+            <text class="mark">10g</text>
+            <text class="mark">250g</text>
+            <text class="mark">500g</text>
+          </view>
+        </view>
+
+        <!-- 快捷份量选择 -->
+        <view class="quick-grams">
+          <view class="quick-grams-label">快捷选择</view>
+          <view class="quick-grams-btns">
+            <view class="quick-gram-btn" bindtap="setQuickGrams" data-grams="50">50g</view>
+            <view class="quick-gram-btn" bindtap="setQuickGrams" data-grams="100">100g</view>
+            <view class="quick-gram-btn" bindtap="setQuickGrams" data-grams="150">150g</view>
+            <view class="quick-gram-btn" bindtap="setQuickGrams" data-grams="200">200g</view>
+            <view class="quick-gram-btn" bindtap="setQuickGrams" data-grams="250">250g</view>
+            <view class="quick-gram-btn" bindtap="setQuickGrams" data-grams="300">300g</view>
+          </view>
+        </view>
+
+        <!-- 热量预览 -->
+        <view class="calories-preview">
+          <view class="preview-row">
+            <text class="preview-label">热量</text>
+            <text class="preview-value">{{editingFood.calculatedCalories || 0}} kcal</text>
+          </view>
+          <view class="preview-row">
+            <text class="preview-label">蛋白质</text>
+            <text class="preview-value protein">{{editingFood.calculatedProtein || 0}}g</text>
+          </view>
+          <view class="preview-row">
+            <text class="preview-label">碳水</text>
+            <text class="preview-value carbs">{{editingFood.calculatedCarbs || 0}}g</text>
+          </view>
+          <view class="preview-row">
+            <text class="preview-label">脂肪</text>
+            <text class="preview-value fat">{{editingFood.calculatedFat || 0}}g</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 操作按钮 -->
+      <view class="food-edit-actions">
+        <view class="edit-btn-cancel" bindtap="closeFoodEdit">取消</view>
+        <view class="edit-btn-save" bindtap="saveFoodEdit">保存修改</view>
       </view>
     </view>
   </view>

@@ -7,72 +7,8 @@
 /* ============ 页面容器 ============ */
 .page-container {
   min-height: 100vh;
-  background: #f5f5f5;
-}
-
-/* ============ 通用卡片包装器 ============ */
-.card-wrapper {
-  background: white;
-  border-radius: 24rpx;
-  padding: 40rpx;
-  margin: 24rpx;
-  box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.06);
-}
-
-/* ============ 通用按钮 ============ */
-.glow-button {
-  position: relative;
-  background: linear-gradient(135deg, #FF6B6B 0%, #FF8E8E 100%);
-  border-radius: 56rpx;
-  padding: 32rpx 48rpx;
-  margin: 24rpx;
-  overflow: hidden;
-  transition: all 0.3s ease;
-}
-
-.glow-button:active {
-  transform: scale(0.98);
-  opacity: 0.9;
-}
-
-.glow-button.loading {
-  opacity: 0.6;
-  pointer-events: none;
-}
-
-.button-content {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.button-title {
-  font-size: 32rpx;
-  font-weight: 600;
-  color: white;
-  margin-bottom: 8rpx;
-}
-
-.button-subtitle {
-  font-size: 24rpx;
-  color: rgba(255, 255, 255, 0.9);
-}
-
-.button-glow {
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  right: -50%;
-  bottom: -50%;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.glow-button:active .button-glow {
-  opacity: 1;
+  /* 继承全局背景，不再单独设置 */
+  background: transparent;
 }
 
 /* ============ 自定义导航栏 ============ */

@@ -93,7 +93,7 @@ Page({
       // 根据筛选条件决定是否传入 mealType
       const mealType = this.data.favoriteMealFilter === 'all' ? '' : this.data.favoriteMealFilter;
 
-      const res = await api.getFrequentFoods(20);
+      const res = await api.getFrequentFoods(20, mealType);
 
       if (res.result?.success) {
         const foods = res.result.data || [];
@@ -123,7 +123,7 @@ Page({
   selectFavorite(e) {
     const food = e.currentTarget.dataset.food;
     wx.navigateTo({
-      url: `/pages/diet-manual/index?food=${encodeURIComponent(JSON.stringify(food))}&mealType=${this.data.selectedMealType}&date=${this.data.targetDate}&fromFavorites=true`
+      url: `/pages/diet/manual/index?food=${encodeURIComponent(JSON.stringify(food))}&mealType=${this.data.selectedMealType}&date=${this.data.targetDate}&fromFavorites=true`
     });
   },
 
@@ -286,14 +286,14 @@ Page({
   selectFood(e) {
     const food = e.currentTarget.dataset.food;
     wx.navigateTo({
-      url: `/pages/diet-manual/index?food=${encodeURIComponent(JSON.stringify(food))}&mealType=${this.data.selectedMealType}&date=${this.data.targetDate}`
+      url: `/pages/diet/manual/index?food=${encodeURIComponent(JSON.stringify(food))}&mealType=${this.data.selectedMealType}&date=${this.data.targetDate}`
     });
   },
 
   // 跳转到手动输入
   goToManual() {
     wx.navigateTo({
-      url: `/pages/diet-manual/index?mealType=${this.data.selectedMealType}&date=${this.data.targetDate}`
+      url: `/pages/diet/manual/index?mealType=${this.data.selectedMealType}&date=${this.data.targetDate}`
     });
   },
 

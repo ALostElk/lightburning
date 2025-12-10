@@ -917,6 +917,9 @@ async function recognizeAndSearch(imageInput, openid = '') {
     confidence: r.confidence,
     source: r.source,
 
+    // AI估计的份量（克数）
+    amount: r.recognized?.amount || 100,
+
     // 营养数据（每100g）
     calories: r.food?.calories || 0,
     protein: r.food?.protein || 0,
@@ -1252,19 +1255,33 @@ async function updateDietLog(openid, logId, updates) {
  * 获取用户常用食物（基于DietLog统计）
  * @param {string} openid - 用户ID
  * @param {number} limit - 返回数量
+ * @param {string} mealType - 餐次类型（可选）：breakfast/lunch/dinner/snack
  */
-async function getFrequentFoods(openid, limit = 20) {
+async function getFrequentFoods(openid, limit = 20, mealType = '') {
+  // 构建查询条件
+  const matchCondition = { _openid: openid };
+
+  // 如果指定了餐次类型，添加筛选条件
+  if (mealType && mealType !== 'all') {
+    matchCondition.mealType = mealType;
+  }
+
   // 方案：使用聚合查询统计食物出现频次
   const result = await db.collection('DietLog')
     .aggregate()
-    .match({ _openid: openid })
+    .match(matchCondition)
     .group({
       _id: '$name',
       count: $.sum(1),
       lastUsed: $.max('$createdAt'),
       avgCalories: $.avg('$calories'),
+      avgProtein: $.avg('$protein'),
+      avgCarbs: $.avg('$carbs'),
+      avgFat: $.avg('$fat'),
+      avgGrams: $.avg('$grams'),
       foodId: $.first('$foodId'),
-      foodSource: $.first('$foodSource')
+      foodSource: $.first('$foodSource'),
+      category: $.first('$category')
     })
     .sort({ count: -1, lastUsed: -1 })
     .limit(limit)
@@ -1275,8 +1292,13 @@ async function getFrequentFoods(openid, limit = 20) {
     count: item.count,
     lastUsed: item.lastUsed,
     avgCalories: Math.round(item.avgCalories || 0),
+    avgProtein: Math.round((item.avgProtein || 0) * 10) / 10,
+    avgCarbs: Math.round((item.avgCarbs || 0) * 10) / 10,
+    avgFat: Math.round((item.avgFat || 0) * 10) / 10,
+    avgGrams: Math.round(item.avgGrams || 100),
     foodId: item.foodId,
-    foodSource: item.foodSource
+    foodSource: item.foodSource,
+    category: item.category
   }));
 }
 
@@ -1600,7 +1622,7 @@ exports.main = async (event) => {
 
       // ========== 常用食物 ==========
       case 'getFrequentFoods':
-        return ok(await getFrequentFoods(OPENID, payload.limit || 20));
+        return ok(await getFrequentFoods(OPENID, payload.limit || 20, payload.mealType || ''));
 
       // ========== 热量计算 ==========
       case 'calculateCalories':

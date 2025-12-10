@@ -1,0 +1,36 @@
+<!--
+  GlowButton 组件 - 全息发光按钮
+  特性：
+  - 橙色渐变背景
+  - 全息噪声纹理
+  - 触摸跟踪白色光泽
+  - 按压缩放动画
+-->
+<view
+  class="glow-button {{disabled ? 'disabled' : ''}} {{loading ? 'loading' : ''}}"
+  style="--glow-x: {{glowX}}px; --glow-y: {{glowY}}px;"
+  bindtouchmove="onTouchMove"
+  bindtouchend="onTouchEnd"
+  bindtouchcancel="onTouchEnd"
+  bindtap="onTap"
+>
+  <!-- 全息纹理层 -->
+  <view class="holo-texture-layer"></view>
+
+  <!-- 移动光泽层 -->
+  <view class="glow-layer"></view>
+
+  <!-- 内容区域 -->
+  <view class="content-wrapper">
+    <view class="text-content">
+      <text class="title">{{title}}</text>
+      <text class="subtitle" wx:if="{{subtitle}}">{{subtitle}}</text>
+    </view>
+
+    <!-- 右侧图标/箭头 -->
+    <view class="icon-wrapper">
+      <view class="loading-spinner" wx:if="{{loading}}"></view>
+      <text class="arrow-icon" wx:else>→</text>
+    </view>
+  </view>
+</view>

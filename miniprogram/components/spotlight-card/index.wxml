@@ -1,0 +1,23 @@
+<!--
+  SpotlightCard 组件 - 聚光灯跟踪卡片 + Prism Border
+
+  修复版本：使用简单 JS 触摸处理，确保内部元素可点击
+  使用 CSS :active 伪类实现按压效果
+-->
+
+<view
+  class="spotlight-card {{computedClass}} {{prism ? 'prism-enabled' : ''}} {{isPressed ? 'touch-active' : ''}}"
+  style="{{customStyle}}"
+  bindtouchstart="onTouchStart"
+  bindtouchend="onTouchEnd"
+  bindtouchcancel="onTouchEnd"
+  bindtap="onTap"
+>
+  <!-- 反射高光层 - 静态顶部渐变 -->
+  <view class="reflection-layer"></view>
+
+  <!-- 内容插槽 - 放在效果层之前，确保可点击 -->
+  <view class="content-layer">
+    <slot></slot>
+  </view>
+</view>

@@ -1,0 +1,31 @@
+<!--
+  BorderBeamButton 组件 - 旋转光束边框按钮
+  特性：
+  - 圆锥渐变旋转光束边框
+  - 加载状态时加速旋转
+  - 悬停时光束变亮
+-->
+<view
+  class="beam-button {{loading ? 'loading' : ''}} {{disabled ? 'disabled' : ''}} size-{{size}}"
+  bindtap="onTap"
+>
+  <!-- 旋转光束容器 -->
+  <view class="beam-container">
+    <view class="rotating-beam {{loading ? 'fast' : ''}}"></view>
+  </view>
+
+  <!-- 内层遮罩（创造边框效果） -->
+  <view class="inner-mask"></view>
+
+  <!-- 按钮内容 -->
+  <view class="button-content">
+    <!-- 图标 -->
+    <view class="icon-wrapper">
+      <text class="sparkle-icon" wx:if="{{!loading}}">{{icon}}</text>
+      <view class="loading-spinner" wx:else></view>
+    </view>
+
+    <!-- 文字 -->
+    <text class="button-text">{{loading ? loadingText : text}}</text>
+  </view>
+</view>
