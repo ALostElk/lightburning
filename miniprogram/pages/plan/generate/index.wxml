@@ -1,12 +1,13 @@
 <!--pages/plan/generate/index.wxml-->
 <view class="container">
+  <!-- 页面标题 -->
   <view class="header">
     <text class="title">生成健康计划</text>
     <text class="subtitle">定制您的专属减重计划</text>
   </view>
 
-  <!-- 当前状态 -->
-  <view class="card" wx:if="{{profile}}">
+  <!-- 当前用户状态卡片 -->
+  <view class="card" wx:if="{{profile}}" style="width: 501rpx; display: block; box-sizing: border-box">
     <view class="current-status">
       <view class="status-item">
         <text class="status-label">当前体重</text>
@@ -23,11 +24,11 @@
     </view>
   </view>
 
-  <!-- 计划参数 -->
-  <view class="card">
+  <!-- 计划参数卡片 -->
+  <view class="card" style="width: 501rpx; display: block; box-sizing: border-box">
     <view class="card-title">计划参数</view>
     
-    <!-- 目标减重 -->
+    <!-- 目标减重参数 -->
     <view class="param-item">
       <view class="param-header">
         <text class="param-label">目标体重变化</text>
@@ -43,7 +44,7 @@
       </view>
     </view>
 
-    <!-- 计划周期 -->
+    <!-- 计划周期参数 -->
     <view class="param-item">
       <view class="param-header">
         <text class="param-label">计划周期</text>
@@ -60,8 +61,8 @@
     </view>
   </view>
 
-  <!-- 计划预览 -->
-  <view class="card">
+  <!-- 计划预览卡片 -->
+  <view class="card" style="width: 501rpx; display: block; box-sizing: border-box">
     <view class="card-title">计划预览</view>
     
     <view class="preview-item">
@@ -76,7 +77,7 @@
     
     <view class="preview-item">
       <text class="preview-label">每周体重变化</text>
-      <text class="preview-value">{{weeklyChange}} kg</text>
+      <text class="preview-value">{{weeklyChange}} kg/周</text>
     </view>
     
     <view class="preview-item">
@@ -93,7 +94,7 @@
     </view>
   </view>
 
-  <!-- 温馨提示 -->
+  <!-- 温馨提示卡片 -->
   <view class="card tips-card">
     <view class="card-title">温馨提示</view>
     <view class="tips">
@@ -104,9 +105,8 @@
     </view>
   </view>
 
-  <!-- 生成按钮 -->
-  <button class="generate-btn" loading="{{generating}}" bindtap="onGeneratePlan">
+  <!-- 生成计划按钮 -->
+  <button class="generate-btn" loading="{{generating}}" bindtap="onGeneratePlan" style="position: relative; left: -1rpx; top: -34rpx">
     生成计划
   </button>
 </view>
-

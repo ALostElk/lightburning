@@ -2,6 +2,10 @@
 import * as api from '../../../utils/cloudApi.js';
 import * as calc from '../../../utils/calculator.js';
 
+/**
+ * 计划生成页面
+ * 用于创建和预览健康计划
+ */
 Page({
   data: {
     // 用户信息
@@ -23,16 +27,22 @@ Page({
     generating: false
   },
 
+  /**
+   * 页面加载
+   */
   onLoad() {
     this.loadProfile();
   },
 
   /**
    * 加载用户信息
+   * @private
    */
   async loadProfile() {
     try {
+      wx.showLoading({ title: '加载用户信息...' });
       const res = await api.getProfile();
+      wx.hideLoading();
       
       if (res.result?.success && res.result?.data) {
         const profile = res.result.data;
@@ -60,12 +70,15 @@ Page({
       }
     } catch (error) {
       console.error('加载用户信息失败:', error);
-      api.handleError(error);
+      wx.hideLoading();
+      api.handleError(error, '加载用户信息失败');
     }
   },
 
   /**
    * 计算预览信息
+   * 根据参数计算每日热量目标、完成日期等
+   * @private
    */
   calculatePreview() {
     const { targetWeightChange, totalDays, profile } = this.data;
@@ -99,6 +112,7 @@ Page({
 
   /**
    * 目标减重滑块变化
+   * @param {Object} e - 事件对象
    */
   onWeightChangeSlider(e) {
     const value = e.detail.value;
@@ -108,6 +122,7 @@ Page({
 
   /**
    * 计划天数滑块变化
+   * @param {Object} e - 事件对象
    */
   onDaysSlider(e) {
     const value = e.detail.value;
@@ -116,7 +131,8 @@ Page({
   },
 
   /**
-   * 目标减重输入
+   * 目标减重手动输入
+   * @param {Object} e - 事件对象
    */
   onWeightInput(e) {
     const value = Number(e.detail.value) || -5;
@@ -125,11 +141,12 @@ Page({
   },
 
   /**
-   * 计划天数输入
+   * 计划天数手动输入
+   * @param {Object} e - 事件对象
    */
   onDaysInput(e) {
     const value = Number(e.detail.value) || 90;
-    // 限制范围
+    // 限制范围在30-180天之间
     const days = Math.max(30, Math.min(180, value));
     this.setData({ totalDays: days });
     this.calculatePreview();
@@ -137,6 +154,7 @@ Page({
 
   /**
    * 生成计划
+   * 验证参数后生成健康计划
    */
   async onGeneratePlan() {
     if (this.data.generating) return;

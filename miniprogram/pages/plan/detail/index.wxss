@@ -5,32 +5,135 @@
   padding: 20rpx;
 }
 
+/* ========== 加载状态 ========== */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  font-size: 28rpx;
+  color: #999;
+}
+
+/* ========== 计划头部 ========== */
 .plan-header {
   background: linear-gradient(135deg, #FF6B6B 0%, #FF8E8E 100%);
   border-radius: 20rpx;
   padding: 40rpx;
   color: white;
   margin-bottom: 20rpx;
+  box-shadow: 0 4rpx 15rpx rgba(255, 107, 107, 0.2);
+}
+
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
 }
 
 .plan-title {
   font-size: 36rpx;
   font-weight: bold;
-  margin-bottom: 20rpx;
+  flex: 1;
 }
 
+.status-badge {
+  padding: 8rpx 20rpx;
+  border-radius: 20rpx;
+  font-size: 24rpx;
+  background: rgba(255, 255, 255, 0.3);
+  color: white;
+  font-weight: 600;
+}
+
+.status-badge.active {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+/* 计划简要信息 */
 .plan-meta {
   display: flex;
   gap: 30rpx;
   font-size: 26rpx;
+  opacity: 0.95;
+  margin-bottom: 30rpx;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.meta-icon {
+  font-size: 28rpx;
+}
+
+.meta-text {
+  line-height: 1.2;
+}
+
+/* 进度条部分 */
+.progress-section {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 16rpx;
+  padding: 20rpx;
+}
+
+.progress-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15rpx;
+}
+
+.progress-label {
+  font-size: 26rpx;
+}
+
+.progress-text {
+  font-size: 28rpx;
+  font-weight: bold;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 8rpx;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 4rpx;
+  overflow: hidden;
+  margin-bottom: 12rpx;
+}
+
+.progress-fill {
+  height: 100%;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 4rpx;
+  transition: width 0.3s ease;
+}
+
+.progress-days {
+  display: flex;
+  justify-content: space-between;
+  font-size: 24rpx;
   opacity: 0.9;
 }
 
+/* ========== 计划内容 ========== */
 .plan-content {
   background-color: white;
   border-radius: 20rpx;
   padding: 30rpx;
   margin-bottom: 20rpx;
+}
+
+.section {
+  margin-bottom: 30rpx;
+}
+
+.section:last-child {
+  margin-bottom: 0;
 }
 
 .section-title {
@@ -42,45 +145,127 @@
   border-left: 6rpx solid #FF6B6B;
 }
 
-.plan-item {
-  padding: 20rpx 0;
-  border-bottom: 2rpx solid #f0f0f0;
+/* 信息行 */
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15rpx 0;
+  border-bottom: 1rpx solid #f0f0f0;
 }
 
-.plan-item:last-child {
+.info-row:last-child {
   border-bottom: none;
 }
 
-.item-title {
-  font-size: 28rpx;
+.info-label {
+  font-size: 26rpx;
+  color: #666;
+  font-weight: 500;
+}
+
+.info-value {
+  font-size: 26rpx;
   color: #333;
+  font-weight: 600;
+}
+
+.info-value.highlight {
+  color: #FF6B6B;
+  font-size: 28rpx;
+}
+
+/* 健康评估卡片 */
+.health-card {
+  border-radius: 12rpx;
+  padding: 20rpx;
+  border-left: 4rpx solid;
+}
+
+.health-card.healthy {
+  background: #f0fdf4;
+  border-color: #22c55e;
+}
+
+.health-card.warning {
+  background: #fef3c7;
+  border-color: #f59e0b;
+}
+
+.health-status {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
   margin-bottom: 10rpx;
 }
 
-.item-description {
+.health-icon {
+  font-size: 28rpx;
+}
+
+.health-text {
   font-size: 26rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.health-desc {
+  font-size: 24rpx;
   color: #666;
+  line-height: 1.5;
+  display: block;
+  margin-left: 38rpx;
+}
+
+/* 建议列表 */
+.suggestions {
+  padding: 0 10rpx;
+}
+
+.suggestion-item {
+  display: flex;
+  margin-bottom: 12rpx;
+}
+
+.suggestion-item:last-child {
+  margin-bottom: 0;
+}
+
+.suggestion-text {
+  font-size: 26rpx;
+  color: #555;
   line-height: 1.6;
 }
 
+/* ========== 操作按钮 ========== */
 .action-buttons {
   display: flex;
   gap: 20rpx;
-  padding: 20rpx;
+  padding: 0 20rpx 20rpx;
+  margin-bottom: 40rpx;
 }
 
 .action-btn {
   flex: 1;
   height: 88rpx;
-  line-height: 88rpx;
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 44rpx;
   font-size: 30rpx;
+  font-weight: bold;
+  transition: all 0.3s ease;
 }
 
 .primary-btn {
   background: linear-gradient(135deg, #FF6B6B 0%, #FF8E8E 100%);
   color: white;
+  box-shadow: 0 4rpx 12rpx rgba(255, 107, 107, 0.3);
+}
+
+.primary-btn:active {
+  opacity: 0.9;
+  box-shadow: 0 2rpx 6rpx rgba(255, 107, 107, 0.3);
 }
 
 .secondary-btn {
@@ -89,3 +274,6 @@
   border: 2rpx solid #FF6B6B;
 }
 
+.secondary-btn:active {
+  background-color: #fafafa;
+}

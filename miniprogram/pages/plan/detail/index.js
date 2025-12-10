@@ -1,16 +1,20 @@
 // pages/plan/detail/index.js
 import * as api from '../../../utils/cloudApi.js';
 
+/**
+ * 计划详情页面
+ * 负责展示健康计划的详细信息、进度和建议
+ */
 Page({
   data: {
-    planId: '',
-    plan: null,
-    loading: true,
+    planId: '',           // 计划ID
+    plan: null,           // 计划数据
+    loading: true,        // 加载状态
     
     // 计划进度
-    progress: 0,
-    daysElapsed: 0,
-    daysRemaining: 0,
+    progress: 0,          // 完成百分比 (0-100)
+    daysElapsed: 0,       // 已完成天数
+    daysRemaining: 0,     // 剩余天数
     
     // 统计数据
     totalWeightChange: 0,
@@ -18,6 +22,10 @@ Page({
     adherenceRate: 0
   },
 
+  /**
+   * 页面加载
+   * @param {Object} options - 页面参数
+   */
   onLoad(options) {
     if (options.planId) {
       this.setData({ planId: options.planId });
@@ -30,6 +38,7 @@ Page({
 
   /**
    * 加载计划详情
+   * @private
    */
   async loadPlan() {
     wx.showLoading({ title: '加载中...' });
@@ -43,7 +52,9 @@ Page({
       if (res.data) {
         this.setData({ plan: res.data });
         this.calculateProgress();
+        wx.hideLoading();
       } else {
+        wx.hideLoading();
         wx.showToast({
           title: '计划不存在',
           icon: 'none'
@@ -52,15 +63,16 @@ Page({
       }
     } catch (error) {
       console.error('加载计划失败:', error);
+      wx.hideLoading();
       api.handleError(error, '加载计划失败');
     } finally {
-      wx.hideLoading();
       this.setData({ loading: false });
     }
   },
 
   /**
    * 加载活跃计划
+   * @private
    */
   async loadActivePlan() {
     wx.showLoading({ title: '加载中...' });
@@ -82,7 +94,9 @@ Page({
           planId: res.data[0]._id
         });
         this.calculateProgress();
+        wx.hideLoading();
       } else {
+        wx.hideLoading();
         wx.showModal({
           title: '提示',
           content: '暂无活跃计划，是否创建新计划？',
@@ -99,15 +113,17 @@ Page({
       }
     } catch (error) {
       console.error('加载计划失败:', error);
+      wx.hideLoading();
       api.handleError(error, '加载计划失败');
     } finally {
-      wx.hideLoading();
       this.setData({ loading: false });
     }
   },
 
   /**
-   * 计算进度
+   * 计算计划进度
+   * 根据开始日期、结束日期计算当前进度
+   * @private
    */
   calculateProgress() {
     const { plan } = this.data;
@@ -131,6 +147,7 @@ Page({
 
   /**
    * 编辑计划
+   * 跳转到计划生成页面进行编辑
    */
   editPlan() {
     wx.navigateTo({
@@ -139,7 +156,8 @@ Page({
   },
 
   /**
-   * 结束计划
+   * 完成计划
+   * 更新计划状态为完成
    */
   completePlan() {
     wx.showModal({
@@ -147,6 +165,7 @@ Page({
       content: '确定要结束当前计划吗？',
       success: async (res) => {
         if (res.confirm) {
+          wx.showLoading({ title: '处理中...' });
           try {
             const db = wx.cloud.database();
             await db.collection('health_plans')
@@ -158,9 +177,12 @@ Page({
                 }
               });
             
+            wx.hideLoading();
             api.showSuccess('计划已完成');
             setTimeout(() => wx.navigateBack(), 1500);
           } catch (error) {
+            wx.hideLoading();
+            console.error('完成计划失败:', error);
             api.handleError(error, '操作失败');
           }
         }
@@ -173,6 +195,8 @@ Page({
    */
   onPullDownRefresh() {
     this.loadPlan().then(() => {
+      wx.stopPullDownRefresh();
+    }).catch(() => {
       wx.stopPullDownRefresh();
     });
   }

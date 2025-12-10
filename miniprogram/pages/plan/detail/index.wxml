@@ -1,11 +1,13 @@
 <!--pages/plan/detail/index.wxml-->
 <view class="plan-detail-container">
+  <!-- 加载状态 -->
   <view wx:if="{{loading}}" class="loading-container">
     <text>加载中...</text>
   </view>
 
+  <!-- 主要内容 -->
   <view wx:elif="{{plan}}" class="content">
-    <!-- 计划头部 -->
+    <!-- ========== 计划头部 ========== -->
     <view class="plan-header">
       <view class="header-top">
         <text class="plan-title">{{plan.name || '我的健康计划'}}</text>
@@ -14,6 +16,7 @@
         </view>
       </view>
       
+      <!-- 计划简要信息 -->
       <view class="plan-meta">
         <view class="meta-item">
           <text class="meta-icon">📅</text>
@@ -29,7 +32,7 @@
         </view>
       </view>
 
-      <!-- 进度条 -->
+      <!-- 进度条部分 -->
       <view class="progress-section">
         <view class="progress-info">
           <text class="progress-label">计划进度</text>
@@ -45,9 +48,9 @@
       </view>
     </view>
 
-    <!-- 计划详情 -->
+    <!-- ========== 计划详情内容 ========== -->
     <view class="plan-content">
-      <!-- 日期信息 -->
+      <!-- 时间安排部分 -->
       <view class="section">
         <view class="section-title">📆 时间安排</view>
         <view class="info-row">
@@ -60,7 +63,7 @@
         </view>
       </view>
 
-      <!-- 目标信息 -->
+      <!-- 目标设定部分 -->
       <view class="section">
         <view class="section-title">🎯 目标设定</view>
         <view class="info-row">
@@ -81,7 +84,7 @@
         </view>
       </view>
 
-      <!-- 健康评估 -->
+      <!-- 健康评估部分 -->
       <view class="section" wx:if="{{plan.planHealth}}">
         <view class="section-title">💪 健康评估</view>
         <view class="health-card {{plan.planHealth.isHealthy ? 'healthy' : 'warning'}}">
@@ -93,7 +96,7 @@
         </view>
       </view>
 
-      <!-- 建议 -->
+      <!-- 健康建议部分 -->
       <view class="section" wx:if="{{plan.suggestions && plan.suggestions.length > 0}}">
         <view class="section-title">💡 健康建议</view>
         <view class="suggestions">
@@ -104,7 +107,7 @@
       </view>
     </view>
 
-    <!-- 操作按钮 -->
+    <!-- ========== 操作按钮 ========== -->
     <view class="action-buttons" wx:if="{{plan.status === 'active'}}">
       <view class="action-btn secondary-btn" bindtap="editPlan">
         <text>调整计划</text>
