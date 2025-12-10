@@ -113,7 +113,14 @@ async function generatePlan(openid, targetWeightChange, totalDays) {
   const totalDeficit = targetWeightChange * 7700;
   const dailyDeficit = Math.round(totalDeficit / totalDays);
 
+  // 生成唯一的计划ID（使用时间戳+随机数确保唯一性）
+  // 格式：时间戳（13位）+ 随机数（5位）= 18位ID
+  const timestamp = Date.now();
+  const random = Math.floor(Math.random() * 100000).toString().padStart(5, '0');
+  const planId = `${timestamp}${random}`;
+
   const plan = {
+    _id: planId,  // 使用自定义 _id
     _openid: openid,
     targetWeightChange,
     totalDays,
@@ -121,11 +128,57 @@ async function generatePlan(openid, targetWeightChange, totalDays) {
     dailyDeficit,
     dailyCalorieGoal: profile.tdee + dailyDeficit,
     startDate: todayString(),
-    createdAt: Date.now()
+    status: 'active',
+    createdAt: timestamp
   };
 
-  await db.collection('Plans').add({ data: plan });
-  return plan;
+  // 添加计划到数据库（使用自定义 _id）
+  let finalPlanId = planId;
+  try {
+    await db.collection('health_plans').add({ data: plan });
+    console.log('计划创建成功，planId:', planId);
+  } catch (addError) {
+    console.error('添加计划失败（可能是 _id 冲突）:', addError);
+    // 如果添加失败（可能是 _id 冲突），尝试不指定 _id 让系统自动生成
+    delete plan._id;
+    const addResult = await db.collection('health_plans').add({ data: plan });
+    // 如果系统返回了 _id，使用系统的 _id
+    if (addResult && addResult._id) {
+      finalPlanId = addResult._id;
+      plan._id = finalPlanId;
+      console.log('使用系统生成的 planId:', finalPlanId);
+    } else {
+      // 如果系统也没有返回 _id，使用我们生成的 planId
+      plan._id = planId;
+      finalPlanId = planId;
+      console.log('使用自定义 planId:', finalPlanId);
+    }
+  }
+  
+  // 构建返回对象：明确设置 planId 字段（避免 _id 被序列化过滤）
+  // 注意：微信云函数在序列化返回数据时可能会过滤掉 _id 字段
+  // 所以我们需要使用 planId 作为普通字段返回
+  const result = {
+    _openid: plan._openid,
+    targetWeightChange: plan.targetWeightChange,
+    totalDays: plan.totalDays,
+    totalDeficit: plan.totalDeficit,
+    dailyDeficit: plan.dailyDeficit,
+    dailyCalorieGoal: plan.dailyCalorieGoal,
+    startDate: plan.startDate,
+    status: plan.status,
+    createdAt: plan.createdAt,
+    planId: finalPlanId,  // 明确设置 planId 字段（符合接口文档）
+    _id: finalPlanId      // 同时保留 _id（如果序列化不过滤的话）
+  };
+  
+  console.log('返回的 result 对象:', JSON.stringify(result, null, 2));
+  console.log('result.planId:', result.planId);
+  console.log('result._id:', result._id);
+  console.log('result 的所有键:', Object.keys(result));
+  
+  // 返回包含 planId 的完整计划对象（符合接口文档规范）
+  return result;
 }
 
 /**
@@ -136,7 +189,7 @@ async function adjustPlan(openid, date, actualDeficit) {
   if (!profile) throw new Error('请先完善个人信息');
 
   // 获取当前计划
-  const planRes = await db.collection('Plans')
+  const planRes = await db.collection('health_plans')
     .where({ _openid: openid })
     .orderBy('createdAt', 'desc')
     .limit(1)
@@ -216,7 +269,7 @@ async function evaluateDaily(openid, date) {
   const profile = await getUserProfile(openid);
   if (!profile) throw new Error('请先完善个人信息');
 
-  const planRes = await db.collection('Plans')
+  const planRes = await db.collection('health_plans')
     .where({ _openid: openid })
     .orderBy('createdAt', 'desc')
     .limit(1)
@@ -295,7 +348,7 @@ async function recommendExercise(openid) {
   if (!profile) throw new Error('请先完善个人信息');
 
   // 获取当前计划
-  const planRes = await db.collection('Plans')
+  const planRes = await db.collection('health_plans')
     .where({ _openid: openid })
     .orderBy('createdAt', 'desc')
     .limit(1)

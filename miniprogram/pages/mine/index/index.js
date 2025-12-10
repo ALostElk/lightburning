@@ -94,7 +94,7 @@ Page({
       let records = 0;
       
       if (dietRes.result?.success && dietRes.result?.data) {
-        const logs = dietRes.result.data;
+        const logs = dietRes.result.data.logs || [];
         dietCalories = logs.reduce((sum, log) => sum + (log.calories || log.totalCalories || 0), 0);
         records = logs.length;
       }

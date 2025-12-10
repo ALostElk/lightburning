@@ -108,7 +108,7 @@ Page({
       let protein = 0, carbs = 0, fat = 0;
       
       if (dietRes.result?.success && dietRes.result?.data) {
-        const logs = dietRes.result.data;
+        const logs = dietRes.result.data.logs || [];
         logs.forEach(log => {
           dietCalories += log.calories || log.totalCalories || 0;
           protein += log.protein || 0;

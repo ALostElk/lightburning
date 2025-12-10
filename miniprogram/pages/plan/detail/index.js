@@ -27,10 +27,16 @@ Page({
    * @param {Object} options - 页面参数
    */
   onLoad(options) {
-    if (options.planId) {
-      this.setData({ planId: options.planId });
-      this.loadPlan();
+    console.log('详情页 onLoad，options:', options);
+    const planId = options.planId;
+    
+    // 检查 planId 是否有效（不能是 undefined、null、空字符串或字符串 "undefined"）
+    if (planId && planId !== 'undefined' && planId !== 'null') {
+      // 直接使用 planId，不依赖 setData 的异步更新
+      this.setData({ planId });
+      this.loadPlan(planId);
     } else {
+      console.warn('planId 无效，尝试加载活跃计划');
       // 加载最新的活跃计划
       this.loadActivePlan();
     }
@@ -38,15 +44,30 @@ Page({
 
   /**
    * 加载计划详情
+   * @param {string} planId - 计划ID（可选，默认使用 this.data.planId）
    * @private
    */
-  async loadPlan() {
+  async loadPlan(planId) {
+    const id = planId || this.data.planId;
+    console.log('loadPlan 调用，planId:', id);
+    
+    if (!id) {
+      console.error('planId 为空');
+      wx.showToast({
+        title: '计划ID不存在',
+        icon: 'none'
+      });
+      setTimeout(() => wx.navigateBack(), 1500);
+      return;
+    }
+    
     wx.showLoading({ title: '加载中...' });
     
     try {
       const db = wx.cloud.database();
+      console.log('查询计划，_id:', id);
       const res = await db.collection('health_plans')
-        .doc(this.data.planId)
+        .doc(id)
         .get();
       
       if (res.data) {
@@ -79,9 +100,9 @@ Page({
     
     try {
       const db = wx.cloud.database();
+      // 移除错误的 _openid 条件，云数据库会自动过滤当前用户的记录
       const res = await db.collection('health_plans')
         .where({
-          _openid: '{openid}',
           status: 'active'
         })
         .orderBy('createdAt', 'desc')
@@ -97,24 +118,46 @@ Page({
         wx.hideLoading();
       } else {
         wx.hideLoading();
-        wx.showModal({
-          title: '提示',
-          content: '暂无活跃计划，是否创建新计划？',
-          success: (res) => {
-            if (res.confirm) {
-              wx.redirectTo({
-                url: '/pages/plan/generate/index'
-              });
-            } else {
-              wx.navigateBack();
+        // 避免死循环：如果是从生成页跳转过来的，直接返回上一页
+        const pages = getCurrentPages();
+        const prevPage = pages[pages.length - 2];
+        if (prevPage && prevPage.route === 'pages/plan/generate/index') {
+          wx.showToast({
+            title: '计划加载失败',
+            icon: 'none'
+          });
+          setTimeout(() => wx.navigateBack(), 1500);
+        } else {
+          wx.showModal({
+            title: '提示',
+            content: '暂无活跃计划，是否创建新计划？',
+            success: (res) => {
+              if (res.confirm) {
+                wx.navigateTo({
+                  url: '/pages/plan/generate/index'
+                });
+              } else {
+                wx.navigateBack();
+              }
             }
-          }
-        });
+          });
+        }
       }
     } catch (error) {
       console.error('加载计划失败:', error);
       wx.hideLoading();
       api.handleError(error, '加载计划失败');
+      // 避免死循环：查询失败时返回上一页，而不是跳转到生成页
+      setTimeout(() => {
+        const pages = getCurrentPages();
+        if (pages.length > 1) {
+          wx.navigateBack();
+        } else {
+          wx.redirectTo({
+            url: '/pages/home/index'
+          });
+        }
+      }, 1500);
     } finally {
       this.setData({ loading: false });
     }

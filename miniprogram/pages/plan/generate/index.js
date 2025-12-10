@@ -180,16 +180,39 @@ Page({
       
       const res = await api.generatePlan(targetWeightChange, totalDays);
       
+      console.log('云函数返回的完整结果:', res);
+      console.log('res.result:', res.result);
+      console.log('res.result.success:', res.result?.success);
+      console.log('res.result.data:', res.result?.data);
+      
       if (res.result?.success) {
+        const data = res.result.data;
+        console.log('返回的 data 对象:', data);
+        console.log('data._id:', data?._id);
+        console.log('data.planId:', data?.planId);
+        console.log('data 的所有键:', data ? Object.keys(data) : 'data 为空');
+        
+        // 尝试多种方式获取 planId（优先使用 planId，然后是 _id）
+        const planId = data?.planId || data?._id;
+        
+        if (!planId) {
+          console.error('生成计划成功但未返回 planId');
+          console.error('res.result:', JSON.stringify(res.result, null, 2));
+          console.error('完整响应:', JSON.stringify(res, null, 2));
+          throw new Error('计划ID获取失败，请重试');
+        }
+        
+        console.log('计划生成成功，planId:', planId);
         api.showSuccess('计划生成成功');
         
-        // 跳转到计划详情页
+        // 跳转到计划详情页，传递 planId
         setTimeout(() => {
           wx.redirectTo({
-            url: '/pages/plan/detail/index'
+            url: `/pages/plan/detail/index?planId=${planId}`
           });
         }, 1000);
       } else {
+        console.error('生成计划失败:', res.result);
         throw new Error(res.result?.error || '生成失败');
       }
       

@@ -336,7 +336,7 @@ lightburning/
 | 集合名 | 说明 | 权限 | 关键字段 |
 |--------|------|------|----------|
 | **UserProfiles** | 用户信息 | 仅创建者可读写 | gender, age, height, weight, bmr, tdee, bmi |
-| **Plans** | 减重计划 | 仅创建者可读写 | targetWeightChange, totalDays, dailyDeficit |
+| **health_plans** | 减重计划 | 仅创建者可读写 | targetWeightChange, totalDays, dailyDeficit |
 | **DietLog** | 饮食记录 | 仅创建者可读写 | name, calories, protein, fat, carbs, mealType |
 | **ExerciseLog** | 运动记录 | 仅创建者可读写 | name, duration, calories, date |
 | **FoodDB** | 食物数据库 | 所有用户可读<br>仅创建者可写 | name, calories, protein, fat, carbs, source |
@@ -441,7 +441,7 @@ App({
 ```bash
 # 用户相关
 UserProfiles          # 权限：仅创建者可读写
-Plans                 # 权限：仅创建者可读写
+health_plans          # 权限：仅创建者可读写
 
 # 记录相关
 DietLog               # 权限：仅创建者可读写
