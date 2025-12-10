@@ -1,94 +1,107 @@
-<!--pages/stats/index/index.wxml-->
-<view class="container">
-  <view class="header">
-    <text class="title">数据统计</text>
+<view class="header-card">
+  <view class="header-top">
+    <view class="header-title">数据概览</view>
+    <view class="header-link" bindtap="goWeeklyReport">
+      周报告 >
+    </view>
+  </view>
+  <view class="header-card">
+  <view class="header-top">
+    <view class="header-title">选择周期</view>
+    <view class="header-link" bindtap="goWeeklyReport">
+     
+    </view>
+  </view>
+    <view class="range-tabs">
+      <view
+        class="range-tab {{rangeType === 7 ? 'active' : ''}}"
+        data-days="7"
+        bindtap="onRangeChange"
+      >近7天</view>
+      <view
+        class="range-tab {{rangeType === 30 ? 'active' : ''}}"
+        data-days="30"
+        bindtap="onRangeChange"
+      >近30天</view>
+      <view
+        class="range-tab {{rangeType === 90 ? 'active' : ''}}"
+        data-days="90"
+        bindtap="onRangeChange"
+      >近90天</view>
+    </view>
+    <view class="time-text">{{startDate}} ~ {{endDate}}</view>
   </view>
 
-  <!-- 时间范围选择 -->
-  <view class="time-range">
-    <view class="range-btn {{timeRange === 7 ? 'active' : ''}}" data-range="7" bindtap="onTimeRangeChange">7天</view>
-    <view class="range-btn {{timeRange === 30 ? 'active' : ''}}" data-range="30" bindtap="onTimeRangeChange">30天</view>
-    <view class="range-btn {{timeRange === 90 ? 'active' : ''}}" data-range="90" bindtap="onTimeRangeChange">90天</view>
-  </view>
-
-  <!-- 饮食统计 -->
-  <view class="card">
-    <view class="card-title">📊 饮食统计</view>
-    
-    <view class="summary-grid">
-      <view class="summary-item">
-        <text class="summary-value primary">{{dietSummary.totalCalories}}</text>
-        <text class="summary-label">总热量(kcal)</text>
-      </view>
-      <view class="summary-item">
-        <text class="summary-value">{{dietSummary.avgCalories}}</text>
-        <text class="summary-label">日均热量</text>
-      </view>
-      <view class="summary-item">
-        <text class="summary-value protein">{{dietSummary.totalProtein}}g</text>
-        <text class="summary-label">蛋白质</text>
-      </view>
-      <view class="summary-item">
-        <text class="summary-value carbs">{{dietSummary.totalCarbs}}g</text>
-        <text class="summary-label">碳水</text>
-      </view>
-      <view class="summary-item">
-        <text class="summary-value fat">{{dietSummary.totalFat}}g</text>
-        <text class="summary-label">脂肪</text>
-      </view>
-      <view class="summary-item">
-        <text class="summary-value">{{dietLogs.length}}</text>
-        <text class="summary-label">记录次数</text>
-      </view>
+  <!-- 核心指标卡片 -->
+  <view class="kpi-row">
+    <view class="kpi-card">
+      <view class="kpi-label">体重变化</view>
+      <view class="kpi-value">{{weightDeltaText}}</view>
+      <view class="kpi-sub">当前：{{currentWeight || '--'}} kg</view>
+    </view>
+    <view class="kpi-card">
+      <view class="kpi-label">平均净热量</view>
+      <view class="kpi-value">{{avgNetCalories || '--'}} kcal</view>
+      <view class="kpi-sub">目标差值：{{avgDeficitText}}</view>
     </view>
   </view>
 
-  <!-- 运动统计 -->
-  <view class="card">
-    <view class="card-title">💪 运动统计</view>
-    
-    <view class="summary-grid">
-      <view class="summary-item">
-        <text class="summary-value primary">{{exerciseSummary.totalDuration}}</text>
-        <text class="summary-label">总时长(分钟)</text>
+  <!-- 运动统计 + 达标率 -->
+  <view class="section-card">
+    <view class="section-header">
+      <view class="section-title">运动 & 达标</view>
+      <view class="section-sub">统计期间</view>
+    </view>
+    <view class="exercise-row">
+      <view class="exercise-block">
+        <view class="exercise-label">总运动次数</view>
+        <view class="exercise-value">{{exerciseStats.totalCount}}</view>
       </view>
-      <view class="summary-item">
-        <text class="summary-value">{{exerciseSummary.totalCalories}}</text>
-        <text class="summary-label">总消耗(kcal)</text>
+      <view class="exercise-block">
+        <view class="exercise-label">总运动时长</view>
+        <view class="exercise-value">{{exerciseStats.totalDuration}} min</view>
       </view>
-      <view class="summary-item">
-        <text class="summary-value">{{exerciseSummary.avgCalories}}</text>
-        <text class="summary-label">平均消耗</text>
+      <view class="exercise-block">
+        <view class="exercise-label">总消耗</view>
+        <view class="exercise-value">{{exerciseStats.totalCalories}} kcal</view>
       </view>
-      <view class="summary-item">
-        <text class="summary-value">{{exerciseSummary.count}}</text>
-        <text class="summary-label">运动次数</text>
+    </view>
+    <view class="rate-row">
+      <view class="rate-text">
+        达标天数：{{goalDays}} / {{totalDays}} 天
       </view>
+      <view class="rate-bar">
+        <view class="rate-fill" style="width: {{goalRateWidth}};"></view>
+
+      </view>
+      <view class="rate-percent">{{goalRate}}%</view>
     </view>
   </view>
 
-  <!-- 体重变化 -->
-  <view class="card" wx:if="{{weightRecords.length > 0}}">
-    <view class="card-title">⚖️ 体重变化</view>
-    
-    <view class="weight-change">
-      <text class="weight-value {{weightChange < 0 ? 'decrease' : 'increase'}}">
-        {{weightChange > 0 ? '+' : ''}}{{weightChange}}kg
-      </text>
-      <text class="weight-label">近{{timeRange}}天变化</text>
+  <!-- 体重变化折线图 -->
+  <view class="section-card">
+    <view class="section-header">
+      <view class="section-title">体重变化</view>
+      <view class="section-sub">更直观地看到趋势</view>
     </view>
+    
   </view>
 
-  <!-- 空状态 -->
-  <view class="empty-state" wx:if="{{dietLogs.length === 0 && exerciseLogs.length === 0 && !loading}}">
-    <text class="empty-icon">📊</text>
-    <text class="empty-text">暂无统计数据</text>
-    <text class="empty-hint">开始记录饮食和运动吧</text>
+  <!-- 热量趋势图 -->
+  <view class="section-card">
+    <view class="section-header">
+      <view class="section-title">热量趋势</view>
+      <view class="section-sub">摄入 / 消耗 / 净差</view>
+    </view>
+    
   </view>
 
-  <!-- 加载状态 -->
-  <view class="loading-state" wx:if="{{loading}}">
-    <text>加载中...</text>
+  <!-- 营养素分布 -->
+  <view class="section-card">
+    <view class="section-header">
+      <view class="section-title">营养素分布</view>
+      <view class="section-sub">平均每日摄入</view>
+    </view>
+    
   </view>
 </view>
-
