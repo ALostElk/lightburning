@@ -65,7 +65,7 @@
           <text class="tip-text">确保食物在画面中清晰可见</text>
         </view>
         <view class="tip-item">
-          <text class="tip-icon">🎯</text>
+          <text class="tip-icon">☀️</text>
           <text class="tip-text">光线充足的环境识别效果更佳</text>
         </view>
       </view>
@@ -74,7 +74,11 @@
     <!-- ====== 已拍照状态：结果区域 ====== -->
     <view wx:else class="result-section">
       <!-- 图片预览卡片 -->
-      <spotlight-card customClass="preview-card" theme="primary">
+      <spotlight-card customClass="preview-card {{isAnalyzing ? 'analyzing' : ''}}" theme="primary">
+        <!-- 旋转光边效果 -->
+        <view class="beam-border {{isAnalyzing ? 'active' : ''}}">
+          <view class="rotating-beam"></view>
+        </view>
         <view class="preview-wrapper">
           <image
             src="{{imagePreview}}"

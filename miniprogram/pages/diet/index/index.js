@@ -39,28 +39,28 @@ Page({
         id: 'breakfast',
         type: 'breakfast',
         title: '早餐',
-        emojiIcon: '🍳',
+        emojiIcon: '🌅',
         totalCalories: 0,
         percentage: 0,
         suggestMin: 300,
         suggestMax: 500,
         emptyText: '美好的一天从早餐开始',
         items: [],
-        collapsed: false,
+        collapsed: true,
         bgStyle: 'background: linear-gradient(135deg, #FFF7ED 0%, #FFEDD5 100%)'
       },
       {
         id: 'lunch',
         type: 'lunch',
         title: '午餐',
-        emojiIcon: '🥗',
+        emojiIcon: '☀️',
         totalCalories: 0,
         percentage: 0,
         suggestMin: 600,
         suggestMax: 800,
         emptyText: '午餐要吃饱，精力才充沛',
         items: [],
-        collapsed: false,
+        collapsed: true,
         bgStyle: 'background: linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%)'
       },
       {
@@ -74,21 +74,21 @@ Page({
         suggestMax: 600,
         emptyText: '晚餐清淡点，睡眠质量高',
         items: [],
-        collapsed: false,
+        collapsed: true,
         bgStyle: 'background: linear-gradient(135deg, #F5F3FF 0%, #EDE9FE 100%)'
       },
       {
         id: 'snack',
         type: 'snack',
         title: '加餐',
-        emojiIcon: '🍎',
+        emojiIcon: '🍩',
         totalCalories: 0,
         percentage: 0,
         suggestMin: 100,
         suggestMax: 300,
         emptyText: '适量加餐，保持代谢活力',
         items: [],
-        collapsed: false,
+        collapsed: true,
         bgStyle: 'background: linear-gradient(135deg, #FFF1F2 0%, #FFE4E6 100%)'
       }
     ],
@@ -214,19 +214,8 @@ Page({
   // 格式化日期显示
   formatDateDisplay(dateStr) {
     const date = new Date(dateStr);
-    const today = new Date();
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
-
     const month = date.getMonth() + 1;
     const day = date.getDate();
-
-    if (dateStr === today.toISOString().slice(0, 10)) {
-      return `今天 ${month}/${day}`;
-    } else if (dateStr === yesterday.toISOString().slice(0, 10)) {
-      return `昨天 ${month}/${day}`;
-    }
-
     return `${month}月${day}日`;
   },
 
@@ -290,15 +279,15 @@ Page({
   // 切换折叠状态
   toggleMealCollapse(e) {
     const mealType = e.currentTarget.dataset.mealtype;
-    const meals = this.data.meals.map(meal => {
-      if (meal.type === mealType) {
-        return { ...meal, collapsed: !meal.collapsed };
-      }
-      return meal;
-    });
-    this.setData({ meals }, () => {
-      this.saveCollapseState();
-    });
+    const index = this.data.meals.findIndex(m => m.type === mealType);
+    if (index !== -1) {
+      const newCollapsed = !this.data.meals[index].collapsed;
+      this.setData({
+        [`meals[${index}].collapsed`]: newCollapsed
+      }, () => {
+        this.saveCollapseState();
+      });
+    }
   },
 
   // 获取有记录的日期列表
@@ -492,6 +481,39 @@ Page({
     d.setDate(diff);
     this.setData({ showCalendarModal: false });
     this.changeDate(d.toISOString().slice(0, 10));
+  },
+
+  // 切换到前一天
+  goToPrevDay() {
+    const [year, month, day] = this.data.selectedDate.split('-').map(Number);
+    const currentDate = new Date(year, month - 1, day);
+    currentDate.setDate(currentDate.getDate() - 1);
+
+    const newYear = currentDate.getFullYear();
+    const newMonth = String(currentDate.getMonth() + 1).padStart(2, '0');
+    const newDay = String(currentDate.getDate()).padStart(2, '0');
+    this.changeDate(`${newYear}-${newMonth}-${newDay}`);
+  },
+
+  // 切换到后一天
+  goToNextDay() {
+    const [year, month, day] = this.data.selectedDate.split('-').map(Number);
+    const currentDate = new Date(year, month - 1, day);
+    currentDate.setDate(currentDate.getDate() + 1);
+
+    const newYear = currentDate.getFullYear();
+    const newMonth = String(currentDate.getMonth() + 1).padStart(2, '0');
+    const newDay = String(currentDate.getDate()).padStart(2, '0');
+    const nextDateStr = `${newYear}-${newMonth}-${newDay}`;
+
+    const todayStr = this.getTodayString();
+
+    // 不能选择未来日期（字符串比较）
+    if (nextDateStr > todayStr) {
+      wx.showToast({ title: '不能选择未来日期', icon: 'none' });
+      return;
+    }
+    this.changeDate(nextDateStr);
   },
 
   // 获取饮食记录
@@ -907,29 +929,38 @@ Page({
   // 切换单餐编辑模式
   toggleMealEdit(e) {
     const mealType = e.currentTarget.dataset.mealtype;
-    const meals = this.data.meals.map(meal => {
-      if (meal.type === mealType) {
-        const newIsEditing = !meal.isEditing;
-        if (!newIsEditing) {
-          // 退出编辑时清除该餐次的选择
-          return {
-            ...meal,
-            isEditing: false,
-            items: meal.items.map(item => ({ ...item, selected: false }))
-          };
+    const index = this.data.meals.findIndex(m => m.type === mealType);
+    if (index === -1) return;
+
+    const meal = this.data.meals[index];
+    const newIsEditing = !meal.isEditing;
+    const updateData = {};
+
+    if (!newIsEditing) {
+      // 退出编辑时清除该餐次的选择
+      updateData[`meals[${index}].isEditing`] = false;
+      // 清除选中状态
+      meal.items.forEach((item, itemIndex) => {
+        if (item.selected) {
+          updateData[`meals[${index}].items[${itemIndex}].selected`] = false;
         }
-        return { ...meal, isEditing: true };
-      }
-      return meal;
-    });
+      });
+    } else {
+      // 进入编辑模式时自动展开餐次
+      updateData[`meals[${index}].isEditing`] = true;
+      updateData[`meals[${index}].collapsed`] = false;
+    }
 
-    const hasAnyMealEditing = meals.some(m => m.isEditing);
+    // 计算是否有任何餐次在编辑模式
+    let hasAnyMealEditing = newIsEditing;
+    if (!newIsEditing) {
+      hasAnyMealEditing = this.data.meals.some((m, i) => i !== index && m.isEditing);
+    }
 
-    this.setData({
-      meals,
-      hasAnyMealEditing,
-      isEditMode: false  // 单餐编辑时退出全局编辑模式
-    }, () => {
+    updateData.hasAnyMealEditing = hasAnyMealEditing;
+    updateData.isEditMode = false;
+
+    this.setData(updateData, () => {
       this.updateSelectionStats();
     });
   },
@@ -953,17 +984,20 @@ Page({
   // 切换单个食物选择
   toggleFoodSelect(e) {
     const foodId = e.currentTarget.dataset.id;
-    const meals = this.data.meals.map(meal => ({
-      ...meal,
-      items: meal.items.map(item => {
-        if (item.id === foodId) {
-          return { ...item, selected: !item.selected };
-        }
-        return item;
-      })
-    }));
+    const mealType = e.currentTarget.dataset.mealtype;
 
-    this.setData({ meals }, () => {
+    // 找到对应的餐次和食物索引
+    const mealIndex = this.data.meals.findIndex(m => m.type === mealType);
+    if (mealIndex === -1) return;
+
+    const itemIndex = this.data.meals[mealIndex].items.findIndex(item => item.id === foodId);
+    if (itemIndex === -1) return;
+
+    const newSelected = !this.data.meals[mealIndex].items[itemIndex].selected;
+
+    this.setData({
+      [`meals[${mealIndex}].items[${itemIndex}].selected`]: newSelected
+    }, () => {
       this.updateSelectionStats();
     });
   },
@@ -973,15 +1007,20 @@ Page({
     let selectedCount = 0;
     let selectedCalories = 0;
     let totalItems = 0;
+    const { isEditMode, hasAnyMealEditing } = this.data;
 
     this.data.meals.forEach(meal => {
-      meal.items.forEach(item => {
-        totalItems++;
-        if (item.selected) {
-          selectedCount++;
-          selectedCalories += item.calories || 0;
-        }
-      });
+      // 单餐编辑模式下只统计当前编辑的餐次
+      const shouldCount = isEditMode || (hasAnyMealEditing && meal.isEditing);
+      if (shouldCount) {
+        meal.items.forEach(item => {
+          totalItems++;
+          if (item.selected) {
+            selectedCount++;
+            selectedCalories += item.calories || 0;
+          }
+        });
+      }
     });
 
     this.setData({
@@ -994,12 +1033,20 @@ Page({
   // 全选/取消全选
   toggleSelectAll() {
     const shouldSelectAll = !this.data.isAllSelected;
-    const meals = this.data.meals.map(meal => ({
-      ...meal,
-      items: meal.items.map(item => ({ ...item, selected: shouldSelectAll }))
-    }));
+    const { isEditMode, hasAnyMealEditing } = this.data;
+    const updateData = {};
 
-    this.setData({ meals }, () => {
+    this.data.meals.forEach((meal, mealIndex) => {
+      // 单餐编辑模式下只操作当前编辑的餐次
+      const shouldOperate = isEditMode || (hasAnyMealEditing && meal.isEditing);
+      if (shouldOperate) {
+        meal.items.forEach((item, itemIndex) => {
+          updateData[`meals[${mealIndex}].items[${itemIndex}].selected`] = shouldSelectAll;
+        });
+      }
+    });
+
+    this.setData(updateData, () => {
       this.updateSelectionStats();
     });
   },
@@ -1007,12 +1054,18 @@ Page({
   // 批量删除选中的食物
   async deleteSelectedFoods() {
     const selectedIds = [];
+    const { isEditMode, hasAnyMealEditing } = this.data;
+
     this.data.meals.forEach(meal => {
-      meal.items.forEach(item => {
-        if (item.selected) {
-          selectedIds.push(item.id);
-        }
-      });
+      // 单餐编辑模式下只操作当前编辑的餐次
+      const shouldOperate = isEditMode || (hasAnyMealEditing && meal.isEditing);
+      if (shouldOperate) {
+        meal.items.forEach(item => {
+          if (item.selected) {
+            selectedIds.push(item.id);
+          }
+        });
+      }
     });
 
     if (selectedIds.length === 0) {

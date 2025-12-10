@@ -35,10 +35,10 @@ Page({
 
     // 餐次 Emoji
     mealEmojis: {
-      breakfast: '🍳',
-      lunch: '🥗',
+      breakfast: '🌅',
+      lunch: '☀️',
       dinner: '🌙',
-      snack: '🍎'
+      snack: '🍩'
     },
 
     // 提交状态

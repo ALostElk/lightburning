@@ -266,9 +266,8 @@
   align-items: center;
   gap: 16rpx;
   padding: 20rpx 24rpx;
-  background: rgba(255, 255, 255, 0.6);
+  background: transparent;
   border-radius: 16rpx;
-  backdrop-filter: blur(10rpx);
 }
 
 .tip-icon {
@@ -292,6 +291,45 @@
   position: relative;
   border-radius: 24rpx;
   overflow: hidden;
+}
+
+/* ============ 旋转光边效果 ============ */
+.beam-border {
+  position: absolute;
+  top: -4rpx;
+  left: -4rpx;
+  right: -4rpx;
+  bottom: -4rpx;
+  border-radius: 28rpx;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 0;
+}
+
+.beam-border.active {
+  opacity: 1;
+}
+
+.beam-border .rotating-beam {
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg 270deg,
+    #FF6B35 300deg,
+    #F59E0B 330deg,
+    #FF6B35 360deg
+  );
+  animation: beam-spin 2s linear infinite;
+}
+
+@keyframes beam-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 .preview-image {

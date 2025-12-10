@@ -5,6 +5,7 @@
   - 全息噪声纹理
   - 触摸跟踪白色光泽
   - 按压缩放动画
+  - 加载时旋转光边
 -->
 <view
   class="glow-button {{disabled ? 'disabled' : ''}} {{loading ? 'loading' : ''}}"
@@ -14,6 +15,11 @@
   bindtouchcancel="onTouchEnd"
   bindtap="onTap"
 >
+  <!-- 旋转光边效果 -->
+  <view class="beam-border {{loading ? 'active' : ''}}">
+    <view class="rotating-beam"></view>
+  </view>
+
   <!-- 全息纹理层 -->
   <view class="holo-texture-layer"></view>
 

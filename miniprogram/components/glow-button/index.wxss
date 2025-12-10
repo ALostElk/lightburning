@@ -33,6 +33,46 @@
   pointer-events: none;
 }
 
+/* ============ 旋转光边效果 ============ */
+.beam-border {
+  position: absolute;
+  top: -6rpx;
+  left: -6rpx;
+  right: -6rpx;
+  bottom: -6rpx;
+  border-radius: 38rpx;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: -1;
+}
+
+.beam-border.active {
+  opacity: 1;
+}
+
+.beam-border .rotating-beam {
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg 240deg,
+    #FFFFFF 270deg,
+    #FFE4C4 300deg,
+    #FFFFFF 330deg,
+    transparent 360deg
+  );
+  animation: beam-spin 1.5s linear infinite;
+}
+
+@keyframes beam-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 /* 全息纹理层 */
 .holo-texture-layer {
   position: absolute;

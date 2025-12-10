@@ -22,19 +22,24 @@
           <text class="user-name">{{userInfo.nickName || '健康达人'}}</text>
         </view>
       </view>
-
-      <!-- 右侧：AI 洞察按钮 -->
-      <border-beam-button
-        text="AI 洞察"
-        icon="✨"
-        loading="{{isAnalyzing}}"
-        bindtap="onAIInsight"
-      />
     </view>
   </view>
 
   <!-- ============ 主内容区 ============ -->
   <view class="main-content">
+    <!-- ============ 日期切换导航栏 ============ -->
+    <view class="date-nav-bar">
+      <view class="date-nav-arrow" bindtap="goToPrevDay">
+        <text class="arrow-icon">‹</text>
+      </view>
+      <view class="date-nav-center" bindtap="showCalendar">
+        <text class="date-nav-text">{{dateDisplay}}</text>
+      </view>
+      <view class="date-nav-arrow" bindtap="goToNextDay">
+        <text class="arrow-icon">›</text>
+      </view>
+    </view>
+
     <!-- AI 分析横幅（条件渲染） -->
     <view class="ai-banner animate-fade-in-up" wx:if="{{aiInsight}}">
       <view class="ai-banner-content">
@@ -134,28 +139,14 @@
       </view>
     </spotlight-card>
 
-    <!-- ============ 每日挑战按钮 ============ -->
-    <view class="challenge-section">
-      <glow-button
-        title="开启每日挑战"
-        subtitle="赢取 50 积分"
-        bindtap="onStartChallenge"
-      />
-    </view>
-
     <!-- ============ 饮食时间线 ============ -->
     <view class="timeline-section">
       <view class="section-header">
-        <text class="section-title">今日饮食</text>
+        <text class="section-title">饮食记录</text>
         <view class="header-right">
           <!-- 编辑模式按钮 -->
           <view class="edit-btn {{isEditMode ? 'active' : ''}}" catchtap="toggleEditMode">
             <text>{{isEditMode ? '完成' : '编辑'}}</text>
-          </view>
-          <view class="date-badge" catchtap="showCalendar">
-            <text class="calendar-icon">📅</text>
-            <text>{{dateDisplay}}</text>
-            <text class="date-arrow">›</text>
           </view>
         </view>
       </view>
