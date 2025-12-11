@@ -1,70 +1,440 @@
-<!--pages/exercise/index/index.wxml-->
-<view class="container">
-  <view class="header">
-    <text class="title">运动管理</text>
-  </view>
-
-  <!-- 今日运动概览 -->
-  <view class="card summary-card">
-    <view class="summary-item">
-      <text class="summary-label">总时长</text>
-      <text class="summary-value">{{todayTotal.duration}}分钟</text>
-    </view>
-    <view class="summary-item">
-      <text class="summary-label">总消耗</text>
-      <text class="summary-value">{{todayTotal.calories}}kcal</text>
-    </view>
-  </view>
-
-  <!-- 快捷操作 -->
-  <view class="action-buttons">
-    <view class="action-btn" bindtap="goToLibrary">
-      <text class="action-icon">📚</text>
-      <text class="action-text">运动库</text>
-    </view>
-    <view class="action-btn" bindtap="goToRecommend">
-      <text class="action-icon">🎯</text>
-      <text class="action-text">智能推荐</text>
-    </view>
-  </view>
-
-  <!-- 今日运动记录 -->
-  <view class="card" wx:if="{{logs.length > 0}}">
-    <view class="card-title">今日记录</view>
-    
-    <view class="log-list">
-      <view class="log-item" wx:for="{{logs}}" wx:key="_id">
-        <view class="log-info">
-          <text class="log-name">{{item.name}}</text>
-          <text class="log-meta">{{item.duration}}分钟 · {{item.calories}}kcal</text>
+<!--
+  运动记录主页 - exercise/index
+  设计语言: Daylight Futurism (日光未来主义)
+  功能: 折叠运动类型 + 日历选择
+-->
+<view class="page-container">
+  <!-- ============ 粘性头部 ============ -->
+  <view class="sticky-header" style="padding-top: {{statusBarHeight}}px;">
+    <view class="header-content">
+      <!-- 左侧：用户信息 -->
+      <view class="user-info">
+        <view class="avatar-wrapper">
+          <image
+            class="user-avatar"
+            src="{{userInfo.avatarUrl || '/images/default-avatar.png'}}"
+            mode="aspectFill"
+          />
+          <view class="status-dot"></view>
         </view>
-        <view class="log-action" data-id="{{item._id}}" bindtap="deleteLog">
-          <text>删除</text>
+        <view class="user-text">
+          <text class="greeting">{{greeting}}</text>
+          <text class="user-name">{{userInfo.nickName || '运动达人'}}</text>
         </view>
       </view>
     </view>
   </view>
 
-  <!-- 推荐运动 -->
-  <view class="card" wx:if="{{recommended.length > 0}}">
-    <view class="card-title">推荐运动</view>
-    
-    <view class="exercise-list">
-      <view class="exercise-item" wx:for="{{recommended}}" wx:key="id">
-        <view class="exercise-info">
-          <text class="exercise-name">{{item.name}}</text>
-          <text class="exercise-meta">{{item.duration}}分钟 · {{item.calories}}kcal</text>
+  <!-- ============ 主内容区 ============ -->
+  <view class="main-content">
+    <!-- ============ 日期切换导航栏 ============ -->
+    <view class="date-nav-bar">
+      <view class="date-nav-arrow" bindtap="goToPrevDay">
+        <text class="arrow-icon">‹</text>
+      </view>
+      <view class="date-nav-center" bindtap="showCalendar">
+        <text class="date-nav-text">{{dateDisplay}}</text>
+      </view>
+      <view class="date-nav-arrow" bindtap="goToNextDay">
+        <text class="arrow-icon">›</text>
+      </view>
+    </view>
+
+    <!-- AI 分析横幅（条件渲染） -->
+    <view class="ai-banner animate-fade-in-up" wx:if="{{aiInsight}}">
+      <view class="ai-banner-content">
+        <view class="ai-icon-wrapper">
+          <text class="ai-icon">🧠</text>
         </view>
-        <button class="add-btn" data-exercise="{{item}}" bindtap="onAddExercise">记录</button>
+        <view class="ai-text">
+          <text class="ai-title">AI 智能分析</text>
+          <text class="ai-message">{{aiInsight}}</text>
+        </view>
+      </view>
+      <view class="ai-close" bindtap="closeAIBanner">
+        <text>×</text>
+      </view>
+    </view>
+
+    <!-- ============ 仪表盘卡片 ============ -->
+    <spotlight-card customClass="dashboard-card" holo="{{true}}" customStyle="background: linear-gradient(135deg, #FFF7ED 0%, #FFEDD5 100%)">
+      <view class="dashboard-content">
+        <!-- 热量环形图 + 核心数据 -->
+        <view class="calories-dashboard">
+          <!-- 左侧：环形进度图 -->
+          <view class="donut-chart-wrapper">
+            <view class="donut-chart">
+              <view
+                class="donut-ring"
+                style="background: conic-gradient(#FF6B35 0deg {{consumedDegrees}}deg, #E5E7EB {{consumedDegrees}}deg 360deg);"
+              ></view>
+              <view class="donut-center">
+                <view class="donut-value-wrapper">
+                  <text class="donut-value">{{stats.totalCalories}}</text>
+                  <text class="donut-unit">kcal</text>
+                </view>
+                <text class="donut-label">已消耗</text>
+              </view>
+            </view>
+          </view>
+
+          <!-- 右侧：详细数据 -->
+          <view class="calories-details">
+            <view class="calorie-row">
+              <view class="calorie-indicator consumed"></view>
+              <text class="calorie-label">已消耗</text>
+              <view class="calorie-value-wrapper">
+                <text class="calorie-value">{{stats.totalCalories}}</text>
+                <text class="calorie-unit">kcal</text>
+              </view>
+            </view>
+            <view class="calorie-row">
+              <view class="calorie-indicator duration"></view>
+              <text class="calorie-label">总时长</text>
+              <text class="calorie-value">{{stats.totalDuration}}分</text>
+            </view>
+            <view class="calorie-row goal">
+              <view class="calorie-indicator goal-ind"></view>
+              <text class="calorie-label">目标</text>
+              <view class="calorie-value-wrapper">
+                <text class="calorie-value">{{stats.targetCalories}}</text>
+                <text class="calorie-unit">kcal</text>
+              </view>
+            </view>
+          </view>
+        </view>
+
+        <!-- 运动时长进度条 -->
+        <view class="macros-section">
+          <view class="macro-bar">
+            <view class="macro-info">
+              <text class="macro-name">运动时长</text>
+              <text class="macro-values">{{stats.totalDuration}}分钟 / {{stats.targetDuration}}分钟</text>
+            </view>
+            <view class="macro-progress-bg">
+              <view
+                class="macro-progress-fill duration-fill"
+                style="width: {{stats.durationPercentage > 100 ? 100 : stats.durationPercentage}}%"
+              ></view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </spotlight-card>
+
+    <!-- ============ 运动时间线 ============ -->
+    <view class="timeline-section">
+      <view class="section-header">
+        <text class="section-title">运动记录</text>
+        <view class="header-right">
+          <!-- 编辑模式按钮 -->
+          <view class="edit-btn {{isEditMode ? 'active' : ''}}" catchtap="toggleEditMode">
+            <text>{{isEditMode ? '完成' : '编辑'}}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 时间线容器 -->
+      <view class="timeline-container">
+        <block wx:for="{{exerciseTypes}}" wx:key="id">
+          <!-- 时间线节点 -->
+          <view class="timeline-item">
+            <!-- 时间线 -->
+            <view class="timeline-track">
+              <view class="timeline-dot {{item.totalCalories > 0 ? 'active' : ''}}">
+                <text class="dot-icon">{{item.emojiIcon}}</text>
+              </view>
+              <view class="timeline-line" wx:if="{{index < exerciseTypes.length - 1}}"></view>
+            </view>
+
+            <!-- 运动类型卡片 -->
+            <view class="type-card-wrapper">
+              <spotlight-card
+                customClass="type-card {{item.type}} {{item.totalCalories > 0 ? 'has-data' : ''}}"
+                customStyle="{{item.bgStyle}}"
+              >
+                <view class="type-card-content">
+                  <!-- 卡片头部 - 点击可折叠 -->
+                  <view class="type-header">
+                    <view class="type-title-group" catchtap="toggleTypeCollapse" data-type="{{item.type}}">
+                      <text class="type-title">{{item.title}}</text>
+                      <text class="type-time">{{item.suggestMin}}-{{item.suggestMax}} 分钟</text>
+                    </view>
+                    <view class="type-right-section">
+                      <!-- 单类型编辑按钮 -->
+                      <view
+                        class="type-edit-btn {{item.isEditing ? 'active' : ''}}"
+                        catchtap="toggleTypeEdit"
+                        data-type="{{item.type}}"
+                        wx:if="{{item.items.length > 0}}"
+                      >
+                        <text>{{item.isEditing ? '完成' : '编辑'}}</text>
+                      </view>
+                      <view class="type-calories" wx:if="{{item.totalCalories > 0}}">
+                        <text class="cal-number">{{item.totalCalories}}</text>
+                        <text class="cal-unit">kcal</text>
+                      </view>
+                      <!-- 折叠/展开图标 -->
+                      <view class="collapse-icon {{item.collapsed ? 'collapsed' : ''}}" catchtap="toggleTypeCollapse" data-type="{{item.type}}">
+                        <text>▼</text>
+                      </view>
+                    </view>
+                  </view>
+
+                  <!-- 进度条 -->
+                  <view class="type-progress-wrapper">
+                    <view class="type-progress-bar">
+                      <view
+                        class="type-progress-fill {{item.percentage > 100 ? 'over' : ''}}"
+                        style="width: {{item.percentage > 100 ? 100 : item.percentage}}%"
+                      ></view>
+                    </view>
+                    <text class="type-progress-text">{{item.percentage}}%</text>
+                  </view>
+
+                  <!-- 可折叠的运动列表 -->
+                  <view class="collapsible-content {{item.collapsed ? 'collapsed' : ''}}">
+                    <!-- 运动列表 -->
+                    <view class="exercise-items" wx:if="{{item.items.length > 0}}">
+                      <block wx:for="{{item.items}}" wx:for-item="exercise" wx:key="uniqueId">
+                        <!-- 左滑删除容器 -->
+                        <view class="exercise-item-wrapper">
+                          <view
+                            class="exercise-item {{exercise.swiped ? 'swiped' : ''}}"
+                            bindtouchstart="onExerciseTouchStart"
+                            bindtouchmove="onExerciseTouchMove"
+                            bindtouchend="onExerciseTouchEnd"
+                            data-id="{{exercise.id}}"
+                            data-type="{{item.type}}"
+                          >
+                            <!-- 编辑模式选择框（全局或单类型） -->
+                            <view class="exercise-checkbox {{isEditMode || item.isEditing ? 'show' : ''}}" catchtap="toggleExerciseSelect" data-id="{{exercise.id}}" data-type="{{item.type}}">
+                              <view class="checkbox-inner {{exercise.selected ? 'checked' : ''}}">
+                                <text wx:if="{{exercise.selected}}">✓</text>
+                              </view>
+                            </view>
+                            <view class="exercise-left" catchtap="{{isEditMode || item.isEditing ? '' : 'openExerciseEdit'}}" data-exercise="{{exercise}}" data-type="{{item.type}}">
+                              <text class="exercise-emoji">{{exercise.emoji}}</text>
+                              <view class="exercise-info">
+                                <text class="exercise-name">{{exercise.name}}</text>
+                                <text class="exercise-duration">{{exercise.duration}}分钟</text>
+                              </view>
+                            </view>
+                            <view class="exercise-right" catchtap="{{isEditMode || item.isEditing ? '' : 'openExerciseEdit'}}" data-exercise="{{exercise}}" data-type="{{item.type}}">
+                              <text class="exercise-cal">{{exercise.calories}}</text>
+                              <text class="exercise-cal-unit">kcal</text>
+                            </view>
+                          </view>
+                          <!-- 左滑删除按钮 -->
+                          <view class="swipe-delete-btn" catchtap="deleteSingleExercise" data-id="{{exercise.id}}">
+                            <text>删除</text>
+                          </view>
+                        </view>
+                      </block>
+
+                      <!-- 添加更多 -->
+                      <view
+                        class="add-type-btn-large"
+                        catchtap="addExercise"
+                        data-type="{{item.type}}"
+                        wx:if="{{!isEditMode && !item.isEditing}}"
+                      >
+                        <text class="add-icon">+</text>
+                        <text class="add-text">添加{{item.title}}</text>
+                      </view>
+                    </view>
+
+                    <!-- 空状态 -->
+                    <view class="empty-state" wx:if="{{item.items.length === 0}}">
+                      <text class="empty-hint">{{item.emptyText}}</text>
+                      <view
+                        class="add-type-btn-large"
+                        catchtap="addExercise"
+                        data-type="{{item.type}}"
+                      >
+                        <text class="add-icon">+</text>
+                        <text class="add-text">添加{{item.title}}</text>
+                      </view>
+                    </view>
+                  </view>
+                </view>
+              </spotlight-card>
+            </view>
+          </view>
+        </block>
+      </view>
+    </view>
+
+    <!-- 底部安全区域 -->
+    <view class="bottom-spacer"></view>
+  </view>
+
+  <!-- ============ 批量操作栏 ============ -->
+  <view class="batch-action-bar {{(isEditMode || hasAnyTypeEditing) && selectedCount > 0 ? 'show' : ''}}">
+    <view class="batch-info">
+      <text class="selected-count">已选择 {{selectedCount}} 项</text>
+      <text class="selected-calories">共 {{selectedCalories}} kcal</text>
+    </view>
+    <view class="batch-actions">
+      <view class="batch-btn select-all" catchtap="toggleSelectAll">
+        <text>{{isAllSelected ? '取消全选' : '全选'}}</text>
+      </view>
+      <view class="batch-btn delete" catchtap="deleteSelectedExercises">
+        <text>🗑️ 删除</text>
       </view>
     </view>
   </view>
 
-  <!-- 空状态 -->
-  <view class="empty-state" wx:if="{{logs.length === 0 && !loading}}">
-    <text class="empty-icon">💪</text>
-    <text class="empty-text">今天还没有运动记录</text>
-    <text class="empty-hint">点击上方按钮开始记录</text>
+  <!-- ============ 浮动搜索按钮 ============ -->
+  <floating-fab
+    icon="🔍"
+    position="bottom-center"
+    theme="glass"
+    safeArea="{{true}}"
+    bindtap="goToSearch"
+  />
+
+  <!-- ============ 日历选择器弹窗 ============ -->
+  <view class="calendar-modal {{showCalendarModal ? 'show' : ''}}" catchtap="hideCalendar">
+    <view class="calendar-content" catchtap="stopPropagation">
+      <view class="calendar-header">
+        <view class="calendar-nav" bindtap="prevMonth">
+          <text>‹</text>
+        </view>
+        <text class="calendar-title">{{calendarYear}}年{{calendarMonth}}月</text>
+        <view class="calendar-nav" bindtap="nextMonth">
+          <text>›</text>
+        </view>
+      </view>
+
+      <!-- 星期头 -->
+      <view class="calendar-weekdays">
+        <text class="weekday">日</text>
+        <text class="weekday">一</text>
+        <text class="weekday">二</text>
+        <text class="weekday">三</text>
+        <text class="weekday">四</text>
+        <text class="weekday">五</text>
+        <text class="weekday">六</text>
+      </view>
+
+      <!-- 日期网格 -->
+      <view class="calendar-days">
+        <block wx:for="{{calendarDays}}" wx:key="date">
+          <view
+            class="calendar-day {{item.isCurrentMonth ? '' : 'other-month'}} {{item.isToday ? 'today' : ''}} {{item.isSelected ? 'selected' : ''}} {{item.hasRecord ? 'has-record' : ''}} {{item.isFuture ? 'future' : ''}}"
+            bindtap="{{item.isFuture ? '' : 'selectCalendarDay'}}"
+            data-date="{{item.date}}"
+          >
+            <text class="day-number">{{item.day}}</text>
+            <view class="record-dot" wx:if="{{item.hasRecord}}"></view>
+          </view>
+        </block>
+      </view>
+
+      <!-- 快捷选项 -->
+      <view class="calendar-shortcuts">
+        <view class="shortcut-btn" bindtap="selectToday">今天</view>
+        <view class="shortcut-btn" bindtap="selectYesterday">昨天</view>
+        <view class="shortcut-btn" bindtap="selectThisWeek">本周</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- ============ 加载遮罩 ============ -->
+  <view class="loading-overlay" wx:if="{{isLoading}}">
+    <view class="loading-content">
+      <view class="loading-spinner"></view>
+      <text class="loading-text">加载中...</text>
+    </view>
+  </view>
+
+  <!-- ============ 运动编辑弹窗 ============ -->
+  <view class="exercise-edit-modal {{showExerciseEditModal ? 'show' : ''}}" catchtap="closeExerciseEdit">
+    <view class="exercise-edit-content" catchtap="stopPropagation">
+      <!-- 弹窗头部 -->
+      <view class="exercise-edit-header">
+        <text class="exercise-edit-title">编辑运动</text>
+        <view class="exercise-edit-close" bindtap="closeExerciseEdit">
+          <text>×</text>
+        </view>
+      </view>
+
+      <!-- 运动信息 -->
+      <view class="exercise-edit-info">
+        <view class="exercise-edit-avatar">
+          <text class="exercise-edit-emoji">{{editingExercise.emoji || '🏃'}}</text>
+        </view>
+        <view class="exercise-edit-name">{{editingExercise.name}}</view>
+      </view>
+
+      <!-- 时长输入 -->
+      <view class="exercise-edit-form">
+        <!-- 时长显示 -->
+        <view class="amount-header">
+          <text class="form-label">运动时长</text>
+          <view class="amount-display">
+            <text class="amount-value">{{editingExercise.duration}}</text>
+            <text class="amount-unit-text">分钟</text>
+          </view>
+        </view>
+
+        <!-- 滑动条区域 -->
+        <view class="slider-container">
+          <view class="slider-track">
+            <view class="slider-fill" style="width: {{(editingExercise.duration / 120) * 100}}%"></view>
+          </view>
+          <slider class="amount-slider"
+                  min="5"
+                  max="120"
+                  step="5"
+                  value="{{editingExercise.duration}}"
+                  activeColor="transparent"
+                  backgroundColor="transparent"
+                  block-size="0"
+                  bindchange="onSliderChange"
+                  bindchanging="onSliderChanging" />
+          <!-- 滑块图标 -->
+          <view class="slider-thumb" style="left: {{(editingExercise.duration / 120) * 100}}%">
+            <view class="thumb-icon">
+              <text>{{editingExercise.emoji || '🏃'}}</text>
+            </view>
+          </view>
+          <!-- 刻度标记 -->
+          <view class="slider-marks">
+            <text class="mark">5分</text>
+            <text class="mark">60分</text>
+            <text class="mark">120分</text>
+          </view>
+        </view>
+
+        <!-- 快捷时长选择 -->
+        <view class="quick-durations">
+          <view class="quick-durations-label">快捷选择</view>
+          <view class="quick-durations-btns">
+            <view class="quick-duration-btn" bindtap="setQuickDuration" data-duration="15">15分</view>
+            <view class="quick-duration-btn" bindtap="setQuickDuration" data-duration="30">30分</view>
+            <view class="quick-duration-btn" bindtap="setQuickDuration" data-duration="45">45分</view>
+            <view class="quick-duration-btn" bindtap="setQuickDuration" data-duration="60">60分</view>
+            <view class="quick-duration-btn" bindtap="setQuickDuration" data-duration="90">90分</view>
+            <view class="quick-duration-btn" bindtap="setQuickDuration" data-duration="120">120分</view>
+          </view>
+        </view>
+
+        <!-- 热量预览 -->
+        <view class="calories-preview">
+          <view class="preview-row">
+            <text class="preview-label">消耗热量</text>
+            <text class="preview-value">{{editingExercise.calculatedCalories || 0}} kcal</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 操作按钮 -->
+      <view class="exercise-edit-actions">
+        <view class="edit-btn-cancel" bindtap="closeExerciseEdit">取消</view>
+        <view class="edit-btn-save" bindtap="saveExerciseEdit">保存修改</view>
+      </view>
+    </view>
   </view>
 </view>
-

@@ -69,7 +69,10 @@
                 style="background: conic-gradient(#FF6B35 0deg {{consumedDegrees}}deg, #E5E7EB {{consumedDegrees}}deg 360deg);"
               ></view>
               <view class="donut-center">
-                <text class="donut-value">{{stats.remainingCalories}}</text>
+                <view class="donut-value-wrapper">
+                  <text class="donut-value">{{stats.remainingCalories}}</text>
+                  <text class="donut-unit">kcal</text>
+                </view>
                 <text class="donut-label">剩余</text>
               </view>
             </view>
@@ -80,17 +83,26 @@
             <view class="calorie-row">
               <view class="calorie-indicator in"></view>
               <text class="calorie-label">已摄入</text>
-              <text class="calorie-value">{{stats.totalCalories}}</text>
+              <view class="calorie-value-wrapper">
+                <text class="calorie-value">{{stats.totalCalories}}</text>
+                <text class="calorie-unit">kcal</text>
+              </view>
             </view>
             <view class="calorie-row">
               <view class="calorie-indicator out"></view>
               <text class="calorie-label">已消耗</text>
-              <text class="calorie-value">{{stats.burnedCalories}}</text>
+              <view class="calorie-value-wrapper">
+                <text class="calorie-value">{{stats.burnedCalories}}</text>
+                <text class="calorie-unit">kcal</text>
+              </view>
             </view>
             <view class="calorie-row goal">
               <view class="calorie-indicator goal-ind"></view>
               <text class="calorie-label">目标</text>
-              <text class="calorie-value">{{stats.targetCalories}}</text>
+              <view class="calorie-value-wrapper">
+                <text class="calorie-value">{{stats.targetCalories}}</text>
+                <text class="calorie-unit">kcal</text>
+              </view>
             </view>
           </view>
         </view>

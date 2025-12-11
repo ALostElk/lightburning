@@ -13,6 +13,8 @@
     "pages/diet/custom-dishes/index",
     "pages/diet/favorites/index",
     "pages/exercise/index/index",
+    "pages/exercise/search/index",
+    "pages/exercise/recommend/index",
     "pages/report/daily/index",
     "pages/stats/index/index",
     "pages/recipe-recommend/index",

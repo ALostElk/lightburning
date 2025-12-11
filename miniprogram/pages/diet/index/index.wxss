@@ -64,17 +64,22 @@
 .user-text {
   display: flex;
   flex-direction: column;
+  gap: 0;
 }
 
 .greeting {
   font-size: 22rpx;
   color: #9CA3AF;
+  line-height: 1.2;
+  display: block;
 }
 
 .user-name {
   font-size: 30rpx;
   font-weight: 700;
   color: #1F2937;
+  line-height: 1.2;
+  display: block;
 }
 
 /* ============ 主内容区 ============ */
@@ -378,11 +383,25 @@
   z-index: 10;
 }
 
+.donut-value-wrapper {
+  display: flex;
+  align-items: baseline;
+  gap: 4rpx;
+  justify-content: center;
+}
+
 .donut-value {
   font-size: 56rpx;
   font-weight: 800;
   color: #1F2937;
   font-family: 'SF Mono', 'Menlo', monospace;
+  line-height: 1;
+}
+
+.donut-unit {
+  font-size: 20rpx;
+  color: #9CA3AF;
+  font-weight: 500;
   line-height: 1;
 }
 
@@ -444,11 +463,23 @@
   font-weight: 600;
 }
 
+.calorie-value-wrapper {
+  display: flex;
+  align-items: baseline;
+  gap: 4rpx;
+}
+
 .calorie-value {
   font-size: 34rpx;
   font-weight: 800;
   color: #1F2937;
   font-family: 'SF Mono', 'Menlo', monospace;
+}
+
+.calorie-unit {
+  font-size: 20rpx;
+  color: #9CA3AF;
+  font-weight: 500;
 }
 
 /* 宏量营养素 */
