@@ -1,94 +1,99 @@
 <view class="page">
-  <!-- 顶部：本周总结 -->
-  <view class="header-card">
-    <view class="header-title-row">
-      <view class="header-title">本周报告</view>
-      <view class="header-sub">{{weekRangeText}}</view>
+  <!-- 顶部周区间卡片 -->
+  <view class="week-card shadow-card">
+    <view class="week-top-row">
+      <text class="week-title">本周饮食报告</text>
+      <text class="week-date">{{weekRangeText}}</text>
     </view>
-    <view class="summary-row">
-      <view class="summary-block">
-        <view class="summary-label">体重变化</view>
-        <view class="summary-value">{{summary.weightChangeText}}</view>
-        <view class="summary-extra">当前：{{summary.currentWeight || '--'}} kg</view>
+
+    <view class="week-main">
+      <view class="week-circle">
+        <view class="week-circle-inner">
+          <text class="week-circle-main">
+            {{summary.goalRate || 0}}%
+          </text>
+          <text class="week-circle-sub">达标率</text>
+        </view>
       </view>
-      <view class="summary-block">
-        <view class="summary-label">平均净热量</view>
-        <view class="summary-value">{{summary.avgNetCalories || '--'}} kcal</view>
-        <view class="summary-extra">{{summary.netCaloriesHint}}</view>
-      </view>
-    </view>
-    <view class="summary-row">
-      <view class="summary-block">
-        <view class="summary-label">总运动时长</view>
-        <view class="summary-value">{{summary.totalDuration}} min</view>
-        <view class="summary-extra">{{summary.totalCount}} 次运动</view>
-      </view>
-      <view class="summary-block">
-        <view class="summary-label">本周达标率</view>
-        <view class="summary-value">{{summary.goalRate}}%</view>
-        <view class="summary-extra">达标 {{summary.goalDays}} / {{summary.totalDays}} 天</view>
+
+      <view class="week-info">
+        <view class="week-info-row">
+          <view class="dot dot-green"></view>
+          <text class="week-info-label">目标达成天数</text>
+          <text class="week-info-value">
+            {{summary.goalDays || 0}} / {{summary.totalDays || 7}}
+          </text>
+        </view>
+        <view class="week-info-row">
+          <view class="dot dot-blue"></view>
+          <text class="week-info-label">日均摄入</text>
+          <text class="week-info-value">
+            {{summary.avgTotalCalories || '--'}} kcal
+          </text>
+        </view>
+        <view class="week-info-row">
+          <view class="dot dot-gray"></view>
+          <text class="week-info-label">提示</text>
+          <text class="week-info-small">
+            {{summary.netCaloriesHint}}
+          </text>
+        </view>
       </view>
     </view>
   </view>
 
-  <!-- 每日完成度（以后可以接入雷达图，现在先用列表 + 进度条） -->
-  <view class="section-card">
-    <view class="section-header">
-      <view class="section-title">每日完成度</view>
-      <view class="section-sub">本周 7 天整体表现</view>
+  <!-- 每日得分 -->
+  <view class="daily-score-card shadow-card">
+    <view class="card-header">
+      <text class="card-title">本周每日完成度</text>
+      <text class="card-sub">0–100 分，越高说明记录越完整</text>
     </view>
 
-    <view wx:if="{{dailyScores.length === 0}}" class="empty-text">
-      本周暂无完整记录，建议坚持记录饮食和运动～
-    </view>
-
-    <block wx:for="{{dailyScores}}" wx:key="date">
-      <view class="day-row">
-        <view class="day-left">
-          <view class="day-name">{{item.label}}</view>
-          <view class="day-date">{{item.date}}</view>
+    <block wx:if="{{dailyScores && dailyScores.length}}">
+      <block wx:for="{{dailyScores}}" wx:key="date">
+        <view class="score-row">
+          <view class="score-label">
+            <text class="score-day">{{item.label}}</text>
+            <text class="score-date">{{item.date}}</text>
+          </view>
+          <view class="score-bar">
+            <view class="score-bar-bg">
+              <view
+                class="score-bar-fill"
+                style="width: {{item.scoreWidth}}"
+              ></view>
+            </view>
+            <text class="score-value">{{item.score}}</text>
+          </view>
         </view>
-        <view class="day-center">
-          <view class="day-bar">
-          <view
-              class="day-bar-fill"
-           style="width: {{item.scoreWidth}};"
-           ></view>
-</view>
-
-        </view>
-        <view class="day-right">
-          <view class="day-score">{{item.score}}</view>
-        </view>
+      </block>
+    </block>
+    <block wx:else>
+      <view class="empty-tip">
+        本周还没有记录到饮食数据，可以从今天开始～
       </view>
     </block>
   </view>
 
-  <!-- 优秀 / 需改进 -->
-  <view class="section-card">
-    <view class="section-header">
-      <view class="section-title">亮点表现</view>
+  <!-- 文案总结 -->
+  <view class="text-card shadow-card">
+    <view class="text-title">亮点回顾</view>
+    <view class="text-content">
+      {{highlights}}
     </view>
-    <view class="desc-text">{{highlights}}</view>
   </view>
 
-  <view class="section-card">
-    <view class="section-header">
-      <view class="section-title">需要改进</view>
+  <view class="text-card shadow-card">
+    <view class="text-title">可以改进的地方</view>
+    <view class="text-content">
+      {{improvements}}
     </view>
-    <view class="desc-text">{{improvements}}</view>
   </view>
 
-  <!-- 下周建议 + 分享 -->
-  <view class="section-card">
-    <view class="section-header">
-      <view class="section-title">下周建议</view>
+  <view class="text-card shadow-card">
+    <view class="text-title">下周小建议</view>
+    <view class="text-content">
+      {{suggestions}}
     </view>
-    <view class="desc-text">{{suggestions}}</view>
-
-    <button
-      class="share-btn"
-      open-type="share"
-    >分享本周报告</button>
   </view>
 </view>
