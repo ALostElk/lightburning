@@ -20,17 +20,9 @@ Page({
       sports: '球类运动'
     },
 
-    // 标签相关
-    activeTab: 'search', // 'search' | 'favorites'
 
-    // 常用运动
-    frequentExercises: [],
-    isLoadingFavorites: false,
-    favoriteTypeFilter: 'all',  // 'all' | 'aerobic' | 'strength' | 'flexibility' | 'sports'
-
-    // 预设运动列表
-    presetExercises: [
-      // 有氧运动
+presetExercises = [
+      // ========== 有氧运动 Aerobic Exercises ==========
       { id: 'run', name: '跑步', type: 'aerobic', emoji: '🏃', caloriesPerMin: 10, duration: 30 },
       { id: 'walk', name: '快走', type: 'aerobic', emoji: '🚶', caloriesPerMin: 5, duration: 30 },
       { id: 'bike', name: '骑行', type: 'aerobic', emoji: '🚴', caloriesPerMin: 8, duration: 30 },
@@ -38,26 +30,50 @@ Page({
       { id: 'jump_rope', name: '跳绳', type: 'aerobic', emoji: '🪢', caloriesPerMin: 11, duration: 15 },
       { id: 'climb', name: '登山', type: 'aerobic', emoji: '🧗', caloriesPerMin: 9, duration: 60 },
       { id: 'dance', name: '跳舞', type: 'aerobic', emoji: '💃', caloriesPerMin: 6, duration: 45 },
-      
-      // 力量训练
+      { id: 'elliptical', name: '椭圆机', type: 'aerobic', emoji: '🏃', caloriesPerMin: 8, duration: 30 },
+      { id: 'row_machine', name: '划船机', type: 'aerobic', emoji: '🚣', caloriesPerMin: 9, duration: 20 },
+      { id: 'aerobics_class', name: '有氧操', type: 'aerobic', emoji: '👯', caloriesPerMin: 7, duration: 45 },
+      { id: 'hiking', name: '徒步', type: 'aerobic', emoji: '🥾', caloriesPerMin: 6, duration: 90 },
+      { id: 'kickboxing', name: '搏击操', type: 'aerobic', emoji: '🥊', caloriesPerMin: 11, duration: 60 },
+    
+      // ========== 力量训练 Strength Training ==========
       { id: 'weightlift', name: '举重', type: 'strength', emoji: '🏋️', caloriesPerMin: 7, duration: 30 },
       { id: 'pushup', name: '俯卧撑', type: 'strength', emoji: '💪', caloriesPerMin: 6, duration: 15 },
       { id: 'squat', name: '深蹲', type: 'strength', emoji: '💪', caloriesPerMin: 6, duration: 15 },
       { id: 'plank', name: '平板支撑', type: 'strength', emoji: '💪', caloriesPerMin: 5, duration: 10 },
       { id: 'situp', name: '仰卧起坐', type: 'strength', emoji: '💪', caloriesPerMin: 5, duration: 15 },
-      
-      // 拉伸放松
+      { id: 'deadlift', name: '硬拉', type: 'strength', emoji: '🏋️', caloriesPerMin: 8, duration: 20 },
+      { id: 'bench_press', name: '卧推', type: 'strength', emoji: '🏋️', caloriesPerMin: 7, duration: 25 },
+      { id: 'pull_up', name: '引体向上', type: 'strength', emoji: '💪', caloriesPerMin: 6, duration: 15 },
+      { id: 'lunges', name: '弓步蹲', type: 'strength', emoji: '🚶', caloriesPerMin: 5, duration: 15 },
+      { id: 'bicep_curl', name: '弯举', type: 'strength', emoji: '💪', caloriesPerMin: 4, duration: 20 },
+      { id: 'tricep_dip', name: '臂屈伸', type: 'strength', emoji: '💪', caloriesPerMin: 5, duration: 15 },
+      { id: 'leg_press', name: '腿举', type: 'strength', emoji: '🦵', caloriesPerMin: 6, duration: 20 },
+    
+      // ========== 拉伸放松 Stretching & Flexibility ==========
       { id: 'yoga', name: '瑜伽', type: 'flexibility', emoji: '🧘', caloriesPerMin: 3, duration: 30 },
       { id: 'stretch', name: '拉伸', type: 'flexibility', emoji: '🤸', caloriesPerMin: 2, duration: 15 },
       { id: 'pilates', name: '普拉提', type: 'flexibility', emoji: '🧘', caloriesPerMin: 4, duration: 30 },
-      
-      // 球类运动
+      { id: 'dynamic_stretch', name: '动态拉伸', type: 'flexibility', emoji: '🤸', caloriesPerMin: 3, duration: 10 },
+      { id: 'foam_rolling', name: '泡沫轴放松', type: 'flexibility', emoji: '🎽', caloriesPerMin: 2, duration: 15 },
+      { id: 'neck_stretch', name: '颈部拉伸', type: 'flexibility', emoji: '🙆', caloriesPerMin: 1, duration: 5 },
+      { id: 'hamstring_stretch', name: '腘绳肌拉伸', type: 'flexibility', emoji: '🦵', caloriesPerMin: 2, duration: 10 },
+      { id: 'cat_cow', name: '猫牛式', type: 'flexibility', emoji: '🐱', caloriesPerMin: 2, duration: 5 },
+      { id: 'child_pose', name: '婴儿式', type: 'flexibility', emoji: '🧘', caloriesPerMin: 1, duration: 5 },
+    
+      // ========== 球类运动 Ball Sports ==========
       { id: 'basketball', name: '篮球', type: 'sports', emoji: '🏀', caloriesPerMin: 9, duration: 60 },
       { id: 'football', name: '足球', type: 'sports', emoji: '⚽', caloriesPerMin: 9, duration: 60 },
       { id: 'badminton', name: '羽毛球', type: 'sports', emoji: '🏸', caloriesPerMin: 7, duration: 45 },
       { id: 'tennis', name: '网球', type: 'sports', emoji: '🎾', caloriesPerMin: 8, duration: 45 },
       { id: 'pingpong', name: '乒乓球', type: 'sports', emoji: '🏓', caloriesPerMin: 6, duration: 45 },
-      { id: 'volleyball', name: '排球', type: 'sports', emoji: '🏐', caloriesPerMin: 7, duration: 60 }
+      { id: 'volleyball', name: '排球', type: 'sports', emoji: '🏐', caloriesPerMin: 7, duration: 60 },
+      { id: 'baseball', name: '棒球', type: 'sports', emoji: '⚾', caloriesPerMin: 6, duration: 90 },
+      { id: 'golf', name: '高尔夫球', type: 'sports', emoji: '⛳', caloriesPerMin: 4, duration: 120 },
+      { id: 'rugby', name: '橄榄球', type: 'sports', emoji: '🏈', caloriesPerMin: 10, duration: 80 },
+      { id: 'cricket', name: '板球', type: 'sports', emoji: '🏏', caloriesPerMin: 5, duration: 120 },
+      { id: 'squash', name: '壁球', type: 'sports', emoji: '🎾', caloriesPerMin: 10, duration: 45 },
+      { id: 'handball', name: '手球', type: 'sports', emoji: '🤾', caloriesPerMin: 9, duration: 60 }
     ]
   },
 
@@ -75,35 +91,19 @@ Page({
   },
 
   onShow() {
-    this.loadFrequentExercises();
+ 
   },
 
+  goBack: function() {
+    // 方法1: 使用navigateBack返回上一页
+    wx.navigateBack({
+      delta: 1  // 返回上一级页面
+    });
+  },
   getTodayString() {
     return new Date().toISOString().slice(0, 10);
   },
 
-  // ============ 标签切换 ============
-  switchTab(e) {
-    const tab = e.currentTarget.dataset.tab;
-    this.setData({ activeTab: tab });
-
-    if (tab === 'favorites' && this.data.frequentExercises.length === 0) {
-      this.loadFrequentExercises();
-    }
-  },
-
-  switchToSearch() {
-    this.setData({ activeTab: 'search' });
-  },
-
-  // 切换常用运动类型筛选
-  switchFavoriteType(e) {
-    const type = e.currentTarget.dataset.type;
-    if (type !== this.data.favoriteTypeFilter) {
-      this.setData({ favoriteTypeFilter: type });
-      this.loadFrequentExercises();
-    }
-  },
 
   onSearchFocus() {
     if (this.data.activeTab !== 'search') {
@@ -325,11 +325,6 @@ Page({
     });
   },
 
-  // 从常用列表添加
-  addFromFavorite(e) {
-    const { exercise } = e.currentTarget.dataset;
-    this.addExercise({ currentTarget: { dataset: { exercise } } });
-  },
 
   // 获取运动 Emoji
   getExerciseEmoji(name, type) {

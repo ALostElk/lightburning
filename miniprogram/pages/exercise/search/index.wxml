@@ -5,9 +5,6 @@
     <view class="navbar-back" bindtap="goBack">
       <text class="back-icon">‹</text>
     </view>
-    <view class="navbar-title">添加运动</view>
-    <view class="navbar-placeholder"></view>
-  </view>
 
   <!-- 搜索框 -->
   <view class="search-container">
@@ -27,31 +24,12 @@
       </view>
     </view>
   </view>
+</view>
 
-  <!-- 标签切换 -->
-  <view class="tabs-container">
-    <view class="tabs">
-      <view
-        class="tab-item {{activeTab === 'search' ? 'active' : ''}}"
-        data-tab="search"
-        bindtap="switchTab"
-      >
-        <text>搜索</text>
-      </view>
-      <view
-        class="tab-item {{activeTab === 'favorites' ? 'active' : ''}}"
-        data-tab="favorites"
-        bindtap="switchTab"
-      >
-        <text>常用</text>
-      </view>
-    </view>
-  </view>
 
+ 
   <!-- 主内容区 -->
   <scroll-view class="content-scroll" scroll-y>
-    <!-- ============ 搜索标签内容 ============ -->
-    <view class="tab-content" wx:if="{{activeTab === 'search'}}">
       <!-- 最近搜索 -->
       <view class="recent-section" wx:if="{{recentSearches.length > 0 && !keyword}}">
         <view class="section-header">
@@ -169,88 +147,6 @@
           </block>
         </view>
       </view>
-    </view>
-
-    <!-- ============ 常用标签内容 ============ -->
-    <view class="tab-content" wx:if="{{activeTab === 'favorites'}}">
-      <!-- 类型筛选 -->
-      <view class="type-filters">
-        <view
-          class="type-filter {{favoriteTypeFilter === 'all' ? 'active' : ''}}"
-          data-type="all"
-          bindtap="switchFavoriteType"
-        >
-          <text>全部</text>
-        </view>
-        <view
-          class="type-filter {{favoriteTypeFilter === 'aerobic' ? 'active' : ''}}"
-          data-type="aerobic"
-          bindtap="switchFavoriteType"
-        >
-          <text>🏃 有氧</text>
-        </view>
-        <view
-          class="type-filter {{favoriteTypeFilter === 'strength' ? 'active' : ''}}"
-          data-type="strength"
-          bindtap="switchFavoriteType"
-        >
-          <text>💪 力量</text>
-        </view>
-        <view
-          class="type-filter {{favoriteTypeFilter === 'flexibility' ? 'active' : ''}}"
-          data-type="flexibility"
-          bindtap="switchFavoriteType"
-        >
-          <text>🧘 拉伸</text>
-        </view>
-        <view
-          class="type-filter {{favoriteTypeFilter === 'sports' ? 'active' : ''}}"
-          data-type="sports"
-          bindtap="switchFavoriteType"
-        >
-          <text>⚽ 球类</text>
-        </view>
-      </view>
-
-      <!-- 常用运动列表 -->
-      <view class="frequent-section">
-        <!-- 加载中 -->
-        <view class="loading-state" wx:if="{{isLoadingFavorites}}">
-          <view class="loading-spinner"></view>
-          <text class="loading-text">加载中...</text>
-        </view>
-
-        <!-- 常用列表 -->
-        <view class="exercise-list" wx:elif="{{frequentExercises.length > 0}}">
-          <view
-            class="exercise-card frequent"
-            wx:for="{{frequentExercises}}"
-            wx:key="name"
-            data-exercise="{{item}}"
-            bindtap="addFromFavorite"
-          >
-            <view class="exercise-icon">
-              <text>{{item.emoji}}</text>
-            </view>
-            <view class="exercise-info">
-              <text class="exercise-name">{{item.name}}</text>
-              <text class="exercise-meta">平均 {{item.duration}} 分钟 · {{item.calories}} kcal</text>
-              <text class="exercise-count">记录 {{item.count}} 次</text>
-            </view>
-            <view class="exercise-action">
-              <text class="add-icon">+</text>
-            </view>
-          </view>
-        </view>
-
-        <!-- 空状态 -->
-        <view class="empty-state" wx:else>
-          <text class="empty-icon">📝</text>
-          <text class="empty-text">暂无常用运动</text>
-          <text class="empty-hint">添加运动记录后会自动生成</text>
-        </view>
-      </view>
-    </view>
-  </scroll-view>
-</view>
+    </scroll-view>
+  </view>
 
