@@ -21,7 +21,7 @@ Page({
     },
 
 
-presetExercises = [
+presetExercises: [
       // ========== 有氧运动 Aerobic Exercises ==========
       { id: 'run', name: '跑步', type: 'aerobic', emoji: '🏃', caloriesPerMin: 10, duration: 30 },
       { id: 'walk', name: '快走', type: 'aerobic', emoji: '🚶', caloriesPerMin: 5, duration: 30 },
