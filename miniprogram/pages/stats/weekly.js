@@ -1,3 +1,5 @@
+// pages/stats/weekly.js
+
 // 工具：格式化日期 yyyy-MM-dd
 function formatDate(date) {
   const y = date.getFullYear();
@@ -99,7 +101,6 @@ Page({
   processLogs(logs) {
     if (!logs || logs.length === 0) {
       this.setData({
-        dailyScores: [],
         summary: {
           weightChangeText: '--',
           currentWeight: null,
@@ -112,6 +113,7 @@ Page({
           totalDays: 7,
           avgTotalCalories: null
         },
+        dailyScores: [],
         highlights: '本周没有记录到饮食数据，可以从每天简单记录一两条开始，逐步建立习惯。',
         improvements: '持续记录是所有分析的基础，建议下周优先保证每天有饮食记录。',
         suggestions: '可以选一个固定时间（睡前/午休），快速回顾并记录当天饮食，让记录变得不费劲。'
@@ -125,7 +127,7 @@ Page({
     // 1. 按日期聚合：DietLog 结构里有 recordDate、calories、mealType…
     const dayMap = {}; // key: yyyy-MM-dd
     logs.forEach(item => {
-      const dateStr = item.recordDate;     // ✅ 真实字段
+      const dateStr = item.recordDate;
       if (!dateStr) return;
 
       if (!dayMap[dateStr]) {
@@ -144,7 +146,7 @@ Page({
       d.totalProtein += item.protein || 0;
       d.totalFat += item.fat || 0;
       d.totalCarbs += item.carbs || 0;
-      if (item.mealType) d.meals.add(item.mealType); // breakfast/lunch/dinner/snack...
+      if (item.mealType) d.meals.add(item.mealType);
       d.logCount += 1;
     });
 
@@ -192,14 +194,13 @@ Page({
       if (info.meals.has('lunch')) score += 8;
       if (info.meals.has('dinner')) score += 8;
 
-      // 总热量区间（可以根据你们的目标再微调）
+      // 总热量区间
       if (cals >= 1200 && cals <= 2200) {
         score += 20;
         goalDays += 1; // 认为这天“达标”
       } else if (cals >= 900 && cals <= 2500) {
         score += 10;
       } else {
-        // 明显过低或过高，扣一点
         score -= 5;
       }
 
@@ -225,13 +226,13 @@ Page({
       totalDays > 0 ? Math.round((goalDays / totalDays) * 100) : 0;
 
     const summary = {
-      weightChangeText: '--',      // 目前没有体重数据，先占位
+      weightChangeText: '--',      // 暂时没有体重数据
       currentWeight: null,
-      avgNetCalories: null,        // 纯饮食，不算净热量
+      avgNetCalories: null,
       netCaloriesHint: avgTotalCalories
         ? `本周日均摄入约 ${avgTotalCalories} kcal`
         : '本周饮食记录较少，暂无法估算日均摄入',
-      totalDuration: 0,            // 运动数据后面接 healthService / exerciseService
+      totalDuration: 0,
       totalCount: 0,
       goalRate,
       goalDays,
@@ -297,7 +298,7 @@ Page({
       }
     }
 
-    // 目前没有接运动数据，这里用温和的提示
+    // 运动部分：暂时没接入数据，给个温和提示
     partsSuggest.push(
       '后续接入运动记录后，周报会同时给出“摄入 - 消耗”的净差分析。'
     );

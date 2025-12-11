@@ -1,232 +1,176 @@
-page {
-  background: #f3fff6;
-}
+/* pages/stats/weekly.wxss */
 
 .page {
-  padding: 20rpx 24rpx 40rpx;
+  padding: 16rpx 20rpx 40rpx;
+  /* 同样改成柔和渐变背景 */
+  background: linear-gradient(180deg, #f7fff8 0%, #e7fff1 45%, #f5fff8 100%);
+  min-height: 100vh;
   box-sizing: border-box;
 }
 
-.shadow-card {
-  border-radius: 28rpx;
+/* 时间范围 */
+.range-bar {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.range-text {
+  font-size: 26rpx;
+  color: #666;
+}
+
+/* 通用卡片，保持和首页一致的风格 */
+.card {
+  border-radius: 24rpx;
+  padding: 20rpx 24rpx;
+  margin-bottom: 20rpx;
+  /* 浅色渐变 + 深色文字 */
+  color: #333333;
+  position: relative;
+  overflow: hidden;
+}
+
+
+/* 卡片渐变改成柔和浅色 */
+.card--primary {
+  /* 周概览：淡蓝绿 */
+  background: linear-gradient(135deg, #e2f2ff, #e6fff6);
+}
+
+.card--green {
+  /* 运动 / 完成度：薄荷绿 */
+  background: linear-gradient(135deg, #e0ffe9, #d4f9e4);
+}
+
+.card--blue {
+  /* 摄入 / 热量：浅蓝紫 */
+  background: linear-gradient(135deg, #e4edff, #dde7ff);
+}
+
+.card--orange {
+  /* 建议 / 提示：暖橙 */
+  background: linear-gradient(135deg, #ffe8d2, #ffd4b8);
+}
+
+.card--plain {
   background: #ffffff;
-  box-shadow: 0 18rpx 40rpx rgba(0, 0, 0, 0.08);
+  color: #333333;
 }
 
-/* 顶部周卡片 */
-.week-card {
-  padding: 26rpx 26rpx 30rpx;
-  background: linear-gradient(135deg, #eafff3, #f9fffb);
-  margin-bottom: 26rpx;
-}
-
-.week-top-row {
+/* 头部 */
+.card-header {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  margin-bottom: 14rpx;
-}
-
-.week-title {
-  font-size: 30rpx;
-  font-weight: 600;
-  color: #303f4c;
-}
-
-.week-date {
-  font-size: 22rpx;
-  color: #8d9aa6;
-}
-
-.week-main {
-  display: flex;
-  margin-top: 10rpx;
-}
-
-.week-circle {
-  width: 40%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.week-circle-inner {
-  width: 170rpx;
-  height: 170rpx;
-  border-radius: 50%;
-  border: 14rpx solid rgba(255, 255, 255, 0.85);
-  background: #f7fff9;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-
-.week-circle-main {
-  font-size: 40rpx;
-  font-weight: 600;
-  color: #14b96b;
-}
-
-.week-circle-sub {
-  margin-top: 6rpx;
-  font-size: 22rpx;
-  color: #96a3af;
-}
-
-.week-info {
-  flex: 1;
-  padding-left: 20rpx;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.week-info-row {
-  display: flex;
-  align-items: center;
-  margin-bottom: 10rpx;
-}
-
-.week-info-row:last-child {
-  margin-bottom: 0;
-}
-
-.dot {
-  width: 14rpx;
-  height: 14rpx;
-  border-radius: 50%;
-  margin-right: 10rpx;
-}
-
-.dot-green {
-  background: #14b96b;
-}
-
-.dot-blue {
-  background: #4b8cff;
-}
-
-.dot-gray {
-  background: #c3ccd5;
-}
-
-.week-info-label {
-  font-size: 24rpx;
-  color: #4c5965;
-  flex-shrink: 0;
-}
-
-.week-info-value {
-  margin-left: 12rpx;
-  font-size: 26rpx;
-  font-weight: 500;
-  color: #273746;
-}
-
-.week-info-small {
-  margin-left: 12rpx;
-  font-size: 22rpx;
-  color: #8896a2;
-}
-
-/* 每日得分 */
-.daily-score-card {
-  padding: 24rpx 24rpx 12rpx;
-  margin-bottom: 26rpx;
-}
-
-.card-header {
   margin-bottom: 12rpx;
 }
 
 .card-title {
-  font-size: 28rpx;
+  font-size: 30rpx;
   font-weight: 600;
-  color: #333e4a;
 }
 
 .card-sub {
-  margin-top: 4rpx;
   font-size: 22rpx;
-  color: #9aa6b2;
+  opacity: 0.86;
 }
 
-.score-row {
+.card-body {
+  margin-top: 8rpx;
+}
+
+/* 顶部摘要里的两列 */
+.summary-row {
   display: flex;
-  padding: 14rpx 0;
-  border-bottom: 1rpx solid #f1f3f6;
+  justify-content: space-between;
+  margin-top: 8rpx;
 }
 
-.score-row:last-child {
-  border-bottom: none;
-}
-
-.score-label {
-  width: 170rpx;
-}
-
-.score-day {
-  font-size: 24rpx;
-  color: #465360;
-}
-
-.score-date {
-  margin-top: 4rpx;
-  font-size: 20rpx;
-  color: #a0adb8;
-}
-
-.score-bar {
+.summary-block {
   flex: 1;
+}
+
+.summary-block:nth-child(2) {
+  text-align: right;
+}
+
+.summary-label {
+  font-size: 22rpx;
+  opacity: 0.9;
+}
+
+.summary-value {
+  margin-top: 4rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+}
+
+/* tag */
+.card-footer {
+  margin-top: 12rpx;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8rpx;
+}
+
+.tag {
+  font-size: 20rpx;
+  padding: 4rpx 10rpx;
+  border-radius: 999rpx;
+  background: rgba(255, 255, 255, 0.18);
+}
+
+/* 每日完成度行 */
+.day-row {
   display: flex;
   align-items: center;
+  margin-top: 12rpx;
 }
 
-.score-bar-bg {
+.day-label {
+  width: 80rpx;
+  font-size: 24rpx;
+  color: #666;
+}
+
+.day-progress {
   flex: 1;
-  height: 12rpx;
+  height: 14rpx;
   border-radius: 999rpx;
-  background: #edf2f7;
+  background: #f1f1f5;
+  margin: 0 16rpx;
   overflow: hidden;
 }
 
-.score-bar-fill {
+.day-progress-inner {
   height: 100%;
   border-radius: 999rpx;
-  background: linear-gradient(90deg, #57e3a2, #14b96b);
+  /* 周内每天完成度：用和首页一致的薄荷绿色渐变 */
+  background: linear-gradient(90deg, #49c58c, #2fb6a0);
 }
 
-.score-value {
-  width: 80rpx;
+.day-score {
+  width: 60rpx;
   text-align: right;
   font-size: 24rpx;
-  color: #273746;
-  margin-left: 12rpx;
+  color: #333;
 }
 
-/* 文案卡片 */
-.text-card {
-  padding: 22rpx 24rpx 24rpx;
-  margin-bottom: 20rpx;
-}
-
-.text-title {
-  font-size: 26rpx;
-  font-weight: 600;
-  color: #333e4a;
-  margin-bottom: 8rpx;
-}
-
-.text-content {
+/* 文案块 */
+.text-block {
+  margin-top: 12rpx;
   font-size: 24rpx;
   line-height: 1.6;
-  color: #5b6976;
+  color: #444444; 
 }
 
-.empty-tip {
-  padding: 18rpx 0 4rpx;
-  font-size: 24rpx;
-  color: #9aa6b2;
-  text-align: center;
+
+
+/* 空状态 */
+.empty {
+  padding: 16rpx 0;
+  font-size: 22rpx;
+  color: #999;
 }

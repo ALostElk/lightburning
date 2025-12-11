@@ -1,99 +1,91 @@
+<!-- pages/stats/weekly.wxml -->
 <view class="page">
-  <!-- 顶部周区间卡片 -->
-  <view class="week-card shadow-card">
-    <view class="week-top-row">
-      <text class="week-title">本周饮食报告</text>
-      <text class="week-date">{{weekRangeText}}</text>
-    </view>
 
-    <view class="week-main">
-      <view class="week-circle">
-        <view class="week-circle-inner">
-          <text class="week-circle-main">
-            {{summary.goalRate || 0}}%
-          </text>
-          <text class="week-circle-sub">达标率</text>
-        </view>
+<!-- 周范围 -->
+<view class="range-bar">
+  <text class="range-text">本周：{{weekRangeText}}</text>
+</view>
+
+<!-- 本周总览卡片 -->
+<view class="card card--primary">
+  <view class="card-header">
+    <text class="card-title">一周饮食总览</text>
+    <text class="card-sub">达标率 {{summary.goalRate}}%</text>
+  </view>
+
+  <view class="card-body summary-row">
+    <view class="summary-block">
+      <text class="summary-label">达标天数</text>
+      <text class="summary-value">{{summary.goalDays}} / {{summary.totalDays}}</text>
+    </view>
+    <view class="summary-block">
+      <text class="summary-label">日均摄入</text>
+      <text class="summary-value">
+        {{summary.avgTotalCalories != null ? summary.avgTotalCalories : '--'}} kcal
+      </text>
+    </view>
+  </view>
+
+  <view class="card-footer">
+    <text class="tag">{{summary.netCaloriesHint}}</text>
+  </view>
+</view>
+
+<!-- 每日完成度条形图 -->
+<view class="card card--plain">
+  <view class="card-header">
+    <text class="card-title">每日完成度</text>
+    <text class="card-sub">记录越完整，分数越高</text>
+  </view>
+
+  <block wx:if="{{dailyScores.length}}">
+    <view
+      class="day-row"
+      wx:for="{{dailyScores}}"
+      wx:key="date"
+    >
+      <text class="day-label">{{item.label}}</text>
+      <view class="day-progress">
+        <view
+          class="day-progress-inner"
+          style="width: {{item.scoreWidth}};"
+        ></view>
       </view>
-
-      <view class="week-info">
-        <view class="week-info-row">
-          <view class="dot dot-green"></view>
-          <text class="week-info-label">目标达成天数</text>
-          <text class="week-info-value">
-            {{summary.goalDays || 0}} / {{summary.totalDays || 7}}
-          </text>
-        </view>
-        <view class="week-info-row">
-          <view class="dot dot-blue"></view>
-          <text class="week-info-label">日均摄入</text>
-          <text class="week-info-value">
-            {{summary.avgTotalCalories || '--'}} kcal
-          </text>
-        </view>
-        <view class="week-info-row">
-          <view class="dot dot-gray"></view>
-          <text class="week-info-label">提示</text>
-          <text class="week-info-small">
-            {{summary.netCaloriesHint}}
-          </text>
-        </view>
-      </view>
+      <text class="day-score">{{item.score}}</text>
     </view>
-  </view>
-
-  <!-- 每日得分 -->
-  <view class="daily-score-card shadow-card">
-    <view class="card-header">
-      <text class="card-title">本周每日完成度</text>
-      <text class="card-sub">0–100 分，越高说明记录越完整</text>
+  </block>
+  <block wx:else>
+    <view class="empty">
+      <text>本周还没有饮食记录，先从今天开始记录吧～</text>
     </view>
+  </block>
+</view>
 
-    <block wx:if="{{dailyScores && dailyScores.length}}">
-      <block wx:for="{{dailyScores}}" wx:key="date">
-        <view class="score-row">
-          <view class="score-label">
-            <text class="score-day">{{item.label}}</text>
-            <text class="score-date">{{item.date}}</text>
-          </view>
-          <view class="score-bar">
-            <view class="score-bar-bg">
-              <view
-                class="score-bar-fill"
-                style="width: {{item.scoreWidth}}"
-              ></view>
-            </view>
-            <text class="score-value">{{item.score}}</text>
-          </view>
-        </view>
-      </block>
-    </block>
-    <block wx:else>
-      <view class="empty-tip">
-        本周还没有记录到饮食数据，可以从今天开始～
-      </view>
-    </block>
+<!-- 文案总结：亮点 / 需要改进 / 建议 -->
+<view class="card card--green">
+  <view class="card-header">
+    <text class="card-title">本周亮点</text>
   </view>
+  <view class="text-block">
+    <text>{{highlights}}</text>
+  </view>
+</view>
 
-  <!-- 文案总结 -->
-  <view class="text-card shadow-card">
-    <view class="text-title">亮点回顾</view>
-    <view class="text-content">
-      {{highlights}}
-    </view>
+<view class="card card--orange">
+  <view class="card-header">
+    <text class="card-title">可以改进的地方</text>
   </view>
+  <view class="text-block">
+    <text>{{improvements}}</text>
+  </view>
+</view>
 
-  <view class="text-card shadow-card">
-    <view class="text-title">可以改进的地方</view>
-    <view class="text-content">
-      {{improvements}}
-    </view>
+<view class="card card--blue">
+  <view class="card-header">
+    <text class="card-title">下周小建议</text>
   </view>
-
-  <view class="text-card shadow-card">
-    <view class="text-title">下周小建议</view>
-    <view class="text-content">
-      {{suggestions}}
-    </view>
+  <view class="text-block">
+    <text>{{suggestions}}</text>
   </view>
+</view>
 </view>
