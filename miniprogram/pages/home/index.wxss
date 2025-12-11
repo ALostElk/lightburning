@@ -22,8 +22,8 @@
 }
 
 .avatar-placeholder {
-  width: 80rpx;
-  height: 80rpx;
+  width: 120rpx;
+  height: 120rpx;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.9);
   display: flex;
@@ -46,14 +46,14 @@
 }
 
 .hello {
-  font-size: 30rpx;
+  font-size: 35rpx;
   font-weight: 600;
   color: #1f2933;
 }
 
 .subtitle {
-  margin-top: 8rpx;
-  font-size: 24rpx;
+  margin-top: 0rpx;
+  font-size: 25rpx;
   color: #4b5563;
 }
 
@@ -73,13 +73,13 @@
 .header-date {
   font-size: 28rpx;
   font-weight: 600;
-  color: #1f2933;
+  color: #1d2125;
 }
 
 .header-tip {
   margin-top: 8rpx;
   font-size: 22rpx;
-  color: #6b7280;
+  color: #55585f;
 }
 
 /* 内容区域 */
