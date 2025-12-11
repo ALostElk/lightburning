@@ -1,380 +1,348 @@
-page {
-  background: #f3fff6;
-}
+/* pages/stats/index.wxss */
 
 .page {
-  padding: 20rpx 24rpx 40rpx;
+  padding: 16rpx 20rpx 40rpx;
+  /* 整体背景换成和饮食页类似的柔和渐变 */
+  background: linear-gradient(180deg, #f7fff8 0%, #e7fff1 45%, #f5fff8 100%);
+  min-height: 100vh;
   box-sizing: border-box;
 }
 
-/* 通用卡片阴影 */
-.shadow-card {
-  border-radius: 28rpx;
-  background: #ffffff;
-  box-shadow: 0 18rpx 40rpx rgba(0, 0, 0, 0.08);
-}
-
-/* 顶部总览卡片 */
-.summary-card {
+/* 时间范围选择（旧样式，仍然保留，实际生效的是下面的 range-tabs-card 那块） */
+.range-bar {
   display: flex;
-  padding: 32rpx 28rpx;
-  margin-bottom: 32rpx;
-  background: linear-gradient(135deg, #e9fff0, #f8fff9);
-}
-
-.summary-left {
-  width: 36%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.ring {
-  width: 180rpx;
-  height: 180rpx;
-  border-radius: 50%;
-  border: 14rpx solid rgba(255, 255, 255, 0.7);
-  background: #f6fff8;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-
-.ring-main {
-  font-size: 40rpx;
-  font-weight: 600;
-  color: #444;
-}
-
-.ring-sub {
-  margin-top: 6rpx;
-  font-size: 20rpx;
-  color: #9aa6b2;
-}
-
-.summary-right {
-  flex: 1;
-  padding-left: 24rpx;
-  display: flex;
-  flex-direction: column;
   justify-content: space-between;
-}
-
-.summary-row {
-  display: flex;
   align-items: center;
-  margin-bottom: 12rpx;
+  margin-bottom: 20rpx;
 }
 
-.summary-row:last-child {
-  margin-bottom: 0;
-}
-
-.dot {
-  width: 14rpx;
-  height: 14rpx;
-  border-radius: 50%;
-  margin-right: 12rpx;
-}
-
-.dot-red {
-  background: #ff7b5a;
-}
-
-.dot-blue {
-  background: #4b8cff;
-}
-
-.dot-purple {
-  background: #aa7bff;
-}
-
-.summary-label {
-  flex: 1;
-  font-size: 24rpx;
-  color: #65727f;
-}
-
-.summary-value {
-  font-size: 30rpx;
-  font-weight: 600;
-  color: #344150;
-  margin-right: 4rpx;
-}
-
-.summary-unit {
-  font-size: 22rpx;
-  color: #9aa6b2;
-}
-
-/* 挑战卡片 */
-.row-space {
-  margin-bottom: 24rpx;
-}
-
-.btn-card {
-  padding: 26rpx 28rpx;
-  border-radius: 26rpx;
-  position: relative;
-}
-
-.btn-orange {
-  background: linear-gradient(135deg, #ff9b4a, #ff7c3a);
-  color: #ffffff;
-}
-
-.btn-text-main {
-  font-size: 30rpx;
-  font-weight: 600;
-}
-
-.btn-text-sub {
-  margin-top: 8rpx;
-  font-size: 22rpx;
-  opacity: 0.85;
-}
-
-.btn-arrow {
-  position: absolute;
-  right: 30rpx;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 40rpx;
-  opacity: 0.9;
-}
-
-/* 头部标题 + tabs */
-.section-header {
-  margin-top: 4rpx;
-  margin-bottom: 16rpx;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.section-title {
-  font-size: 30rpx;
-  font-weight: 600;
-  color: #333e4a;
+.range-text {
+  font-size: 26rpx;
+  color: #666;
 }
 
 .range-tabs {
   display: flex;
-  align-items: center;
+  border-radius: 999rpx;
+  background: #ecf0ff;
+  padding: 4rpx;
 }
 
 .range-tab {
   min-width: 120rpx;
-  padding: 8rpx 14rpx;
-  border-radius: 999rpx;
-  border: 1rpx solid #e0ecf5;
-  font-size: 22rpx;
-  color: #8a96a2;
   text-align: center;
-  margin-left: 12rpx;
-}
-
-.range-tab.active {
-  background: #ffffff;
-  color: #ff7b3a;
-  border-color: #ffb58a;
-}
-
-/* chips */
-.chips-row {
-  display: flex;
-  flex-wrap: wrap;
-  margin-bottom: 24rpx;
-}
-
-.chip {
-  display: flex;
-  align-items: center;
-  padding: 8rpx 14rpx;
-  background: rgba(255, 255, 255, 0.85);
-  border-radius: 999rpx;
-  margin-right: 12rpx;
-  margin-bottom: 10rpx;
-}
-
-.chip-icon {
   font-size: 24rpx;
-  margin-right: 4rpx;
+  padding: 6rpx 16rpx;
+  border-radius: 999rpx;
+  color: #6670a0;
 }
 
-.chip-text {
-  font-size: 22rpx;
-  color: #6a7682;
+.range-tab--active {
+  background: #ffffff;
+  color: #2f5bff;
+  box-shadow: 0 4rpx 10rpx rgba(47, 91, 255, 0.25);
 }
 
-/* 营养结构 */
-.macro-card {
-  padding: 20rpx 26rpx;
-  margin-bottom: 26rpx;
-  background: linear-gradient(135deg, #ebfff4, #f9fffb);
+/* 通用卡片 */
+.card {
+  border-radius: 24rpx;
+  padding: 20rpx 24rpx;
+  margin-bottom: 20rpx;
+  /* 文字改成深色，这样在浅渐变上更清晰 */
+  color: #333333;
+  position: relative;
+  overflow: hidden;
 }
 
-.macro-row {
+
+/* 渐变背景（根据不同卡片）——改成更柔和的浅色渐变 */
+.card--primary {
+  /* 总览卡：淡蓝 */
+  background: linear-gradient(135deg, #e2f2ff, #f4fbff);
+}
+
+.card--pink {
+  /* 体重相关：粉橙 */
+  background: linear-gradient(135deg, #ffe3ec, #ffd6e8);
+}
+
+.card--green {
+  /* 运动：薄荷绿 */
+  background: linear-gradient(135deg, #e0ffe9, #d4f9e4);
+}
+
+.card--blue {
+  /* 热量趋势：浅蓝紫 */
+  background: linear-gradient(135deg, #e4edff, #dde7ff);
+}
+
+.card--orange {
+  /* 营养结构：暖橙 */
+  background: linear-gradient(135deg, #ffe8d2, #ffd4b8);
+}
+
+/* 灰底卡片（每日记录） */
+.card--plain {
+  background: #ffffff;
+  color: #333333;
+}
+
+/* 卡片内容结构 */
+.card-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  padding: 8rpx 0;
-}
-
-.macro-label {
-  font-size: 24rpx;
-  color: #51606d;
-}
-
-.macro-value {
-  font-size: 26rpx;
-  font-weight: 500;
-  color: #2e3f4f;
-}
-
-/* 每日列表卡片 */
-.card-list {
-  padding: 26rpx 24rpx 14rpx;
-  background: #ffffff;
-}
-
-.card-list-header {
+  align-items: baseline;
   margin-bottom: 12rpx;
 }
 
 .card-title {
-  font-size: 28rpx;
+  font-size: 30rpx;
   font-weight: 600;
-  color: #333;
 }
 
 .card-sub {
-  margin-top: 4rpx;
   font-size: 22rpx;
-  color: #9aa6b2;
+  opacity: 0.8;
 }
 
-.daily-item {
+.card-body {
+  margin-top: 8rpx;
+}
+
+/* 顶部摘要里的两列 */
+.summary-row {
   display: flex;
-  padding: 16rpx 0;
-  border-bottom: 1rpx solid #f1f3f6;
+  justify-content: space-between;
+  margin-top: 8rpx;
 }
 
-.daily-item:last-child {
-  border-bottom: none;
-}
-
-.daily-left {
-  width: 220rpx;
-}
-
-.daily-date {
-  font-size: 24rpx;
-  color: #4a5966;
-}
-
-.daily-right {
+.summary-block {
   flex: 1;
 }
 
-.kcal-line {
+.summary-block:nth-child(2) {
+  text-align: right;
+}
+
+.summary-label {
+  font-size: 22rpx;
+  opacity: 0.9;
+}
+
+.summary-value {
+  margin-top: 4rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+}
+
+/* tag 小标签 */
+.card-footer {
+  margin-top: 12rpx;
   display: flex;
-  justify-content: flex-end;
-  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8rpx;
 }
 
-.kcal-value {
-  font-size: 26rpx;
-  font-weight: 500;
-  color: #ff7b3a;
-}
-
-.kcal-unit {
+.tag {
   font-size: 20rpx;
-  color: #9aa6b2;
-  margin-left: 4rpx;
+  padding: 4rpx 10rpx;
+  border-radius: 999rpx;
+  background: rgba(255, 255, 255, 0.18);
 }
 
-.fake-bar {
+/* 图表区域 */
+.chart-wrapper {
   margin-top: 8rpx;
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 20rpx;
+  padding: 12rpx;
+}
+
+.weight-chart {
   width: 100%;
-  height: 10rpx;
+  height: 120px;
+}
+
+.divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.22);
+  margin: 16rpx 0;
+}
+
+/* 进度条通用样式 */
+.progress-section {
+  margin-top: 4rpx;
+}
+
+.progress-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.progress-row--bottom {
+  margin-top: 6rpx;
+}
+
+.progress-label {
+  font-size: 22rpx;
+}
+
+.progress-desc {
+  font-size: 22rpx;
+  opacity: 0.9;
+}
+
+.progress-percent {
+  font-size: 24rpx;
+  font-weight: 600;
+}
+
+.progress-bar {
+  margin-top: 8rpx;
+  height: 14rpx;
   border-radius: 999rpx;
-  background: #edf2f7;
+  /* 卡片上用浅白做背景条 */
+  background: rgba(255, 255, 255, 0.35);
   overflow: hidden;
 }
 
-.fake-bar-inner {
-  width: 60%;
+.progress-inner {
   height: 100%;
   border-radius: 999rpx;
-  background: linear-gradient(90deg, #ffb58a, #ff7b3a);
-  opacity: 0.85;
+  /* 体重进度：暖橙渐变 */
+  background: linear-gradient(90deg, #ffb26b, #ff7f50);
 }
 
-.empty-tip {
-  padding: 20rpx 0;
-  font-size: 24rpx;
-  color: #9aa6b2;
-  text-align: center;
+.progress-inner--green {
+  /* 计划完成度：薄荷绿渐变 */
+  background: linear-gradient(90deg, #49c58c, #2fb6a0);
 }
 
-/* 周报入口 */
-.weekly-entry {
-  margin-top: 26rpx;
-  margin-bottom: 10rpx;
-  padding: 18rpx 24rpx;
-  border-radius: 24rpx;
-  background: rgba(255, 255, 255, 0.92);
+/* 运动状态 */
+.exercise-status {
+  margin-top: 12rpx;
+  font-size: 22rpx;
+}
+
+/* 营养结构 */
+.macro-row {
+  margin-top: 12rpx;
   display: flex;
-  align-items: center;
   justify-content: space-between;
 }
 
-.weekly-text {
+.macro-item {
+  flex: 1;
+  text-align: center;
+}
+
+.macro-label {
+  font-size: 22rpx;
+}
+
+.macro-val {
+  font-size: 30rpx;
+  font-weight: 600;
+  margin-top: 4rpx;
+  display: block;
+}
+
+/* 每日记录列表 */
+.daily-item {
+  padding: 16rpx 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.daily-main {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4rpx;
+}
+
+.daily-date {
   font-size: 26rpx;
-  color: #333e4a;
+  color: #333;
+}
+
+.daily-cal {
+  font-size: 26rpx;
+  color: #ff7b66;
+}
+
+.daily-sub {
+  font-size: 22rpx;
+  color: #999;
+  display: flex;
+  gap: 20rpx;
+}
+
+.empty {
+  padding: 20rpx 0 4rpx;
+  font-size: 22rpx;
+  color: #999;
+}
+
+/* 去周报入口 */
+.weekly-entry {
+  margin-top: 8rpx;
+  padding: 20rpx 24rpx;
+  border-radius: 24rpx;
+  background: #ffffff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #333;
+  font-size: 26rpx;
 }
 
 .weekly-arrow {
   font-size: 34rpx;
-  color: #9aa6b2;
-}
-.stat-card {
-  position: relative;
-  overflow: hidden;
-  z-index: 0;
+  color: #ff9b4a;
 }
 
-.stat-card::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 28rpx;
-  background: radial-gradient(circle at 10% 0%, rgba(255, 255, 255, 0.6), transparent 60%);
-  z-index: -1;          /* 关键：放在文字下面 */
+/* 新版时间范围卡片（当前实际使用的） */
+.range-tabs-card {
+  margin: 16rpx 0 20rpx;
+  padding: 20rpx 24rpx;
+  border-radius: 24rpx;
+  background: #ffffff;
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.04);
 }
 
-
-
-
-/* 蓝色：运动&达标 */
-.stat-card-blue {
-  background: linear-gradient(135deg, #e2f2ff, #f2fbff);
+.range-tabs-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #333333;
+  margin-bottom: 16rpx;
 }
 
-/* 绿色：体重变化 */
-.stat-card-green {
-  background: linear-gradient(135deg, #e4ffe8, #f4fff6);
+.range-tabs {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16rpx;
 }
 
-/* 紫色：热量趋势 */
-.stat-card-purple {
-  background: linear-gradient(135deg, #f1ecff, #f9f4ff);
+.range-tab {
+  flex: 1;
+  text-align: center;
+  padding: 12rpx 0;
+  border-radius: 999rpx;
+  font-size: 26rpx;
+  color: #666666;
+  background: #f5f5f7;
 }
 
-/* 粉色：营养素分布 */
-.stat-card-pink {
-  background: linear-gradient(135deg, #ffe7e5, #fff4f2);
+.range-tab.active {
+  color: #ffffff;
+  /* active 状态用橙色渐变，和饮食页按钮统一 */
+  background: linear-gradient(135deg, #ff9b4a, #ff7c3a);
+  font-weight: 600;
+}
+
+.range-text {
+  margin-top: 12rpx;
+  font-size: 24rpx;
+  color: #999999;
 }
