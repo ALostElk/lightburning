@@ -1,0 +1,238 @@
+/* General improvements and subtle touches */
+.container {
+  min-height: 100vh; /* 确保容器覆盖整个视口高度 */
+  background: linear-gradient(180deg, #f6f8f8 0%, #b4cec6 100%); /* 保持背景渐变 */
+  padding: 0 20rpx 40rpx;
+  box-sizing: border-box;
+  /* 增加全局字体抗锯齿，使文本渲染更平滑 */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 标签切换 (Tabs) */
+.tabs-container {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: #fff;
+  padding: 30rpx 0;
+  margin: 0 -20rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.05); /* 阴影稍微柔和一点，但范围更大 */
+}
+.tabs {
+  display: flex;
+  justify-content: space-around;
+  padding: 0 20rpx;
+  gap: 45rpx; /* 增加标签之间的间距，避免过于拥挤 */
+}
+.tab-item {
+  flex: 1; /* 让标签平均分配宽度 */
+  text-align: center; /* 确保内容居中 */
+  padding: 18rpx 0; /* 调整垂直内边距，移除水平内边距（宽度由flex处理） */
+  border-radius: 10rpx; /* 稍微增加圆角，更柔和 */
+  transition: all 0.3s ease-in-out; /* 更平滑的过渡动画 */
+  background: #F8F8F8; /* 非选中状态的背景色，比F5F5F5更浅一点，增加层次感 */
+  box-shadow: 0 2rpx 6rpx rgba(0, 0, 0, 0.03); /* 为非选中标签添加非常细微的阴影，增加立体感 */
+  border: 1rpx solid #EEE; /* 添加一个非常浅的边框，提供清晰的边缘 */
+}
+.tab-item.active {
+  background: linear-gradient(135deg, #FF6B35 0%, #FF8C42 100%);
+  transform: translateY(-2rpx) scale(1.02); /* 选中时稍微上浮并放大一点，更具动态感 */
+  box-shadow: 0 6rpx 16rpx rgba(255, 107, 53, 0.4); /* 选中状态的阴影更明显 */
+  border: none; /* 选中时移除边框，让阴影更突出 */
+}
+.tab-label {
+  font-size: 30rpx; /* 字体稍微大一点，提高可读性 */
+  color: rgb(114, 112, 112); /* 未选中标签的颜色稍微深一点 */
+  font-weight: 500;
+}
+.tab-item.active .tab-label {
+  color: #fff;
+  font-weight: 600;
+}
+
+/* AI建议 (AI Suggestions) */
+.ai-suggestions {
+  background: linear-gradient(135deg, #667EEA 0%, #764BA2 100%);
+  border-radius: 24rpx; /* 圆角更大，更显友好 */
+  padding: 28rpx; /* 内边距增加，内容有更多呼吸空间 */
+  color: #fff;
+  margin-top: 30rpx; /* 增加与上方内容的间距 */
+  box-shadow: 0 6rpx 20rpx rgba(102, 126, 234, 0.4); /* 更强的阴影，突出卡片 */
+}
+.ai-title {
+  font-size: 36rpx; /* 标题字体更大 */
+  margin-bottom: 20rpx; /* 标题下方间距增加 */
+}
+.suggestion-item {
+  background: rgba(255, 255, 255, 0.25); /* 背景稍微不那么透明 */
+  border-radius: 16rpx; /* 更多圆角 */
+  padding: 20rpx; /* 更多内边距 */
+  margin-top: 16rpx; /* 增加项目间的间距 */
+  backdrop-filter: blur(12rpx); /* 稍微增强背景模糊效果 */
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1); /* 为每个建议项添加细微阴影 */
+}
+.suggestion-message {
+  font-size: 28rpx; /* 建议消息字体稍微大一点，更易读 */
+}
+/* 警告/错误/成功边框保持不变，它们已经很清晰 */
+
+/* 刷新按钮 (Refresh Button) */
+.refresh-section {
+  margin-top: 40rpx; /* 增加按钮上方间距 */
+  margin-bottom: 20rpx; /* 增加按钮下方间距 */
+}
+.btn-refresh {
+  border: 2rpx solid #FF6B35;
+  border-radius: 60rpx; /* 更多圆角，使其看起来像一个胶囊按钮 */
+  padding: 18rpx 50rpx; /* 增加内边距，使按钮更大气 */
+  font-size: 30rpx; /* 字体稍微大一点 */
+  box-shadow: 0 6rpx 16rpx rgba(255, 107, 53, 0.2); /* 更强的阴影 */
+}
+.btn-refresh:active {
+  transform: translateY(1rpx) scale(0.98); /* 点击时稍微下沉并缩小，更自然的反馈 */
+  box-shadow: 0 2rpx 8rpx rgba(255, 107, 53, 0.25);
+}
+.refresh-icon {
+  font-size: 30rpx; /* 图标稍微大一点 */
+}
+
+/* 加载状态 (Loading State) */
+.loading-container {
+  padding: 100rpx 0; /* 稍微减少垂直内边距 */
+}
+.loading-spinner {
+  width: 90rpx; /* 旋转器稍微大一点 */
+  height: 90rpx;
+  border-width: 8rpx; /* 边框更粗 */
+  border-top-color: #FF6B35;
+}
+.loading-text {
+  font-size: 30rpx; /* 字体稍微大一点 */
+  color: #777; /* 颜色稍微深一点 */
+}
+
+/* 食谱列表 (Recipe List) */
+.recipe-list {
+  margin-top: 30rpx; /* 增加与上方内容的间距 */
+}
+.recipe-card {
+  border-radius: 24rpx; /* 更多圆角，与AI建议卡片保持风格一致 */
+  margin-bottom: 32rpx; /* 增加卡片间的垂直间距 */
+  box-shadow: 0 8rpx 24rpx rgba(14, 13, 13, 0.1); /* 更明显、更立体的阴影效果 */
+}
+.recipe-card:active {
+  transform: translateY(1rpx) scale(0.99); /* 点击时轻微下沉和缩小 */
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.15);
+}
+.recipe-image-container {
+  height: 480rpx; /* 增加图片高度，更具视觉冲击力 */
+}
+.recipe-score {
+  top: 20rpx; /* 分数标签稍微向下、向左移动一点 */
+  right: 20rpx;
+  border-radius: 28rpx; /* 更多圆角 */
+  padding: 10rpx 18rpx; /* 增加内边距 */
+}
+.score-icon {
+  font-size: 26rpx;
+}
+.score-value {
+  font-size: 26rpx;
+}
+.recipe-info {
+  padding: 30rpx; /* 增加卡片信息区域的内边距 */
+}
+.recipe-header {
+  margin-bottom: 16rpx; /* 增加标题下方间距 */
+}
+.recipe-name {
+  font-size: 40rpx; /* 食谱名称字体更大，更醒目 */
+  font-weight: 700; /* 加粗 */
+  color: #222; /* 更深的字体颜色，对比度更高 */
+}
+.action-btn {
+  width: 64rpx; /* 动作按钮稍微大一点 */
+  height: 64rpx;
+  background: #F0F0F0; /* 按钮背景色稍微深一点 */
+  box-shadow: 0 2rpx 6rpx rgba(0, 0, 0, 0.05); /* 为按钮添加细微阴影 */
+}
+.action-btn:active {
+  background: #E5E5E5;
+  transform: scale(0.95);
+}
+.action-icon {
+  font-size: 36rpx; /* 图标字体更大 */
+  color: #555; /* 图标颜色稍微深一点 */
+}
+.recipe-description {
+  font-size: 30rpx; /* 描述文字字体稍微大一点 */
+  color: #555; /* 颜色稍微深一点 */
+  margin-bottom: 20rpx; /* 增加下方间距 */
+}
+
+/* 营养信息 (Nutrition Info) */
+.nutrition-info {
+  padding: 20rpx 0; /* 增加垂直内边距 */
+  margin-bottom: 20rpx; /* 增加下方间距 */
+  border-top: 1rpx solid #EAEAEA; /* 边框颜色更浅一点 */
+  border-bottom: 1rpx solid #EAEAEA;
+}
+.nutrition-icon {
+  font-size: 30rpx; /* 图标稍微大一点 */
+  color: #555;
+}
+.nutrition-value {
+  font-size: 40rpx; /* 数值字体稍微大一点 */
+  font-weight: 700; /* 加粗 */
+  color: #222;
+}
+.nutrition-unit {
+  font-size: 25rpx; /* 单位字体稍微大一点 */
+  color: #888;
+}
+
+/* 标签 (Tags) */
+.recipe-tags {
+  margin-bottom: 20rpx; /* 增加下方间距 */
+  gap: 12rpx; /* 增加标签之间的间距 */
+}
+.tag {
+  padding: 8rpx 18rpx; /* 增加内边距 */
+  background: #e9e8e8; /* 标签背景色稍微深一点 */
+  border-radius: 24rpx; /* 更多圆角，像胶囊 */
+  font-size: 24rpx; /* 字体稍微大一点 */
+  color: rgb(44, 43, 43); /* 字体颜色稍微深一点 */
+  font-weight: 500;
+}
+
+/* 烹饪信息 (Cooking Info) */
+.cooking-info {
+  font-size: 26rpx; /* 字体稍微大一点 */
+  color: rgb(70, 68, 68); /* 颜色稍微深一点 */
+  padding-top: 16rpx; /* 增加上方内边距 */
+  border-top: 1rpx solid #EAEAEA;
+}
+.cooking-time::before,
+.cooking-difficulty::before {
+  font-size: 28rpx; /* 图标字体大小与文字匹配 */
+}
+
+/* 空状态 (Empty State) */
+.empty-state {
+  padding: 160rpx 0; /* 增加垂直内边距，使空状态居中更舒适 */
+}
+.empty-icon {
+  font-size: 150rpx; /* 图标更大，更显眼 */
+  margin-bottom: 30rpx;
+  color: #D0D0D0; /* 颜色稍微深一点 */
+}
+.empty-text {
+  font-size: 36rpx; /* 字体更大 */
+  color: #555; /* 字体颜色稍微深一点 */
+  margin-bottom: 16rpx;
+}
+.empty-hint {
+  font-size: 28rpx; /* 字体更大 */
+  color: #888;
+}
