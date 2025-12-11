@@ -28,7 +28,7 @@
         </view>
         <view class="meta-item">
           <text class="meta-icon">🔥</text>
-          <text class="meta-text">每日{{Math.abs(plan.dailyDeficit)}}kcal</text>
+          <text class="meta-text">每日{{plan.dailyCalorieGoal}}kcal</text>
         </view>
       </view>
 
@@ -59,7 +59,7 @@
         </view>
         <view class="info-row">
           <text class="info-label">结束日期</text>
-          <text class="info-value">{{plan.endDate}}</text>
+          <text class="info-value">{{plan.endDate || calculatedEndDate}}</text>
         </view>
       </view>
 

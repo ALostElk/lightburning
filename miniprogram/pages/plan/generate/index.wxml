@@ -3,11 +3,11 @@
   <!-- 页面标题 -->
   <view class="header">
     <text class="title">生成健康计划</text>
-    <text class="subtitle">定制您的专属减重计划</text>
+    <text class="subtitle" style="position: relative; left: 29rpx; top: -12rpx">定制您的专属减重计划</text>
   </view>
 
   <!-- 当前用户状态卡片 -->
-  <view class="card" wx:if="{{profile}}" style="width: 501rpx; display: block; box-sizing: border-box">
+  <view class="card" wx:if="{{profile}}" style="width: 572rpx; display: block; box-sizing: border-box; position: relative; left: 1rpx; top: -49rpx">
     <view class="current-status">
       <view class="status-item">
         <text class="status-label">当前体重</text>
@@ -25,7 +25,7 @@
   </view>
 
   <!-- 计划参数卡片 -->
-  <view class="card" style="width: 501rpx; display: block; box-sizing: border-box">
+  <view class="card" style="width: 568rpx; display: block; box-sizing: border-box; position: relative; left: 6rpx; top: -41rpx">
     <view class="card-title">计划参数</view>
     
     <!-- 目标减重参数 -->
@@ -62,7 +62,7 @@
   </view>
 
   <!-- 计划预览卡片 -->
-  <view class="card" style="width: 501rpx; display: block; box-sizing: border-box">
+  <view class="card" style="width: 564rpx; display: block; box-sizing: border-box; position: relative; left: 8rpx; top: -48rpx">
     <view class="card-title">计划预览</view>
     
     <view class="preview-item">
@@ -95,7 +95,7 @@
   </view>
 
   <!-- 温馨提示卡片 -->
-  <view class="card tips-card">
+  <view class="card tips-card" style="width: 560rpx; display: block; box-sizing: border-box; position: relative; left: 11rpx; top: -62rpx">
     <view class="card-title">温馨提示</view>
     <view class="tips">
       <text class="tip-item">• 健康减重速度：每周0.5-1kg</text>
@@ -106,7 +106,7 @@
   </view>
 
   <!-- 生成计划按钮 -->
-  <button class="generate-btn" loading="{{generating}}" bindtap="onGeneratePlan" style="position: relative; left: -1rpx; top: -34rpx">
+  <button class="generate-btn" loading="{{generating}}" bindtap="onGeneratePlan">
     生成计划
   </button>
 </view>

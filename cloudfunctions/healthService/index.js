@@ -119,6 +119,12 @@ async function generatePlan(openid, targetWeightChange, totalDays) {
   const random = Math.floor(Math.random() * 100000).toString().padStart(5, '0');
   const planId = `${timestamp}${random}`;
 
+  // 计算开始和结束日期
+  const startDate = todayString();
+  const startDateObj = new Date(startDate);
+  const endDateObj = new Date(startDateObj.getTime() + totalDays * 24 * 60 * 60 * 1000);
+  const endDate = endDateObj.toISOString().slice(0, 10);
+
   const plan = {
     _id: planId,  // 使用自定义 _id
     _openid: openid,
@@ -127,7 +133,8 @@ async function generatePlan(openid, targetWeightChange, totalDays) {
     totalDeficit,
     dailyDeficit,
     dailyCalorieGoal: profile.tdee + dailyDeficit,
-    startDate: todayString(),
+    startDate: startDate,
+    endDate: endDate,
     status: 'active',
     createdAt: timestamp
   };
@@ -166,6 +173,7 @@ async function generatePlan(openid, targetWeightChange, totalDays) {
     dailyDeficit: plan.dailyDeficit,
     dailyCalorieGoal: plan.dailyCalorieGoal,
     startDate: plan.startDate,
+    endDate: plan.endDate,
     status: plan.status,
     createdAt: plan.createdAt,
     planId: finalPlanId,  // 明确设置 planId 字段（符合接口文档）
