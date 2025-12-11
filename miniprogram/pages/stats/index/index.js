@@ -2,9 +2,8 @@
 
 // 计算某个范围的起止日期
 function calcDateRange(days) {
-  const end = new Date();           // 今天
+  const end = new Date(); // 今天
   const start = new Date();
-  // 近7天：包含今天，一共7天
   start.setDate(end.getDate() - (days - 1));
 
   const format = (d) => {
@@ -16,30 +15,41 @@ function calcDateRange(days) {
 
   return {
     startDate: format(start),
-    endDate: format(end)
+    endDate: format(end),
   };
 }
 
 // 根据 DietLog 数组做聚合，返回首页要显示的统计
 function buildStatsFromLogs(logs, rangeDays) {
-  // logs 结构来自云函数 DietLog：
-  // { calories, protein, fat, carbs, recordDate, mealType, ... }
+  const dayMap = {}; // 按日期聚合
 
-  const dayMap = {};      // 按日期聚合
   let totalCalories = 0;
   let totalProtein = 0;
   let totalFat = 0;
   let totalCarbs = 0;
 
+  // 运动相关
+  let totalExerciseMinutes = 0;
+  const exerciseDaySet = {};
+
+  // 体重相关
+  const weightLogs = []; // 用于折线图 [{date, weight}]
+  let firstWeight = null;
+  let lastWeight = null;
+  let firstWeightDate = null;
+  let lastWeightDate = null;
+
   logs.forEach((log) => {
     const date = log.recordDate;
+    if (!date) return;
+
     if (!dayMap[date]) {
       dayMap[date] = {
         date,
         calories: 0,
         protein: 0,
         fat: 0,
-        carbs: 0
+        carbs: 0,
       };
     }
 
@@ -57,64 +67,156 @@ function buildStatsFromLogs(logs, rangeDays) {
     totalProtein += p;
     totalFat += f;
     totalCarbs += cb;
+
+    // 运动时长：兼容几种字段名
+    const ex =
+      Number(log.exerciseMinutes) ||
+      Number(log.exercise) ||
+      0;
+    if (ex > 0) {
+      totalExerciseMinutes += ex;
+      exerciseDaySet[date] = true;
+    }
+
+    // 体重：如果有 weight 字段则使用
+    const w = Number(log.weight) || 0;
+    if (w > 0) {
+      weightLogs.push({ date, weight: w });
+
+      if (firstWeight === null || date < firstWeightDate) {
+        firstWeight = w;
+        firstWeightDate = date;
+      }
+      if (lastWeight === null || date > lastWeightDate) {
+        lastWeight = w;
+        lastWeightDate = date;
+      }
+    }
   });
 
-  // 按日期排序，生成折线图/列表用的数据
+  // 按日期排序
   const dailyList = Object.keys(dayMap)
     .sort()
     .map((k) => dayMap[k]);
 
   const activeDays = dailyList.length; // 有记录的天数
-  const avgCalories = rangeDays > 0 ? Math.round(totalCalories / rangeDays) : 0;
+  const avgCalories =
+    rangeDays > 0 ? Math.round(totalCalories / rangeDays) : 0;
+
+  // 热量趋势：最高 / 最低
+  let maxCalories = 0;
+  let minCalories = null;
+  dailyList.forEach((d) => {
+    const val = d.calories || 0;
+    if (val > maxCalories) maxCalories = val;
+    if (minCalories === null || val < minCalories) minCalories = val;
+  });
+  if (minCalories === null) minCalories = 0;
+
+  // 营养素比例
+  const macroTotal = totalCarbs + totalProtein + totalFat;
+  let macroPercentCarb = 0;
+  let macroPercentProtein = 0;
+  let macroPercentFat = 0;
+  if (macroTotal > 0) {
+    macroPercentCarb = Math.round((totalCarbs * 100) / macroTotal);
+    macroPercentProtein = Math.round((totalProtein * 100) / macroTotal);
+    macroPercentFat = 100 - macroPercentCarb - macroPercentProtein;
+  }
+
+  // 运动统计 + 达标描述
+  const exerciseDays = Object.keys(exerciseDaySet).length;
+  const exerciseAvgMinutes =
+    exerciseDays > 0
+      ? Math.round(totalExerciseMinutes / exerciseDays)
+      : 0;
+
+  const goalPerDay = 30; // 假设目标：每天 30 分钟
+  let exerciseStatusText = '暂无运动记录';
+  if (exerciseDays > 0) {
+    if (exerciseAvgMinutes >= goalPerDay) {
+      exerciseStatusText = '整体达标（≥ 30 min/天）';
+    } else if (exerciseAvgMinutes >= goalPerDay * 0.5) {
+      exerciseStatusText = '接近达标，建议适当增加时长';
+    } else {
+      exerciseStatusText = '未达标，可以多安排运动时间';
+    }
+  }
+
+  // 体重变化描述 + 折线数据
+  let weightChange = 0;
+  let weightChangeText = '暂无体重记录';
+  let weightTrendList = [];
+
+  if (weightLogs.length > 0) {
+    // 按日期排序
+    weightLogs.sort((a, b) => (a.date > b.date ? 1 : -1));
+    weightTrendList = weightLogs;
+
+    if (firstWeight !== null && lastWeight !== null) {
+      weightChange = Number((lastWeight - firstWeight).toFixed(1));
+      if (weightChange > 0) {
+        weightChangeText = `+${weightChange} kg`;
+      } else if (weightChange < 0) {
+        weightChangeText = `${weightChange} kg`;
+      } else {
+        weightChangeText = '0 kg';
+      }
+    }
+  }
 
   return {
     // 顶部摘要卡片
-    totalCaloriesIn: totalCalories,      // 总摄入
-    avgCaloriesIn: avgCalories,          // 平均每日摄入
+    totalCaloriesIn: totalCalories,
+    avgCaloriesIn: avgCalories,
     totalProtein: Number(totalProtein.toFixed(1)),
     totalFat: Number(totalFat.toFixed(1)),
     totalCarbs: Number(totalCarbs.toFixed(1)),
 
-    // 「记录天数 / 达标天数」之类可以先简单用 activeDays 占位
     totalDays: rangeDays,
     recordDays: activeDays,
-    recordRate: rangeDays > 0 ? Math.round((activeDays * 100) / rangeDays) : 0,
+    recordRate:
+      rangeDays > 0
+        ? Math.round((activeDays * 100) / rangeDays)
+        : 0,
 
-    // 雷达图 / 进度条用的几个维度（可以随便先占位，保证不报错）
-    completionItems: [
-      {
-        key: 'diet',
-        label: '饮食记录天数',
-        score: rangeDays > 0 ? Math.round((activeDays * 100) / rangeDays) : 0
-      },
-      {
-        key: 'calorie',
-        label: '平均热量记录',
-        score: avgCalories > 0 ? 80 : 0 // 简单给个常数占位，后面你可以按目标热量算
-      },
-      {
-        key: 'protein',
-        label: '蛋白质记录',
-        score: totalProtein > 0 ? 80 : 0
-      }
-    ],
+    // 运动卡片
+    exerciseMinutesTotal: totalExerciseMinutes,
+    exerciseDays,
+    exerciseAvgMinutes,
+    exerciseGoalPerDay: goalPerDay,
+    exerciseStatusText,
 
-    // 折线图/列表
-    dailyList
+    // 体重卡片
+    weightStart: firstWeight,
+    weightEnd: lastWeight,
+    weightChange,
+    weightChangeText,
+    weightTrendList,
+
+    // 热量趋势卡片
+    minCalories,
+    maxCalories,
+
+    // 营养素分布卡片
+    macroPercentCarb,
+    macroPercentProtein,
+    macroPercentFat,
+
+    // 每日列表
+    dailyList,
   };
 }
 
 Page({
   data: {
-    // 当前选择的时间范围，天数
     rangeDays: 7,
-    // 展示的日期区间，比如 "2025-11-28 ~ 2025-12-04"
     rangeText: '',
     startDate: '',
     endDate: '',
     loading: false,
 
-    // ↓↓↓ 这些字段对应首页「数据概览」要用到的绑定字段
+    // 顶部摘要
     totalCaloriesIn: 0,
     avgCaloriesIn: 0,
     totalProtein: 0,
@@ -123,20 +225,38 @@ Page({
     totalDays: 7,
     recordDays: 0,
     recordRate: 0,
-    completionItems: [],
-    dailyList: []
+
+    // 运动
+    exerciseMinutesTotal: 0,
+    exerciseDays: 0,
+    exerciseAvgMinutes: 0,
+    exerciseGoalPerDay: 30,
+    exerciseStatusText: '',
+
+    // 体重
+    weightStart: null,
+    weightEnd: null,
+    weightChange: 0,
+    weightChangeText: '',
+    weightTrendList: [],
+
+    // 热量趋势
+    minCalories: 0,
+    maxCalories: 0,
+
+    // 营养素比例
+    macroPercentCarb: 0,
+    macroPercentProtein: 0,
+    macroPercentFat: 0,
+
+    dailyList: [],
   },
 
   onLoad() {
-    // 默认近7天
     const fakeEvent = { currentTarget: { dataset: { days: 7 } } };
     this.changeRange(fakeEvent);
   },
 
-  /**
-   * 点击「近7天 / 近30天 / 近90天」按钮
-   * wxml: bindtap="changeRange" data-days="7"
-   */
   changeRange(e) {
     const days = Number(e.currentTarget.dataset.days || 7);
     const { startDate, endDate } = calcDateRange(days);
@@ -146,7 +266,7 @@ Page({
         rangeDays: days,
         startDate,
         endDate,
-        rangeText: `${startDate} ~ ${endDate}`
+        rangeText: `${startDate} ~ ${endDate}`,
       },
       () => {
         this.loadStats();
@@ -154,18 +274,12 @@ Page({
     );
   },
 
-  // 如果你 wxml 里绑定的是 onRangeChange，这里做个转发也行
   onRangeChange(e) {
     this.changeRange(e);
   },
 
-  /**
-   * 调用后端 dietService.getDietLogsByRange
-   * 拉取这个时间段内的 DietLog，然后做聚合
-   */
   async loadStats() {
     const { startDate, endDate, rangeDays } = this.data;
-
     if (!startDate || !endDate) return;
 
     this.setData({ loading: true });
@@ -173,7 +287,7 @@ Page({
 
     try {
       if (!wx.cloud || !wx.cloud.callFunction) {
-        console.error('[stats] wx.cloud 未初始化，请检查 app.js 中是否有 wx.cloud.init');
+        console.error('[stats] wx.cloud 未初始化');
         wx.showToast({ title: '云开发未初始化', icon: 'none' });
         return;
       }
@@ -182,14 +296,9 @@ Page({
         name: 'dietService',
         data: {
           action: 'getDietLogsByRange',
-          payload: {
-            startDate,
-            endDate
-          }
-        }
+          payload: { startDate, endDate },
+        },
       });
-
-      console.log('[stats] dietService.getDietLogsByRange result:', res);
 
       const result = res.result || {};
       if (!result.success) {
@@ -199,10 +308,15 @@ Page({
       }
 
       const logs = result.data || [];
-      // 计算统计值
-      const stats = buildStatsFromLogs(logs, rangeDays);
+      console.log('[stats] 原始日志 logs = ', logs);
 
-      this.setData(stats);
+      const stats = buildStatsFromLogs(logs, rangeDays);
+      this.setData(stats, () => {
+        // 统计更新完再画折线图
+        wx.nextTick(() => {
+          this.drawWeightChart();
+        });
+      });
     } catch (err) {
       console.error('[stats] 调用 dietService 失败: ', err);
       wx.showToast({ title: '网络异常', icon: 'none' });
@@ -212,28 +326,84 @@ Page({
     }
   },
 
-  /**
-   * 跳转到周报页面
-   * wxml: bindtap="goWeeklyReport"
-   */
+  // 体重折线图
+  drawWeightChart() {
+    const list = this.data.weightTrendList || [];
+    if (!list.length) {
+      // 没有体重记录不画
+      const ctx = wx.createCanvasContext('weightChart', this);
+      ctx.clearRect(0, 0, 300, 120);
+      ctx.draw();
+      return;
+    }
+
+    const ctx = wx.createCanvasContext('weightChart', this);
+    const width = 300;
+    const height = 120;
+    const padding = 10;
+
+    ctx.clearRect(0, 0, width, height);
+
+    const weights = list.map((d) => d.weight);
+    const minW = Math.min(...weights);
+    const maxW = Math.max(...weights);
+    const diff = maxW - minW || 1;
+
+    const n = list.length;
+    const stepX = (width - padding * 2) / (n - 1 || 1);
+
+    ctx.setStrokeStyle('#1f8cff');
+    ctx.setLineWidth(2);
+    ctx.beginPath();
+
+    list.forEach((item, idx) => {
+      const x = padding + stepX * idx;
+      const y =
+        height -
+        padding -
+        ((item.weight - minW) / diff) * (height - padding * 2);
+
+      if (idx === 0) {
+        ctx.moveTo(x, y);
+      } else {
+        ctx.lineTo(x, y);
+      }
+    });
+
+    ctx.stroke();
+
+    // 画小圆点
+    ctx.setFillStyle('#1f8cff');
+    list.forEach((item, idx) => {
+      const x = padding + stepX * idx;
+      const y =
+        height -
+        padding -
+        ((item.weight - minW) / diff) * (height - padding * 2);
+      ctx.beginPath();
+      ctx.arc(x, y, 3, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    ctx.draw();
+  },
+
   goWeeklyReport() {
     wx.navigateTo({
-      url: '/pages/stats/weekly'
+      url: '/pages/stats/weekly',
     });
   },
 
-  // 下拉刷新：重新拉一次
   onPullDownRefresh() {
     this.loadStats().finally(() => {
       wx.stopPullDownRefresh();
     });
   },
 
-  // 分享
   onShareAppMessage() {
     return {
       title: '我的健康数据概览',
-      path: '/pages/stats/index'
+      path: '/pages/stats/index',
     };
-  }
+  },
 });

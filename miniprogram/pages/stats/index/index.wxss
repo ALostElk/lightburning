@@ -1,184 +1,380 @@
+page {
+  background: #f3fff6;
+}
+
 .page {
-  min-height: 100vh;
-  padding: 24rpx 24rpx 40rpx;
-  background: linear-gradient(180deg, #f8fbff 0%, #f2f5ff 40%, #ffffff 100%);
+  padding: 20rpx 24rpx 40rpx;
   box-sizing: border-box;
 }
 
-.header-card {
-  padding: 32rpx;
-  border-radius: 24rpx;
-  background: linear-gradient(135deg, #2f80ed 0%, #56ccf2 100%);
-  color: #ffffff;
-  box-shadow: 0 16rpx 40rpx rgba(0, 0, 0, 0.12);
-  margin-bottom: 32rpx;
-}
-
-.header-title {
-  font-size: 34rpx;
-  font-weight: 600;
-
-}
-
-.range-tabs {
-  display: flex;
-  gap: 16rpx;
-  margin-bottom: 16rpx;
-}
-
-.range-tab {
-  flex: 1;
-  text-align: center;
-  padding: 12rpx 0;
-  border-radius: 999rpx;
-  font-size: 24rpx;
-  border: 1rpx solid rgba(255, 255, 255, 0.5);
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.range-tab.active {
+/* 通用卡片阴影 */
+.shadow-card {
+  border-radius: 28rpx;
   background: #ffffff;
-  color: #2f80ed;
+  box-shadow: 0 18rpx 40rpx rgba(0, 0, 0, 0.08);
 }
 
-.time-text {
+/* 顶部总览卡片 */
+.summary-card {
+  display: flex;
+  padding: 32rpx 28rpx;
+  margin-bottom: 32rpx;
+  background: linear-gradient(135deg, #e9fff0, #f8fff9);
+}
+
+.summary-left {
+  width: 36%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.ring {
+  width: 180rpx;
+  height: 180rpx;
+  border-radius: 50%;
+  border: 14rpx solid rgba(255, 255, 255, 0.7);
+  background: #f6fff8;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.ring-main {
+  font-size: 40rpx;
+  font-weight: 600;
+  color: #444;
+}
+
+.ring-sub {
+  margin-top: 6rpx;
+  font-size: 20rpx;
+  color: #9aa6b2;
+}
+
+.summary-right {
+  flex: 1;
+  padding-left: 24rpx;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.summary-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12rpx;
+}
+
+.summary-row:last-child {
+  margin-bottom: 0;
+}
+
+.dot {
+  width: 14rpx;
+  height: 14rpx;
+  border-radius: 50%;
+  margin-right: 12rpx;
+}
+
+.dot-red {
+  background: #ff7b5a;
+}
+
+.dot-blue {
+  background: #4b8cff;
+}
+
+.dot-purple {
+  background: #aa7bff;
+}
+
+.summary-label {
+  flex: 1;
+  font-size: 24rpx;
+  color: #65727f;
+}
+
+.summary-value {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #344150;
+  margin-right: 4rpx;
+}
+
+.summary-unit {
   font-size: 22rpx;
+  color: #9aa6b2;
+}
+
+/* 挑战卡片 */
+.row-space {
+  margin-bottom: 24rpx;
+}
+
+.btn-card {
+  padding: 26rpx 28rpx;
+  border-radius: 26rpx;
+  position: relative;
+}
+
+.btn-orange {
+  background: linear-gradient(135deg, #ff9b4a, #ff7c3a);
+  color: #ffffff;
+}
+
+.btn-text-main {
+  font-size: 30rpx;
+  font-weight: 600;
+}
+
+.btn-text-sub {
+  margin-top: 8rpx;
+  font-size: 22rpx;
+  opacity: 0.85;
+}
+
+.btn-arrow {
+  position: absolute;
+  right: 30rpx;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 40rpx;
   opacity: 0.9;
 }
 
-.kpi-row {
-  display: flex;
-  gap: 24rpx;
-  margin-bottom: 32rpx;
-}
-
-.kpi-card {
-  flex: 1;
-  padding: 24rpx;
-  border-radius: 24rpx;
-  background: #ffffff;
-  box-shadow: 0 8rpx 24rpx rgba(15, 35, 52, 0.08);
-}
-
-.kpi-label {
-  font-size: 24rpx;
-  color: #7a8aa0;
-  margin-bottom: 16rpx;
-}
-
-.kpi-value {
-  font-size: 36rpx;
-  font-weight: 600;
-  color: #111827;
-  margin-bottom: 8rpx;
-}
-
-.kpi-sub {
-  font-size: 22rpx;
-  color: #9ca3af;
-}
-
-.section-card {
-  margin-bottom: 32rpx;
-  padding: 24rpx 24rpx 16rpx;
-  border-radius: 24rpx;
-  background: #ffffff;
-  box-shadow: 0 8rpx 24rpx rgba(15, 35, 52, 0.08);
-}
-
+/* 头部标题 + tabs */
 .section-header {
+  margin-top: 4rpx;
+  margin-bottom: 16rpx;
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  align-items: flex-end;
-  margin-bottom: 12rpx;
 }
 
 .section-title {
   font-size: 30rpx;
   font-weight: 600;
-  color: #111827;
+  color: #333e4a;
 }
 
-.section-sub {
-  font-size: 22rpx;
-  color: #9ca3af;
-}
-
-.exercise-row {
+.range-tabs {
   display: flex;
-  justify-content: space-between;
-  margin-top: 12rpx;
+  align-items: center;
+}
+
+.range-tab {
+  min-width: 120rpx;
+  padding: 8rpx 14rpx;
+  border-radius: 999rpx;
+  border: 1rpx solid #e0ecf5;
+  font-size: 22rpx;
+  color: #8a96a2;
+  text-align: center;
+  margin-left: 12rpx;
+}
+
+.range-tab.active {
+  background: #ffffff;
+  color: #ff7b3a;
+  border-color: #ffb58a;
+}
+
+/* chips */
+.chips-row {
+  display: flex;
+  flex-wrap: wrap;
   margin-bottom: 24rpx;
 }
 
-.exercise-block {
-  flex: 1;
-  text-align: center;
-}
-
-.exercise-label {
-  font-size: 22rpx;
-  color: #6b7280;
-  margin-bottom: 8rpx;
-}
-
-.exercise-value {
-  font-size: 30rpx;
-  font-weight: 600;
-  color: #111827;
-}
-
-.rate-row {
+.chip {
   display: flex;
   align-items: center;
-  gap: 16rpx;
-}
-
-.rate-text {
-  font-size: 22rpx;
-  color: #6b7280;
-  flex-shrink: 0;
-}
-
-.rate-bar {
-  flex: 1;
-  height: 14rpx;
+  padding: 8rpx 14rpx;
+  background: rgba(255, 255, 255, 0.85);
   border-radius: 999rpx;
-  background: #e5e7eb;
+  margin-right: 12rpx;
+  margin-bottom: 10rpx;
+}
+
+.chip-icon {
+  font-size: 24rpx;
+  margin-right: 4rpx;
+}
+
+.chip-text {
+  font-size: 22rpx;
+  color: #6a7682;
+}
+
+/* 营养结构 */
+.macro-card {
+  padding: 20rpx 26rpx;
+  margin-bottom: 26rpx;
+  background: linear-gradient(135deg, #ebfff4, #f9fffb);
+}
+
+.macro-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8rpx 0;
+}
+
+.macro-label {
+  font-size: 24rpx;
+  color: #51606d;
+}
+
+.macro-value {
+  font-size: 26rpx;
+  font-weight: 500;
+  color: #2e3f4f;
+}
+
+/* 每日列表卡片 */
+.card-list {
+  padding: 26rpx 24rpx 14rpx;
+  background: #ffffff;
+}
+
+.card-list-header {
+  margin-bottom: 12rpx;
+}
+
+.card-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.card-sub {
+  margin-top: 4rpx;
+  font-size: 22rpx;
+  color: #9aa6b2;
+}
+
+.daily-item {
+  display: flex;
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid #f1f3f6;
+}
+
+.daily-item:last-child {
+  border-bottom: none;
+}
+
+.daily-left {
+  width: 220rpx;
+}
+
+.daily-date {
+  font-size: 24rpx;
+  color: #4a5966;
+}
+
+.daily-right {
+  flex: 1;
+}
+
+.kcal-line {
+  display: flex;
+  justify-content: flex-end;
+  align-items: baseline;
+}
+
+.kcal-value {
+  font-size: 26rpx;
+  font-weight: 500;
+  color: #ff7b3a;
+}
+
+.kcal-unit {
+  font-size: 20rpx;
+  color: #9aa6b2;
+  margin-left: 4rpx;
+}
+
+.fake-bar {
+  margin-top: 8rpx;
+  width: 100%;
+  height: 10rpx;
+  border-radius: 999rpx;
+  background: #edf2f7;
   overflow: hidden;
 }
 
-.rate-fill {
+.fake-bar-inner {
+  width: 60%;
   height: 100%;
   border-radius: 999rpx;
-  background: linear-gradient(90deg, #10b981 0%, #22c55e 100%);
+  background: linear-gradient(90deg, #ffb58a, #ff7b3a);
+  opacity: 0.85;
 }
 
-.rate-percent {
+.empty-tip {
+  padding: 20rpx 0;
   font-size: 24rpx;
-  color: #10b981;
-  font-weight: 600;
-  width: 80rpx;
-  text-align: right;
+  color: #9aa6b2;
+  text-align: center;
 }
 
-.chart-canvas {
-  width: 100%;
-  height: 360rpx;
-  margin-top: 12rpx;
-}
-.header-top {
+/* 周报入口 */
+.weekly-entry {
+  margin-top: 26rpx;
+  margin-bottom: 10rpx;
+  padding: 18rpx 24rpx;
+  border-radius: 24rpx;
+  background: rgba(255, 255, 255, 0.92);
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 24rpx;
+  justify-content: space-between;
 }
 
-.header-link {
-  font-size: 24rpx;
-  color: rgba(255, 255, 255, 0.9);
-  padding: 8rpx 18rpx;
-  border-radius: 999rpx;
-  border: 1rpx solid rgba(255, 255, 255, 0.45);
-  background: rgba(255, 255, 255, 0.12);
+.weekly-text {
+  font-size: 26rpx;
+  color: #333e4a;
+}
+
+.weekly-arrow {
+  font-size: 34rpx;
+  color: #9aa6b2;
+}
+.stat-card {
+  position: relative;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.stat-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 28rpx;
+  background: radial-gradient(circle at 10% 0%, rgba(255, 255, 255, 0.6), transparent 60%);
+  z-index: -1;          /* 关键：放在文字下面 */
+}
+
+
+
+
+/* 蓝色：运动&达标 */
+.stat-card-blue {
+  background: linear-gradient(135deg, #e2f2ff, #f2fbff);
+}
+
+/* 绿色：体重变化 */
+.stat-card-green {
+  background: linear-gradient(135deg, #e4ffe8, #f4fff6);
+}
+
+/* 紫色：热量趋势 */
+.stat-card-purple {
+  background: linear-gradient(135deg, #f1ecff, #f9f4ff);
+}
+
+/* 粉色：营养素分布 */
+.stat-card-pink {
+  background: linear-gradient(135deg, #ffe7e5, #fff4f2);
 }

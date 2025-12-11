@@ -1,107 +1,191 @@
-<view class="header-card">
-  <view class="header-top">
-    <view class="header-title">数据概览</view>
-    <view class="header-link" bindtap="goWeeklyReport">
-      周报告 >
-    </view>
-  </view>
-  <view class="header-card">
-  <view class="header-top">
-    <view class="header-title">选择周期</view>
-    <view class="header-link" bindtap="goWeeklyReport">
-     
-    </view>
-  </view>
-    <view class="range-tabs">
-      <view
-        class="range-tab {{rangeType === 7 ? 'active' : ''}}"
-        data-days="7"
-        bindtap="onRangeChange"
-      >近7天</view>
-      <view
-        class="range-tab {{rangeType === 30 ? 'active' : ''}}"
-        data-days="30"
-        bindtap="onRangeChange"
-      >近30天</view>
-      <view
-        class="range-tab {{rangeType === 90 ? 'active' : ''}}"
-        data-days="90"
-        bindtap="onRangeChange"
-      >近90天</view>
-    </view>
-    <view class="time-text">{{startDate}} ~ {{endDate}}</view>
-  </view>
+<view class="page">
 
-  <!-- 核心指标卡片 -->
-  <view class="kpi-row">
-    <view class="kpi-card">
-      <view class="kpi-label">体重变化</view>
-      <view class="kpi-value">{{weightDeltaText}}</view>
-      <view class="kpi-sub">当前：{{currentWeight || '--'}} kg</view>
-    </view>
-    <view class="kpi-card">
-      <view class="kpi-label">平均净热量</view>
-      <view class="kpi-value">{{avgNetCalories || '--'}} kcal</view>
-      <view class="kpi-sub">目标差值：{{avgDeficitText}}</view>
+<!-- 顶部总览卡片 -->
+<view class="summary-card shadow-card">
+  <view class="summary-left">
+    <view class="ring">
+      <text class="ring-main">
+        {{avgCaloriesIn ? avgCaloriesIn : '--'}}
+      </text>
+      <text class="ring-sub">kcal / 日均摄入</text>
     </view>
   </view>
 
-  <!-- 运动统计 + 达标率 -->
-  <view class="section-card">
-    <view class="section-header">
-      <view class="section-title">运动 & 达标</view>
-      <view class="section-sub">统计期间</view>
+  <view class="summary-right">
+    <view class="summary-row">
+      <view class="dot dot-red"></view>
+      <view class="summary-label">总摄入</view>
+      <view class="summary-value">{{totalCaloriesIn || 0}}</view>
+      <text class="summary-unit">kcal</text>
     </view>
-    <view class="exercise-row">
-      <view class="exercise-block">
-        <view class="exercise-label">总运动次数</view>
-        <view class="exercise-value">{{exerciseStats.totalCount}}</view>
+    <view class="summary-row">
+      <view class="dot dot-blue"></view>
+      <view class="summary-label">记录天数</view>
+      <view class="summary-value">{{recordDays || 0}}</view>
+      <text class="summary-unit"> / {{totalDays || 0}}</text>
+    </view>
+    <view class="summary-row">
+      <view class="dot dot-purple"></view>
+      <view class="summary-label">记录完成度</view>
+      <view class="summary-value">{{recordRate || 0}}</view>
+      <text class="summary-unit">%</text>
+    </view>
+  </view>
+</view>
+
+<!-- 选择周期 -->
+<view class="section-header">
+  <view class="section-title">选择周期</view>
+  <view class="range-tabs">
+    <view
+      class="range-tab {{rangeDays==7 ? 'active' : ''}}"
+      data-days="7"
+      bindtap="changeRange"
+    >
+      近7天
+    </view>
+    <view
+      class="range-tab {{rangeDays==30 ? 'active' : ''}}"
+      data-days="30"
+      bindtap="changeRange"
+    >
+      近30天
+    </view>
+    <view
+      class="range-tab {{rangeDays==90 ? 'active' : ''}}"
+      data-days="90"
+      bindtap="changeRange"
+    >
+      近90天
+    </view>
+  </view>
+</view>
+
+<!-- 日期区间 + 记录情况 -->
+<view class="chips-row">
+  <view class="chip">
+    <text class="chip-icon">📅</text>
+    <text class="chip-text">{{rangeText}}</text>
+  </view>
+  <view class="chip">
+    <text class="chip-icon">✅</text>
+    <text class="chip-text">
+      已记录 {{recordDays || 0}} 天（{{recordRate || 0}}%）
+    </text>
+  </view>
+</view>
+
+<!-- === 中间四个卡片：运动 / 体重 / 趋势 / 营养 === -->
+
+<!-- 运动 & 达标 -->
+<view class="shadow-card stat-card stat-card-blue" style="margin-top: 16rpx; padding: 20rpx 22rpx;">
+  <view style="display:flex; align-items:center; justify-content:space-between;">
+    <view style="flex:1;">
+      <view style="font-size:26rpx; font-weight:600; color:#27344a;">
+        运动 & 达标
       </view>
-      <view class="exercise-block">
-        <view class="exercise-label">总运动时长</view>
-        <view class="exercise-value">{{exerciseStats.totalDuration}} min</view>
+      <view style="margin-top:6rpx; font-size:22rpx; color:#96a3b3;">
+        目标 ≥ {{exerciseGoalPerDay}} min/天
       </view>
-      <view class="exercise-block">
-        <view class="exercise-label">总消耗</view>
-        <view class="exercise-value">{{exerciseStats.totalCalories}} kcal</view>
+      <view style="margin-top:2rpx; font-size:22rpx; color:#96a3b3;">
+        {{exerciseStatusText}}
       </view>
     </view>
-    <view class="rate-row">
-      <view class="rate-text">
-        达标天数：{{goalDays}} / {{totalDays}} 天
+    <view style="margin-left:24rpx; text-align:right;">
+      <view style="font-size:30rpx; font-weight:600; color:#1f8cff;">
+        {{exerciseMinutesTotal || 0}} min
       </view>
-      <view class="rate-bar">
-        <view class="rate-fill" style="width: {{goalRateWidth}};"></view>
-
+      <view style="font-size:22rpx; color:#8693a5; margin-top:4rpx;">
+        日均 {{exerciseAvgMinutes || 0}} min · {{exerciseDays || 0}} 天
       </view>
-      <view class="rate-percent">{{goalRate}}%</view>
     </view>
   </view>
+</view>
 
-  <!-- 体重变化折线图 -->
-  <view class="section-card">
-    <view class="section-header">
-      <view class="section-title">体重变化</view>
-      <view class="section-sub">更直观地看到趋势</view>
+<!-- 体重变化 -->
+<view class="shadow-card stat-card stat-card-green" style="margin-top: 14rpx; padding: 20rpx 22rpx;">
+  <view style="display:flex; flex-direction:column;">
+    <view style="display:flex; align-items:center; justify-content:space-between;">
+      <view style="flex:1;">
+        <view style="font-size:26rpx; font-weight:600; color:#27344a;">
+          体重变化
+        </view>
+        <view
+          wx:if="{{weightStart}}"
+          style="margin-top:6rpx; font-size:22rpx; color:#96a3b3;"
+        >
+          {{weightStart}} kg → {{weightEnd}} kg
+        </view>
+        <view
+          wx:else
+          style="margin-top:6rpx; font-size:22rpx; color:#96a3b3;"
+        >
+          暂无体重记录
+        </view>
+      </view>
+      <view style="margin-left:24rpx; text-align:right;">
+        <view style="font-size:28rpx; font-weight:600; color:#27344a;">
+          {{weightChangeText || '--'}}
+        </view>
+      </view>
     </view>
-    
-  </view>
 
-  <!-- 热量趋势图 -->
-  <view class="section-card">
-    <view class="section-header">
-      <view class="section-title">热量趋势</view>
-      <view class="section-sub">摄入 / 消耗 / 净差</view>
+    <!-- 小折线图 -->
+    <view style="margin-top:16rpx;">
+      <canvas
+        canvas-id="weightChart"
+        style="width:100%; height:120rpx;"
+      ></canvas>
     </view>
-    
   </view>
+</view>
 
-  <!-- 营养素分布 -->
-  <view class="section-card">
-    <view class="section-header">
-      <view class="section-title">营养素分布</view>
-      <view class="section-sub">平均每日摄入</view>
+
+<!-- 热量趋势 -->
+<view class="shadow-card stat-card stat-card-purple" style="margin-top: 14rpx; padding: 20rpx 22rpx;">
+  <view style="display:flex; align-items:center; justify-content:space-between;">
+    <view style="flex:1;">
+      <view style="font-size:26rpx; font-weight:600; color:#27344a;">
+        热量趋势
+      </view>
+      <view style="margin-top:6rpx; font-size:22rpx; color:#96a3b3;">
+        日均 {{avgCaloriesIn || 0}} kcal
+      </view>
+      <view style="margin-top:2rpx; font-size:22rpx; color:#b0bcc9;">
+        最高 {{maxCalories || 0}} · 最低 {{minCalories || 0}} kcal
+      </view>
     </view>
-    
+    <view style="margin-left:24rpx; text-align:right;">
+      <view style="font-size:22rpx; color:#8693a5;">
+        记录 {{recordDays || 0}} 天
+      </view>
+    </view>
   </view>
+</view>
+
+<!-- 营养素分布 -->
+<view class="shadow-card stat-card stat-card-pink" style="margin-top: 14rpx; padding: 20rpx 22rpx;">
+  <view style="display:flex; align-items:center; justify-content:space-between;">
+    <view style="flex:1;">
+      <view style="font-size:26rpx; font-weight:600; color:#27344a;">
+        营养素分布
+      </view>
+      <view style="margin-top:6rpx; font-size:22rpx; color:#96a3b3;">
+        碳水 {{totalCarbs || 0}} g（{{macroPercentCarb || 0}}%）
+      </view>
+      <view style="margin-top:2rpx; font-size:22rpx; color:#96a3b3;">
+        蛋白质 {{totalProtein || 0}} g（{{macroPercentProtein || 0}}%）
+      </view>
+      <view style="margin-top:2rpx; font-size:22rpx; color:#96a3b3;">
+        脂肪 {{totalFat || 0}} g（{{macroPercentFat || 0}}%）
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- 查看周报 -->
+<view class="weekly-entry" bindtap="goWeeklyReport">
+  <text class="weekly-text">查看本周详细报告</text>
+  <text class="weekly-arrow">›</text>
+</view>
 </view>
