@@ -1,76 +1,102 @@
-<!--pages/mine/index/index.wxml-->
-<view class="container">
-  <!-- 用户信息卡片 -->
-  <view class="user-card">
-    <view class="user-avatar">
-      <image wx:if="{{userInfo}}" src="{{userInfo.avatarUrl}}" mode="aspectFill"></image>
-      <text wx:else>👤</text>
+<!-- pages/mine/index/index.wxml -->
+<view class="page">
+  <!-- 顶部用户信息区域（恢复原样式） -->
+  <view class="user-info-card">
+    <view class="avatar-wrap" bindtap="chooseAvatar">
+      <image class="avatar" src="{{userInfo.avatarUrl}}" mode="aspectFill"></image>
     </view>
-    <view class="user-info" wx:if="{{profile}}">
-      <text class="user-name">{{userInfo.nickName || '健康用户'}}</text>
-      <view class="user-stats">
-        <text class="stat-item">{{profile.height}}cm</text>
-        <text class="stat-divider">·</text>
-        <text class="stat-item">{{profile.weight}}kg</text>
-        <text class="stat-divider">·</text>
-        <text class="stat-item">{{profile.goal}}</text>
+    <view class="user-base">
+      <view class="user-name-wrap">
+        <text class="user-name">{{userInfo.nickName}}</text>
+        <button class="edit-btn" bindtap="goToEdit">编辑</button>
+      </view>
+      <text class="nickname-edit-tip" bindtap="openNicknameModal">点击编辑昵称</text>
+      <text class="user-basic">{{userInfo.height}}cm · {{userInfo.weight}}kg · {{userInfo.goal}}</text>
+    </view>
+  </view>
+
+  <!-- 今日数据区域（恢复原样式） -->
+  <view class="stats-row">
+    <view class="stats-item">
+      <text class="stats-label">今日摄入</text>
+      <text class="stats-value">{{todayIntake}}kcal</text>
+    </view>
+    <view class="stats-item">
+      <text class="stats-label">今日消耗</text>
+      <text class="stats-value">{{todayConsume}}kcal</text>
+    </view>
+    <view class="stats-item">
+      <text class="stats-label">记录次数</text>
+      <text class="stats-value">{{recordCount}}</text>
+    </view>
+  </view>
+
+  <!-- 身体指标区域（恢复原样式） -->
+  <view class="body-stats-card">
+    <text class="card-title">身体指标</text>
+    <view class="body-stats-row">
+      <view class="body-stats-item">
+        <text class="stats-key">BMI</text>
+        <text class="stats-val">{{formatNumber(userStats.bmi)}}</text>
+      </view>
+      <view class="body-stats-item">
+        <text class="stats-key">BMR</text>
+        <text class="stats-val">{{formatNumber(userStats.bmr)}}kcal</text>
+      </view>
+      <view class="body-stats-item">
+        <text class="stats-key">TDEE</text>
+        <text class="stats-val">{{formatNumber(userStats.tdee)}}kcal</text>
       </view>
     </view>
-    <view class="edit-btn" bindtap="onEditProfile">
-      <text>编辑</text>
+  </view>
+
+  <!-- 功能按钮区域（恢复原布局） -->
+  <view class="function-list">
+    <view class="function-item" bindtap="goToPlan">
+      <text class="func-icon">📋</text>
+      <text class="func-text">我的计划</text>
+      <text class="func-desc">查看管理计划</text>
+      <text class="func-arrow">→</text>
+    </view>
+    <view class="function-item" bindtap="goToCustomDishes">
+      <text class="func-icon">🍽️</text>
+      <text class="func-text">自定义菜品管理</text>
+      <text class="func-desc">我的菜品</text>
+      <text class="func-arrow">→</text>
+    </view>
+    <view class="function-item" bindtap="goToFavorites">
+      <text class="func-icon">⭐</text>
+      <text class="func-text">收藏食谱</text>
+      <text class="func-desc">我的收藏</text>
+      <text class="func-arrow">→</text>
+    </view>
+    <view class="function-item" bindtap="goToStats">
+      <text class="func-icon">📊</text>
+      <text class="func-text">数据统计</text>
+      <text class="func-desc">查看数据趋势</text>
+      <text class="func-arrow">→</text>
+    </view>
+    <view class="function-item" bindtap="goToHelp">
+      <text class="func-icon">❓</text>
+      <text class="func-text">使用帮助</text>
+      <text class="func-desc">了解如何使用</text>
+      <text class="func-arrow">→</text>
     </view>
   </view>
 
-  <!-- 今日数据 -->
-  <view class="today-stats">
-    <view class="stat-card">
-      <text class="stat-value">{{todayStats.dietCalories}}</text>
-      <text class="stat-label">今日摄入(kcal)</text>
+  <!-- 昵称编辑弹窗 -->
+  <view class="modal-mask" wx:if="{{isNicknameModalShow}}" bindtap="cancelNicknameEdit"></view>
+  <view class="modal-content" wx:if="{{isNicknameModalShow}}">
+    <text class="modal-title">修改昵称</text>
+    <input 
+      class="nickname-input" 
+      placeholder="请输入新昵称" 
+      value="{{newNickname}}"
+      bindinput="onNicknameInput"
+    />
+    <view class="modal-btns">
+      <button class="modal-btn cancel" bindtap="cancelNicknameEdit">取消</button>
+      <button class="modal-btn confirm" bindtap="confirmNicknameEdit">确认</button>
     </view>
-    <view class="stat-card">
-      <text class="stat-value">{{todayStats.exerciseCalories}}</text>
-      <text class="stat-label">今日消耗(kcal)</text>
-    </view>
-    <view class="stat-card">
-      <text class="stat-value">{{todayStats.records}}</text>
-      <text class="stat-label">记录次数</text>
-    </view>
-  </view>
-
-  <!-- 健康指标 -->
-  <view class="indicators-card" wx:if="{{profile}}">
-    <view class="indicator">
-      <text class="indicator-label">BMI</text>
-      <text class="indicator-value">{{profile.bmi}}</text>
-    </view>
-    <view class="indicator">
-      <text class="indicator-label">BMR</text>
-      <text class="indicator-value">{{profile.bmr}}</text>
-    </view>
-    <view class="indicator">
-      <text class="indicator-label">TDEE</text>
-      <text class="indicator-value">{{profile.tdee}}</text>
-    </view>
-  </view>
-
-  <!-- 功能菜单 -->
-  <view class="menu-list">
-    <view class="menu-item" wx:for="{{menuItems}}" wx:key="title" data-url="{{item.url}}" data-action="{{item.action}}" bindtap="onMenuItemClick">
-      <view class="menu-left">
-        <text class="menu-icon">{{item.icon}}</text>
-        <view class="menu-text">
-          <text class="menu-title">{{item.title}}</text>
-          <text class="menu-desc">{{item.desc}}</text>
-        </view>
-      </view>
-      <text class="menu-arrow">›</text>
-    </view>
-  </view>
-
-  <!-- 关于 -->
-  <view class="about-section">
-    <text class="app-name">轻燃健康管理</text>
-    <text class="app-version">v1.0.0</text>
   </view>
 </view>
-
