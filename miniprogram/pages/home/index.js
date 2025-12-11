@@ -195,8 +195,31 @@ Page({
    * 跳转到AI建议
    */
   onAISuggestion() {
-    wx.switchTab({ url: '/pages/ai-suggestion/index' });
-  },
+  wx.navigateTo({ url: '/pages/ai-suggestion/index' });
+},
+// pages/home/index.js
+
+onQuickAction(e) {
+  const { url } = e.currentTarget.dataset;
+  if (!url) return;
+
+  // 这里写你的 tabBar 页面路径（和 app.json 里保持一致）
+  const tabBarPages = [
+    '/pages/home/index',
+    '/pages/diet/index/index',
+    '/pages/exercise/index/index',
+    '/pages/profile/index'
+  ];
+
+  if (tabBarPages.includes(url)) {
+    // tabBar 页面用 switchTab
+    wx.switchTab({ url });
+  } else {
+    // 非 tabBar 页面用 navigateTo
+    wx.navigateTo({ url });
+  }
+},
+
 
   /**
    * 查看食谱详情

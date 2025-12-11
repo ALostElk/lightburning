@@ -1,361 +1,478 @@
 /* pages/home/index.wxss */
-.container {
+
+.page {
   min-height: 100vh;
-  background: #f5f5f5;
-  padding-bottom: 20rpx;
-}
-
-/* 欢迎卡片 */
-.welcome-card {
-  background: linear-gradient(135deg, #FF6B6B 0%, #FF8E8E 100%);
-  margin: 20rpx;
-  padding: 40rpx 30rpx;
-  border-radius: 24rpx;
+  background: linear-gradient(180deg, #e7f9f2 0%, #f7fff9 45%, #f9fbff 100%);
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+}
+
+/* 顶部头部区域 */
+.header {
+  padding: 40rpx 32rpx 80rpx;
+  background: linear-gradient(135deg, #bdf6d5 0%, #cfeffb 45%, #fdf3d8 100%);
+  border-bottom-left-radius: 40rpx;
+  border-bottom-right-radius: 40rpx;
+  box-shadow: 0 16rpx 40rpx rgba(172, 210, 185, 0.4);
+}
+
+.header-top {
+  display: flex;
   align-items: center;
-  box-shadow: 0 8rpx 24rpx rgba(255, 107, 107, 0.3);
 }
 
-.welcome-text {
+.avatar-placeholder {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 24rpx;
+  box-shadow: 0 8rpx 20rpx rgba(0, 0, 0, 0.06);
+}
+
+.avatar-text {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #46a08b;
+}
+
+.header-info {
   flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
-.greeting {
-  display: block;
-  font-size: 36rpx;
-  font-weight: bold;
-  color: white;
-  margin-bottom: 8rpx;
+.hello {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #1f2933;
 }
 
-.date {
-  display: block;
-  font-size: 26rpx;
-  color: rgba(255, 255, 255, 0.9);
+.subtitle {
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  color: #4b5563;
 }
 
 .profile-btn {
-  background: rgba(255, 255, 255, 0.2);
-  padding: 16rpx 32rpx;
-  border-radius: 40rpx;
-  color: white;
-  font-size: 26rpx;
-  backdrop-filter: blur(10rpx);
+  padding: 10rpx 20rpx;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 999rpx;
+  font-size: 22rpx;
+  color: #16a086;
+  border: 1rpx solid rgba(22, 160, 134, 0.2);
 }
 
-/* 今日数据卡片 */
-.data-card {
-  background: white;
-  margin: 20rpx;
-  padding: 30rpx;
-  border-radius: 24rpx;
-  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.05);
+.header-bottom {
+  margin-top: 30rpx;
+}
+
+.header-date {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1f2933;
+}
+
+.header-tip {
+  margin-top: 8rpx;
+  font-size: 22rpx;
+  color: #6b7280;
+}
+
+/* 内容区域 */
+
+
+/* 内容区域：注意加上 box-sizing 和稍大的左右 padding */
+.content {
+  flex: 1;
+  padding: 0 32rpx 32rpx;   /* 原来是 0 24rpx 32rpx，可以整体再宽一点 */
+  box-sizing: border-box;   /* 防止内部 padding 把右边挤出屏幕 */
+  margin-top: -60rpx;
+}
+
+/* 通用卡片：给左右各加一点 margin，避免贴边 */
+.card {
+  background: rgba(255, 255, 255, 0.96);
+  border-radius: 32rpx;
+  padding: 28rpx 26rpx 32rpx;
+  margin: 0 8rpx 28rpx;      /* 关键：左右各 8rpx，解决卡片右边缘被吃的问题 */
+  box-shadow: 0 16rpx 40rpx rgba(148, 163, 184, 0.18);
+}
+
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16rpx;
 }
 
 .card-title {
-  font-size: 32rpx;
+  font-size: 28rpx;
   font-weight: 600;
-  color: #333;
-  margin-bottom: 30rpx;
+  color: #111827;
 }
 
-/* 热量部分 */
-.calorie-section {
-  margin-bottom: 30rpx;
+.card-subtitle {
+  font-size: 22rpx;
+  color: #9ca3af;
 }
 
-.calorie-header {
+/* 今日总览 */
+.today-card {
+  padding-top: 32rpx;
+}
+
+.today-main {
   display: flex;
-  justify-content: space-between;
+  margin-top: 10rpx;
+}
+
+.calorie-ring {
+  width: 40%;
   align-items: center;
-  margin-bottom: 16rpx;
-}
-
-.calorie-label {
-  font-size: 28rpx;
-  color: #666;
-}
-
-.calorie-value {
-  font-size: 28rpx;
-  color: #333;
-}
-
-.calorie-value .current {
-  font-size: 40rpx;
-  font-weight: bold;
-  color: #FF6B6B;
-}
-
-.calorie-value .divider {
-  margin: 0 8rpx;
-  color: #999;
-}
-
-.calorie-value .target {
-  font-size: 32rpx;
-  color: #666;
-}
-
-.calorie-value .unit {
-  margin-left: 8rpx;
-  font-size: 24rpx;
-  color: #999;
-}
-
-.progress-bar {
-  height: 16rpx;
-  background: #f0f0f0;
-  border-radius: 8rpx;
-  overflow: hidden;
-  margin-bottom: 16rpx;
-}
-
-.progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #FF6B6B 0%, #FF8E8E 100%);
-  border-radius: 8rpx;
-  transition: width 0.3s ease;
-}
-
-.calorie-detail {
+  justify-content: center;
   display: flex;
-  justify-content: space-around;
-  padding: 20rpx 0;
-  background: #f9f9f9;
-  border-radius: 12rpx;
+  flex-direction: column;
 }
 
-.detail-item {
+.ring-outer {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #fdfdfd 0%, #f0fff6 40%, #d8f7ec 75%, #c1e7f4 100%);
+  box-shadow: inset 0 0 0 16rpx #f6fbff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ring-inner {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 50%;
+  background: #ffffff;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
 }
 
-.detail-label {
-  font-size: 24rpx;
-  color: #999;
-  margin-bottom: 8rpx;
-}
-
-.detail-value {
+.ring-number {
   font-size: 32rpx;
   font-weight: 600;
-  color: #333;
+  color: #111827;
 }
 
-.detail-value.over {
-  color: #FF6B6B;
+.ring-unit {
+  margin-top: 4rpx;
+  font-size: 20rpx;
+  color: #6b7280;
 }
 
-/* 营养素部分 */
-.macros-section {
+.ring-tip {
+  margin-top: 10rpx;
+  font-size: 20rpx;
+  color: #16a086;
+}
+
+.today-stats {
+  flex: 1;
+  padding-left: 24rpx;
   display: flex;
   flex-direction: column;
-  gap: 20rpx;
+  justify-content: center;
 }
 
-.macro-item {
+.stat-row {
   display: flex;
-  flex-direction: column;
-}
-
-.macro-header {
-  display: flex;
-  justify-content: space-between;
   align-items: center;
   margin-bottom: 12rpx;
 }
 
+.dot {
+  width: 14rpx;
+  height: 14rpx;
+  border-radius: 50%;
+  margin-right: 12rpx;
+}
+
+.dot-intake {
+  background: #ff8c7b;
+}
+
+.dot-exercise {
+  background: #4fd1c5;
+}
+
+.dot-target {
+  background: #facc15;
+}
+
+.stat-text {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.stat-label {
+  font-size: 24rpx;
+  color: #6b7280;
+}
+
+.stat-value {
+  font-size: 24rpx;
+  font-weight: 500;
+  color: #111827;
+}
+
+/* 卡片中的进度条 */
+.card-section {
+  margin-top: 20rpx;
+}
+
+.section-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 22rpx;
+  color: #6b7280;
+  margin-bottom: 10rpx;
+}
+
+.section-value {
+  color: #111827;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 14rpx;
+  border-radius: 999rpx;
+  background: #e5e7eb;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 999rpx;
+  background: linear-gradient(90deg, #34d399, #22c5c7, #facc15);
+}
+
+/* 营养素卡片 */
+.macros-card {
+  background: linear-gradient(135deg, #f8fff7 0%, #f7fbff 100%);
+}
+
+.macro-item + .macro-item {
+  margin-top: 18rpx;
+}
+
+.macro-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6rpx;
+}
+
 .macro-label {
-  font-size: 26rpx;
-  color: #666;
+  font-size: 24rpx;
+  color: #4b5563;
 }
 
 .macro-value {
-  font-size: 24rpx;
-  color: #999;
+  font-size: 22rpx;
+  color: #6b7280;
 }
 
 .macro-bar {
-  height: 8rpx;
-  background: #f0f0f0;
-  border-radius: 4rpx;
+  width: 100%;
+  height: 12rpx;
+  border-radius: 999rpx;
+  background: #e5e7eb;
   overflow: hidden;
 }
 
 .macro-fill {
   height: 100%;
-  border-radius: 4rpx;
-  transition: width 0.3s ease;
+  border-radius: 999rpx;
 }
 
 .macro-fill.protein {
-  background: #4ECDC4;
+  background: linear-gradient(90deg, #4ade80, #34d399);
 }
 
 .macro-fill.carbs {
-  background: #FFD93D;
+  background: linear-gradient(90deg, #60a5fa, #38bdf8);
 }
 
 .macro-fill.fat {
-  background: #FF6B6B;
+  background: linear-gradient(90deg, #f97316, #fb923c);
 }
 
 /* 快捷操作 */
-.quick-actions {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20rpx;
-  margin: 20rpx;
+.quick-card {
+  background: linear-gradient(135deg, #fffaf2 0%, #fdf8ff 100%);
 }
 
-.action-item {
+.quick-grid {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
+  margin-top: 10rpx;
+}
+
+.quick-item {
+  width: 48%;
+  margin-right: 4%;
+  margin-top: 16rpx;
+  border-radius: 26rpx;
+  padding: 18rpx 20rpx;
+  border-width: 2rpx;
+  border-style: solid;
+  box-sizing: border-box;
+  display: flex;
   align-items: center;
-  justify-content: center;
-  padding: 40rpx 20rpx;
-  background: white;
-  border-radius: 20rpx;
-  border: 2rpx solid;
-  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
-  transition: all 0.3s;
 }
 
-.action-item:active {
-  transform: scale(0.95);
+.quick-item:nth-child(2n) {
+  margin-right: 0;
 }
 
-.action-icon {
-  font-size: 48rpx;
-  margin-bottom: 12rpx;
+.quick-icon {
+  font-size: 32rpx;
+  margin-right: 16rpx;
 }
 
-.action-title {
-  font-size: 28rpx;
-  color: #333;
-  font-weight: 500;
+.quick-title {
+  font-size: 24rpx;
+  color: #374151;
 }
 
 /* 推荐食谱 */
-.recommendations {
-  margin: 20rpx;
-}
-
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20rpx;
-}
-
-.section-title {
-  font-size: 32rpx;
-  font-weight: 600;
-  color: #333;
+.recommend-card {
+  background: linear-gradient(135deg, #f5fbff 0%, #f7fff8 100%);
 }
 
 .section-more {
   display: flex;
   align-items: center;
-  color: #FF6B6B;
-  font-size: 26rpx;
+  font-size: 22rpx;
+  color: #6b7280;
 }
 
-.arrow {
-  font-size: 32rpx;
+.section-more .arrow {
   margin-left: 4rpx;
+}
+
+.recipe-scroll {
+  margin-top: 16rpx;
 }
 
 .recipe-list {
   display: flex;
-  gap: 20rpx;
-  overflow-x: auto;
-  padding-bottom: 10rpx;
 }
 
 .recipe-card {
-  flex-shrink: 0;
-  width: 280rpx;
-  background: white;
-  border-radius: 16rpx;
+  width: 260rpx;
+  margin-right: 18rpx;
+  border-radius: 24rpx;
+  background: #ffffff;
   overflow: hidden;
-  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
+  box-shadow: 0 12rpx 30rpx rgba(148, 163, 184, 0.2);
 }
 
 .recipe-image {
   width: 100%;
-  height: 180rpx;
+  height: 150rpx;
 }
 
 .recipe-info {
-  padding: 20rpx;
+  padding: 14rpx 16rpx 16rpx;
 }
 
 .recipe-name {
-  display: block;
-  font-size: 28rpx;
-  color: #333;
-  font-weight: 500;
-  margin-bottom: 8rpx;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  font-size: 24rpx;
+  color: #111827;
 }
 
 .recipe-calories {
-  font-size: 24rpx;
-  color: #FF6B6B;
+  margin-top: 6rpx;
+  font-size: 22rpx;
+  color: #6b7280;
 }
 
-/* AI入口 */
+/* AI 建议入口 */
 .ai-entry {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  margin: 20rpx;
-  padding: 30rpx;
-  border-radius: 20rpx;
+  margin-top: 8rpx;
+  padding: 22rpx 24rpx;
+  border-radius: 30rpx;
+  background: linear-gradient(135deg, #d9f1ff 0%, #e3ffe9 50%, #fff6d7 100%);
   display: flex;
   align-items: center;
-  box-shadow: 0 8rpx 24rpx rgba(102, 126, 234, 0.3);
+  justify-content: space-between;
+  box-shadow: 0 16rpx 40rpx rgba(148, 163, 184, 0.25);
+}
+
+.ai-left {
+  display: flex;
+  align-items: center;
 }
 
 .ai-icon {
-  font-size: 48rpx;
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin-right: 20rpx;
+  font-size: 30rpx;
 }
 
 .ai-text {
-  flex: 1;
   display: flex;
   flex-direction: column;
 }
 
 .ai-title {
-  font-size: 30rpx;
+  font-size: 26rpx;
   font-weight: 600;
-  color: white;
-  margin-bottom: 8rpx;
+  color: #111827;
 }
 
 .ai-desc {
-  font-size: 24rpx;
-  color: rgba(255, 255, 255, 0.8);
+  margin-top: 4rpx;
+  font-size: 22rpx;
+  color: #4b5563;
 }
 
 .ai-arrow {
-  font-size: 40rpx;
-  color: white;
-  font-weight: 300;
+  font-size: 32rpx;
+  color: #6b7280;
 }
 
-/* 加载状态 */
-.loading-state {
+/* 加载遮罩 */
+.loading-mask {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.08);
   display: flex;
-  justify-content: center;
   align-items: center;
-  padding: 100rpx 0;
-  color: #999;
-  font-size: 28rpx;
+  justify-content: center;
+}
+
+.loading-box {
+  padding: 18rpx 26rpx;
+  border-radius: 999rpx;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 10rpx 30rpx rgba(148, 163, 184, 0.35);
+}
+
+.loading-text {
+  font-size: 24rpx;
+  color: #4b5563;
 }
