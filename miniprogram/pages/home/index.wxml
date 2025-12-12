@@ -15,18 +15,18 @@
       <text class="hello">
         {{ profile && profile.name ? ('你好，' + profile.name) : '你好，健康达人' }} 👋
       </text>
-      <text class="subtitle">
+      <text class="subtitle" style="height: 87rpx; display: block; box-sizing: border-box; position: relative; left: 0rpx; top: -22rpx">
         {{ profile && profile.goal ? profile.goal : '开始你的轻燃计划吧' }}
       </text>
     </view>
-    <view class="profile-btn" bindtap="onEditProfile">
+    <view class="profile-btn" bindtap="onEditProfile" style="position: relative; left: -39rpx; top: 1rpx">
       <text>个人信息</text>
     </view>
   </view>
 
   <view class="header-bottom">
-    <text class="header-date">今天</text>
-    <text class="header-tip">坚持打卡，让每一天都更轻盈</text>
+    <text class="header-date" style="position: relative; left: 37rpx; top: 1rpx">今天</text>
+    <text class="header-tip" style="position: relative; left: 70rpx; top: 4rpx">坚持打卡，让每一天都更轻盈</text>
   </view>
 </view>
 
@@ -35,7 +35,7 @@
 
   <!-- 今日总览卡片 -->
   <view class="card today-card">
-    <view class="card-header">
+    <view class="card-header" style="height: 52rpx; display: flex; box-sizing: border-box">
       <text class="card-title">今日总览</text>
       <text class="card-subtitle">热量与运动一目了然</text>
     </view>
@@ -43,7 +43,7 @@
     <view class="today-main">
       <!-- 左侧圆环 -->
       <view class="calorie-ring">
-        <view class="ring-outer">
+        <view class="ring-outer" style="width: 190rpx; height: 190rpx; display: flex; box-sizing: border-box; position: relative; left: -1rpx; top: 10rpx">
           <view class="ring-inner">
             <text class="ring-number">{{todayData.netCalories}}</text>
             <text class="ring-unit">净摄入(kcal)</text>
@@ -53,26 +53,26 @@
       </view>
 
       <!-- 右侧数据 -->
-      <view class="today-stats">
+      <view class="today-stats" style="height: 218rpx; display: flex; box-sizing: border-box">
         <view class="stat-row">
           <view class="dot dot-intake"></view>
           <view class="stat-text">
-            <text class="stat-label">已摄入</text>
-            <text class="stat-value">{{todayData.dietCalories}} kcal</text>
+            <text class="stat-label" style="width: 93rpx; height: 31rpx; display: block; box-sizing: border-box">已摄入</text>
+            <text class="stat-value" style="width: 90rpx; display: block; box-sizing: border-box; height: 31rpx">{{todayData.dietCalories}} kcal</text>
           </view>
         </view>
         <view class="stat-row">
           <view class="dot dot-exercise"></view>
           <view class="stat-text">
-            <text class="stat-label">运动消耗</text>
-            <text class="stat-value">-{{todayData.exerciseCalories}} kcal</text>
+            <text class="stat-label" style="width: 110rpx; height: 31rpx; display: block; box-sizing: border-box">运动消耗</text>
+            <text class="stat-value" style="width: 90rpx; display: block; box-sizing: border-box; height: 31rpx">-{{todayData.exerciseCalories}} kcal</text>
           </view>
         </view>
         <view class="stat-row">
           <view class="dot dot-target"></view>
           <view class="stat-text">
             <text class="stat-label">完成度</text>
-            <text class="stat-value">
+            <text class="stat-value" style="width: 70rpx; display: block; box-sizing: border-box; position: relative; left: -22rpx; top: -27rpx">
               {{calorieProgress}}%
             </text>
           </view>
@@ -84,7 +84,7 @@
     <view class="card-section">
       <view class="section-row">
         <text class="section-label">今日热量进度</text>
-        <text class="section-value">{{todayData.dietCalories}} / {{todayData.targetCalories}} kcal</text>
+        <text class="section-value" style="width: 152rpx; height: 29rpx; display: block; box-sizing: border-box">{{todayData.dietCalories}} / {{todayData.targetCalories}} kcal</text>
       </view>
       <view class="progress-bar">
         <view class="progress-fill" style="width: {{calorieProgress}}"></view>
@@ -95,7 +95,7 @@
   <!-- 营养素卡片 -->
   <view class="card macros-card">
     <view class="card-header">
-      <text class="card-title">营养分布</text>
+      <text class="card-title" style="width: 139rpx; height: 29rpx; display: block; box-sizing: border-box">营养分布</text>
       <text class="card-subtitle">蛋白质 / 碳水 / 脂肪</text>
     </view>
 
