@@ -215,24 +215,103 @@
     </view>
 
     <!-- ============ 周度概览 ============ -->
-    <view class="weekly-overview">
-      <view class="overview-header">
-        <text class="overview-title">本周概览</text>
-        <view class="overview-stats">
-          <text class="stats-text">遵守率 {{weeklyOverview.adherenceRate}}%</text>
-          <view class="trend-indicator" data-trend="{{weeklyOverview.trend}}">
-            <text class="trend-icon">{{weeklyOverview.trend === 'up' ? '📈' : weeklyOverview.trend === 'down' ? '📉' : '➡️'}}</text>
+    <spotlight-card customClass="weekly-overview-card" holo="{{true}}" customStyle="background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%);">
+      <view class="weekly-overview">
+        <!-- 头部统计 -->
+        <view class="overview-header">
+          <view class="header-left">
+            <text class="overview-title">本周概览</text>
+            <text class="overview-subtitle">最近7天数据统计</text>
+          </view>
+          <view class="header-right">
+            <view class="adherence-badge" data-rate="{{weeklyOverview.adherenceRate}}">
+              <text class="adherence-label">遵守率</text>
+              <text class="adherence-value">{{weeklyOverview.adherenceRate}}%</text>
+            </view>
+            <view class="trend-indicator" data-trend="{{weeklyOverview.trend}}">
+              <text class="trend-icon">{{weeklyOverview.trend === 'up' ? '📈' : weeklyOverview.trend === 'down' ? '📉' : '➡️'}}</text>
+            </view>
+          </view>
+        </view>
+
+        <!-- 统计卡片 -->
+        <view class="stats-cards">
+          <view class="stat-card">
+            <text class="stat-label">平均热量</text>
+            <text class="stat-value">{{weeklyOverview.avgCalories}}</text>
+            <text class="stat-unit">kcal/天</text>
+          </view>
+          <view class="stat-card">
+            <text class="stat-label">平均运动</text>
+            <text class="stat-value">{{weeklyOverview.avgExercise}}</text>
+            <text class="stat-unit">kcal/天</text>
+          </view>
+          <view class="stat-card" wx:if="{{weeklyOverview.bestDay}}">
+            <text class="stat-label">最佳表现</text>
+            <text class="stat-value">{{weeklyOverview.bestDay}}</text>
+            <text class="stat-unit">日期</text>
+          </view>
+        </view>
+
+        <!-- 趋势图表 -->
+        <view class="weekly-chart">
+          <view class="chart-header">
+            <text class="chart-title">热量趋势</text>
+            <view class="chart-legend">
+              <view class="legend-item">
+                <view class="legend-dot" style="background: #FF6B35;"></view>
+                <text class="legend-text">饮食</text>
+              </view>
+              <view class="legend-item">
+                <view class="legend-dot" style="background: #4ECDC4;"></view>
+                <text class="legend-text">运动</text>
+              </view>
+            </view>
+          </view>
+          
+          <view class="chart-container">
+            <view class="chart-bars">
+              <view class="chart-bar-group" wx:for="{{weeklyOverview.dates}}" wx:key="index" wx:for-item="date">
+                <view class="bar-wrapper">
+                  <!-- 饮食柱状图 -->
+                  <view class="bar-item diet-bar" style="height: {{weeklyOverview.maxValue > 0 ? (weeklyOverview.weekCalories[index] / weeklyOverview.maxValue * 100) : 0}}%;">
+                    <view class="bar-value" wx:if="{{weeklyOverview.weekCalories[index] > 0}}">
+                      {{weeklyOverview.weekCalories[index]}}
+                    </view>
+                  </view>
+                  <!-- 运动柱状图 -->
+                  <view class="bar-item exercise-bar" style="height: {{weeklyOverview.maxValue > 0 ? (weeklyOverview.weekExercise[index] / weeklyOverview.maxValue * 100) : 0}}%;">
+                    <view class="bar-value" wx:if="{{weeklyOverview.weekExercise[index] > 0}}">
+                      {{weeklyOverview.weekExercise[index]}}
+                    </view>
+                  </view>
+                </view>
+                <text class="bar-label">{{date}}</text>
+              </view>
+            </view>
+          </view>
+        </view>
+
+        <!-- 平衡度展示 -->
+        <view class="balance-overview">
+          <view class="balance-header">
+            <text class="balance-title">每日热量平衡</text>
+          </view>
+          <view class="balance-bars">
+            <view class="balance-bar-item" wx:for="{{weeklyOverview.weekBalanceWithWidth}}" wx:key="index" wx:for-item="item">
+              <view class="balance-bar-wrapper">
+                <view 
+                  class="balance-bar" 
+                  data-balance="{{item.value}}"
+                  style="width: {{item.width}}%; background: {{item.value > 0 ? '#FF6B6B' : item.value < 0 ? '#51CF66' : '#95A5A6'}};"
+                ></view>
+              </view>
+              <text class="balance-value">{{item.value > 0 ? '+' : ''}}{{item.value}}</text>
+            </view>
           </view>
         </view>
       </view>
-
-      <view class="weekly-chart">
-        <view class="chart-placeholder">
-          <text class="placeholder-text">周度趋势图</text>
-          <text class="placeholder-subtext">展示7天的数据趋势</text>
-        </view>
-      </view>
-    </view>
+    </spotlight-card>
 
     <!-- AI 分析横幅（条件渲染） -->
     <view class="ai-banner animate-fade-in-up" wx:if="{{aiInsight.message}}" data-priority="{{aiInsight.priority}}">
