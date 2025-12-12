@@ -46,6 +46,30 @@ export const generatePlan = (targetWeightChange, totalDays) => {
 };
 
 /**
+ * 获取活跃计划
+ */
+export const getActivePlan = () => {
+  return wx.cloud.callFunction({
+    name: 'healthService',
+    data: {
+      action: 'getActivePlan'
+    }
+  });
+};
+
+/**
+ * 获取周度概览数据
+ */
+export const getWeeklyOverview = () => {
+  return wx.cloud.callFunction({
+    name: 'healthService',
+    data: {
+      action: 'getWeeklyOverview'
+    }
+  });
+};
+
+/**
  * 动态调整计划
  * @param {string} date - 日期 YYYY-MM-DD
  * @param {number} actualDeficit - 实际热量差
@@ -186,6 +210,20 @@ export const getDietLogsByRange = (startDate, endDate) => {
     data: {
       action: 'getDietLogsByRange',
       payload: { startDate, endDate }
+    }
+  });
+};
+
+/**
+ * 获取运动记录
+ * @param {string} date - 日期
+ */
+export const getExerciseLogs = (date) => {
+  return wx.cloud.callFunction({
+    name: 'healthService',
+    data: {
+      action: 'getExerciseLogs',
+      payload: { date }
     }
   });
 };

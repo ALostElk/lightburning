@@ -12,6 +12,7 @@ Page({
       targetWeight: 65,
       goal: '减脂',
       activityLevel: 1.375
+      
     },
     
     // 计算结果
@@ -29,6 +30,9 @@ Page({
     // 目标选项
     goals: ['减脂', '增肌', '保持'],
     goalIndex: 0,  // 当前选中的目标索引
+    
+    // 性别选项
+    genders: ['男', '女'],
     
     // UI状态
     loading: false,
@@ -151,8 +155,9 @@ Page({
    * 性别选择
    */
   onGenderChange(e) {
+    const value = Number(e.detail.value);
     this.setData({
-      'profile.gender': e.detail.value === '0' ? 'male' : 'female'
+      'profile.gender': value === 0 ? 'male' : 'female'
     });
     this.calculateHealth();
   },

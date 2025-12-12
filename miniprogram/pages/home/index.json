@@ -1,5 +1,7 @@
 {
   "navigationBarTitleText": "轻燃",
   "enablePullDownRefresh": true,
-  "usingComponents": {}
+  "usingComponents": {
+    "spotlight-card": "/components/spotlight-card/index"
+  }
 }

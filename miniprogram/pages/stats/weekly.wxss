@@ -1,174 +1,176 @@
+/* pages/stats/weekly.wxss */
+
 .page {
+  padding: 16rpx 20rpx 40rpx;
+  /* 同样改成柔和渐变背景 */
+  background: linear-gradient(180deg, #f7fff8 0%, #e7fff1 45%, #f5fff8 100%);
   min-height: 100vh;
-  padding: 24rpx 24rpx 40rpx;
   box-sizing: border-box;
-  background: linear-gradient(180deg, #f8fbff 0%, #f2f5ff 40%, #ffffff 100%);
 }
 
-/* 顶部总结卡片 */
-
-.header-card {
-  padding: 28rpx 24rpx 20rpx;
-  border-radius: 24rpx;
-  background: linear-gradient(135deg, #4f46e5 0%, #6366f1 40%, #0ea5e9 100%);
-  color: #ffffff;
-  box-shadow: 0 16rpx 40rpx rgba(15, 23, 42, 0.18);
-  margin-bottom: 32rpx;
-}
-
-.header-title-row {
+/* 时间范围 */
+.range-bar {
   display: flex;
-  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
   margin-bottom: 20rpx;
 }
 
-.header-title {
-  font-size: 34rpx;
+.range-text {
+  font-size: 26rpx;
+  color: #666;
+}
+
+/* 通用卡片，保持和首页一致的风格 */
+.card {
+  border-radius: 24rpx;
+  padding: 20rpx 24rpx;
+  margin-bottom: 20rpx;
+  /* 浅色渐变 + 深色文字 */
+  color: #333333;
+  position: relative;
+  overflow: hidden;
+}
+
+
+/* 卡片渐变改成柔和浅色 */
+.card--primary {
+  /* 周概览：淡蓝绿 */
+  background: linear-gradient(135deg, #e2f2ff, #e6fff6);
+}
+
+.card--green {
+  /* 运动 / 完成度：薄荷绿 */
+  background: linear-gradient(135deg, #e0ffe9, #d4f9e4);
+}
+
+.card--blue {
+  /* 摄入 / 热量：浅蓝紫 */
+  background: linear-gradient(135deg, #e4edff, #dde7ff);
+}
+
+.card--orange {
+  /* 建议 / 提示：暖橙 */
+  background: linear-gradient(135deg, #ffe8d2, #ffd4b8);
+}
+
+.card--plain {
+  background: #ffffff;
+  color: #333333;
+}
+
+/* 头部 */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 12rpx;
+}
+
+.card-title {
+  font-size: 30rpx;
   font-weight: 600;
 }
 
-.header-sub {
-  margin-top: 6rpx;
+.card-sub {
   font-size: 22rpx;
-  opacity: 0.9;
+  opacity: 0.86;
 }
 
+.card-body {
+  margin-top: 8rpx;
+}
+
+/* 顶部摘要里的两列 */
 .summary-row {
   display: flex;
-  gap: 20rpx;
-  margin-bottom: 12rpx;
+  justify-content: space-between;
+  margin-top: 8rpx;
 }
 
 .summary-block {
   flex: 1;
-  padding: 16rpx 18rpx;
-  border-radius: 20rpx;
-  background: rgba(15, 23, 42, 0.18);
-  backdrop-filter: blur(10rpx);
+}
+
+.summary-block:nth-child(2) {
+  text-align: right;
 }
 
 .summary-label {
   font-size: 22rpx;
   opacity: 0.9;
-  margin-bottom: 8rpx;
 }
 
 .summary-value {
+  margin-top: 4rpx;
   font-size: 32rpx;
   font-weight: 600;
 }
 
-.summary-extra {
-  margin-top: 4rpx;
-  font-size: 22rpx;
-  opacity: 0.85;
-}
-
-/* 通用卡片 */
-
-.section-card {
-  margin-bottom: 24rpx;
-  padding: 20rpx 22rpx 18rpx;
-  border-radius: 22rpx;
-  background: #ffffff;
-  box-shadow: 0 8rpx 24rpx rgba(15, 23, 42, 0.08);
-}
-
-.section-header {
+/* tag */
+.card-footer {
+  margin-top: 12rpx;
   display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  margin-bottom: 12rpx;
+  flex-wrap: wrap;
+  gap: 8rpx;
 }
 
-.section-title {
-  font-size: 30rpx;
-  font-weight: 600;
-  color: #111827;
+.tag {
+  font-size: 20rpx;
+  padding: 4rpx 10rpx;
+  border-radius: 999rpx;
+  background: rgba(255, 255, 255, 0.18);
 }
 
-.section-sub {
-  font-size: 22rpx;
-  color: #9ca3af;
-}
-
-.empty-text {
-  padding: 8rpx 0 4rpx;
-  font-size: 24rpx;
-  color: #9ca3af;
-}
-
-/* 每日完成度 */
-
+/* 每日完成度行 */
 .day-row {
   display: flex;
   align-items: center;
-  padding: 12rpx 0;
+  margin-top: 12rpx;
 }
 
-.day-left {
-  width: 160rpx;
-}
-
-.day-name {
+.day-label {
+  width: 80rpx;
   font-size: 24rpx;
-  color: #374151;
+  color: #666;
 }
 
-.day-date {
-  font-size: 20rpx;
-  color: #9ca3af;
-}
-
-.day-center {
+.day-progress {
   flex: 1;
-  padding: 0 16rpx;
-}
-
-.day-bar {
-  width: 100%;
   height: 14rpx;
   border-radius: 999rpx;
-  background: #e5e7eb;
+  background: #f1f1f5;
+  margin: 0 16rpx;
   overflow: hidden;
 }
 
-.day-bar-fill {
+.day-progress-inner {
   height: 100%;
   border-radius: 999rpx;
-  background: linear-gradient(90deg, #22c55e 0%, #16a34a 40%, #10b981 100%);
-}
-
-.day-right {
-  width: 80rpx;
-  text-align: right;
-  font-size: 24rpx;
-  color: #111827;
+  /* 周内每天完成度：用和首页一致的薄荷绿色渐变 */
+  background: linear-gradient(90deg, #49c58c, #2fb6a0);
 }
 
 .day-score {
-  font-weight: 600;
-}
-
-/* 文本 */
-
-.desc-text {
+  width: 60rpx;
+  text-align: right;
   font-size: 24rpx;
-  color: #4b5563;
-  line-height: 1.6;
+  color: #333;
 }
 
-/* 分享按钮 */
+/* 文案块 */
+.text-block {
+  margin-top: 12rpx;
+  font-size: 24rpx;
+  line-height: 1.6;
+  color: #444444; 
+}
 
-.share-btn {
-  margin-top: 20rpx;
-  width: 100%;
-  height: 80rpx;
-  line-height: 80rpx;
-  border-radius: 999rpx;
-  border: none;
-  background: linear-gradient(90deg, #0ea5e9 0%, #6366f1 100%);
-  color: #ffffff;
-  font-size: 28rpx;
-  font-weight: 600;
+
+
+/* 空状态 */
+.empty {
+  padding: 16rpx 0;
+  font-size: 22rpx;
+  color: #999;
 }

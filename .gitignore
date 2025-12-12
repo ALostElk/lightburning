@@ -22,7 +22,3 @@ npm-debug.log*
 *.tmp
 .temp/
 
-# Claude Hooks 追踪日志（测试会话）
-.claude/tsc-cache/test-*
-.claude/.last-track
-

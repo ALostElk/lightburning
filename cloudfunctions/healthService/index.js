@@ -119,6 +119,12 @@ async function generatePlan(openid, targetWeightChange, totalDays) {
   const random = Math.floor(Math.random() * 100000).toString().padStart(5, '0');
   const planId = `${timestamp}${random}`;
 
+  // 计算开始和结束日期
+  const startDate = todayString();
+  const startDateObj = new Date(startDate);
+  const endDateObj = new Date(startDateObj.getTime() + totalDays * 24 * 60 * 60 * 1000);
+  const endDate = endDateObj.toISOString().slice(0, 10);
+
   const plan = {
     _id: planId,  // 使用自定义 _id
     _openid: openid,
@@ -127,7 +133,8 @@ async function generatePlan(openid, targetWeightChange, totalDays) {
     totalDeficit,
     dailyDeficit,
     dailyCalorieGoal: profile.tdee + dailyDeficit,
-    startDate: todayString(),
+    startDate: startDate,
+    endDate: endDate,
     status: 'active',
     createdAt: timestamp
   };
@@ -166,6 +173,7 @@ async function generatePlan(openid, targetWeightChange, totalDays) {
     dailyDeficit: plan.dailyDeficit,
     dailyCalorieGoal: plan.dailyCalorieGoal,
     startDate: plan.startDate,
+    endDate: plan.endDate,
     status: plan.status,
     createdAt: plan.createdAt,
     planId: finalPlanId,  // 明确设置 planId 字段（符合接口文档）
@@ -388,6 +396,25 @@ async function recommendExercise(openid) {
 }
 
 /**
+ * 获取运动记录
+ * @param {string} openid - 用户openid
+ * @param {string} date - 日期
+ * @returns {Array} 运动记录列表
+ */
+async function getExerciseLogs(openid, date) {
+  const db = cloud.database();
+
+  const result = await db.collection('exercise_records')
+    .where({
+      _openid: openid,
+      recordDate: date
+    })
+    .get();
+
+  return result.data || [];
+}
+
+/**
  * 记录运动
  */
 async function logExercise(openid, data) {
@@ -402,6 +429,142 @@ async function logExercise(openid, data) {
 
   await db.collection('ExerciseLog').add({ data: log });
   return log;
+}
+
+/**
+ * 获取周度概览数据
+ * 返回最近7天的饮食、运动和平衡数据
+ */
+async function getWeeklyOverview(openid) {
+  const db = cloud.database();
+  const today = todayString();
+  const todayDate = new Date(today);
+  
+  // 计算最近7天的日期范围
+  const dates = [];
+  for (let i = 6; i >= 0; i--) {
+    const date = new Date(todayDate);
+    date.setDate(date.getDate() - i);
+    dates.push(date.toISOString().slice(0, 10));
+  }
+  
+  const startDate = dates[0];
+  const endDate = dates[dates.length - 1];
+  
+  // 获取用户信息（用于计算目标）
+  const profile = await getUserProfile(openid);
+  const targetCalories = profile?.tdee || 2000;
+  
+  // 获取7天的饮食记录
+  const dietRes = await db.collection('DietLog')
+    .where({
+      _openid: openid,
+      recordDate: db.command.gte(startDate).and(db.command.lte(endDate))
+    })
+    .get();
+  
+  // 获取7天的运动记录
+  const exerciseRes = await db.collection('exercise_records')
+    .where({
+      _openid: openid,
+      recordDate: db.command.gte(startDate).and(db.command.lte(endDate))
+    })
+    .get();
+  
+  // 按日期组织数据
+  const dailyData = {};
+  dates.forEach(date => {
+    dailyData[date] = {
+      date,
+      calories: 0,
+      exercise: 0,
+      balance: 0,
+      protein: 0,
+      carbs: 0,
+      fat: 0
+    };
+  });
+  
+  // 处理饮食记录
+  dietRes.data.forEach(log => {
+    const date = log.recordDate;
+    if (dailyData[date]) {
+      dailyData[date].calories += log.calories || log.totalCalories || 0;
+      dailyData[date].protein += log.protein || 0;
+      dailyData[date].carbs += log.carbs || 0;
+      dailyData[date].fat += log.fat || 0;
+    }
+  });
+  
+  // 处理运动记录
+  exerciseRes.data.forEach(log => {
+    const date = log.recordDate;
+    if (dailyData[date]) {
+      dailyData[date].exercise += log.calories || 0;
+    }
+  });
+  
+  // 计算每日平衡和生成数组
+  const weekCalories = [];
+  const weekExercise = [];
+  const weekBalance = [];
+  
+  dates.forEach(date => {
+    const data = dailyData[date];
+    const balance = data.calories - data.exercise - targetCalories;
+    
+    weekCalories.push(Math.round(data.calories));
+    weekExercise.push(Math.round(data.exercise));
+    weekBalance.push(Math.round(balance));
+  });
+  
+  // 计算遵守率（达到目标的天数 / 总天数）
+  const daysWithData = dates.filter(date => dailyData[date].calories > 0 || dailyData[date].exercise > 0).length;
+  const daysOnTarget = dates.filter(date => {
+    const data = dailyData[date];
+    const balance = data.calories - data.exercise - targetCalories;
+    return Math.abs(balance) <= 300; // 允许300卡路里的误差
+  }).length;
+  
+  const adherenceRate = dates.length > 0 ? Math.round((daysOnTarget / dates.length) * 100) : 0;
+  
+  // 计算趋势（比较前3天和后3天的平均值）
+  const firstHalf = weekBalance.slice(0, 3).reduce((a, b) => a + b, 0) / 3;
+  const secondHalf = weekBalance.slice(4).reduce((a, b) => a + b, 0) / 3;
+  
+  let trend = 'stable';
+  if (secondHalf > firstHalf + 100) trend = 'up';
+  else if (secondHalf < firstHalf - 100) trend = 'down';
+  
+  // 找出表现最好的一天（最接近目标平衡）
+  let bestDay = '';
+  let bestBalance = Infinity;
+  dates.forEach(date => {
+    const balance = Math.abs(dailyData[date].calories - dailyData[date].exercise - targetCalories);
+    if (balance < bestBalance) {
+      bestBalance = balance;
+      bestDay = date;
+    }
+  });
+  
+  // 格式化日期显示
+  const formatDate = (dateStr) => {
+    const d = new Date(dateStr);
+    const month = d.getMonth() + 1;
+    const day = d.getDate();
+    return `${month}/${day}`;
+  };
+  
+  return {
+    calories: weekCalories,
+    exercise: weekExercise,
+    balance: weekBalance,
+    adherenceRate,
+    trend,
+    bestDay: bestDay ? formatDate(bestDay) : '',
+    dates: dates.map(formatDate),
+    targetCalories
+  };
 }
 
 // ==================== 主入口 ====================
@@ -431,8 +594,14 @@ exports.main = async (event) => {
       // 运动
       case 'recommendExercise':
         return ok(await recommendExercise(OPENID));
+      case 'getExerciseLogs':
+        return ok(await getExerciseLogs(OPENID, payload.date));
       case 'logExercise':
         return ok(await logExercise(OPENID, payload));
+
+      // 周度概览
+      case 'getWeeklyOverview':
+        return ok(await getWeeklyOverview(OPENID));
 
       default:
         return fail(`未知操作: ${action}`);

@@ -1,107 +1,198 @@
-<view class="header-card">
-  <view class="header-top">
-    <view class="header-title">数据概览</view>
-    <view class="header-link" bindtap="goWeeklyReport">
-      周报告 >
+<!-- pages/stats/index.wxml -->
+<view class="page">
+
+<!-- 时间范围 + 切换按钮 -->
+<!-- 时间范围切换 -->
+<view class="range-tabs-card">
+  <view class="range-tabs-title">统计时间范围</view>
+  <view class="range-tabs">
+    <view
+      class="range-tab {{rangeDays === 7 ? 'active' : ''}}"
+      data-days="7"
+      bindtap="onRangeChange"
+    >
+      近7天
+    </view>
+    <view
+      class="range-tab {{rangeDays === 30 ? 'active' : ''}}"
+      data-days="30"
+      bindtap="onRangeChange"
+    >
+      近30天
+    </view>
+    <view
+      class="range-tab {{rangeDays === 90 ? 'active' : ''}}"
+      data-days="90"
+      bindtap="onRangeChange"
+    >
+      近90天
     </view>
   </view>
-  <view class="header-card">
-  <view class="header-top">
-    <view class="header-title">选择周期</view>
-    <view class="header-link" bindtap="goWeeklyReport">
-     
+
+  <view class="range-text">
+    {{rangeText}}
+  </view>
+</view>
+
+<!-- 顶部摘要卡片：总热量 / 记录率 -->
+<view class="card card--primary">
+  <view class="card-header">
+    <text class="card-title">总体概览</text>
+    <text class="card-sub">{{totalDays}} 天 · 记录 {{recordRate}}%</text>
+  </view>
+  <view class="card-body summary-row">
+    <view class="summary-block">
+      <text class="summary-label">平均摄入</text>
+      <text class="summary-value">{{avgCaloriesIn}} kcal/天</text>
+    </view>
+    <view class="summary-block">
+      <text class="summary-label">总摄入</text>
+      <text class="summary-value">{{totalCaloriesIn}} kcal</text>
     </view>
   </view>
-    <view class="range-tabs">
+  <view class="card-footer">
+    <text class="tag">蛋白 {{totalProtein}} g</text>
+    <text class="tag">脂肪 {{totalFat}} g</text>
+    <text class="tag">碳水 {{totalCarbs}} g</text>
+  </view>
+</view>
+
+<!-- 体重卡片：折线图 + 体重进度条 -->
+<view class="card card--pink">
+  <view class="card-header">
+    <text class="card-title">体重变化</text>
+    <text class="card-sub">{{weightChangeText}}</text>
+  </view>
+
+  <view class="chart-wrapper">
+    <canvas
+      canvas-id="weightChart"
+      class="weight-chart"
+      style="width: 300px; height: 120px;"
+    ></canvas>
+  </view>
+
+  <view class="divider"></view>
+
+  <view class="progress-section">
+    <view class="progress-row">
+      <text class="progress-label">
+        当前体重：{{currentWeight || '--'}} kg
+      </text>
+      <text class="progress-label">
+        目标体重：{{targetWeight || '--'}} kg
+      </text>
+    </view>
+
+    <view class="progress-bar">
       <view
-        class="range-tab {{rangeType === 7 ? 'active' : ''}}"
-        data-days="7"
-        bindtap="onRangeChange"
-      >近7天</view>
-      <view
-        class="range-tab {{rangeType === 30 ? 'active' : ''}}"
-        data-days="30"
-        bindtap="onRangeChange"
-      >近30天</view>
-      <view
-        class="range-tab {{rangeType === 90 ? 'active' : ''}}"
-        data-days="90"
-        bindtap="onRangeChange"
-      >近90天</view>
+        class="progress-inner"
+        style="width: {{weightProgressPercent}};"
+      ></view>
     </view>
-    <view class="time-text">{{startDate}} ~ {{endDate}}</view>
-  </view>
-
-  <!-- 核心指标卡片 -->
-  <view class="kpi-row">
-    <view class="kpi-card">
-      <view class="kpi-label">体重变化</view>
-      <view class="kpi-value">{{weightDeltaText}}</view>
-      <view class="kpi-sub">当前：{{currentWeight || '--'}} kg</view>
-    </view>
-    <view class="kpi-card">
-      <view class="kpi-label">平均净热量</view>
-      <view class="kpi-value">{{avgNetCalories || '--'}} kcal</view>
-      <view class="kpi-sub">目标差值：{{avgDeficitText}}</view>
+    <view class="progress-row progress-row--bottom">
+      <text class="progress-desc">{{weightGoalText}}</text>
+      <text class="progress-percent">{{weightProgressPercent}}%</text>
     </view>
   </view>
+</view>
 
-  <!-- 运动统计 + 达标率 -->
-  <view class="section-card">
-    <view class="section-header">
-      <view class="section-title">运动 & 达标</view>
-      <view class="section-sub">统计期间</view>
-    </view>
-    <view class="exercise-row">
-      <view class="exercise-block">
-        <view class="exercise-label">总运动次数</view>
-        <view class="exercise-value">{{exerciseStats.totalCount}}</view>
+<!-- 计划完成度卡片：使用 evaluateDaily -->
+<view class="card card--green">
+  <view class="card-header">
+    <text class="card-title">本周期计划完成度</text>
+    <text class="card-sub">基于每日营养评价</text>
+  </view>
+
+  <view class="progress-bar">
+    <view
+      class="progress-inner progress-inner--green"
+      style="width: {{planProgressPercent}};"
+    ></view>
+  </view>
+  <view class="progress-row progress-row--bottom">
+    <text class="progress-desc">{{planSummaryText}}</text>
+    <text class="progress-percent">{{planProgressPercent}}%</text>
+  </view>
+</view>
+
+<!-- 运动卡片 -->
+<view class="card card--blue">
+  <view class="card-header">
+    <text class="card-title">运动情况</text>
+    <text class="card-sub">{{exerciseDays}} 天有运动记录</text>
+  </view>
+  <view class="card-body">
+    <view class="summary-row">
+      <view class="summary-block">
+        <text class="summary-label">总时长</text>
+        <text class="summary-value">{{exerciseMinutesTotal}} min</text>
       </view>
-      <view class="exercise-block">
-        <view class="exercise-label">总运动时长</view>
-        <view class="exercise-value">{{exerciseStats.totalDuration}} min</view>
-      </view>
-      <view class="exercise-block">
-        <view class="exercise-label">总消耗</view>
-        <view class="exercise-value">{{exerciseStats.totalCalories}} kcal</view>
+      <view class="summary-block">
+        <text class="summary-label">平均 / 有运动日</text>
+        <text class="summary-value">{{exerciseAvgMinutes}} min</text>
       </view>
     </view>
-    <view class="rate-row">
-      <view class="rate-text">
-        达标天数：{{goalDays}} / {{totalDays}} 天
+    <view class="exercise-status">{{exerciseStatusText}}</view>
+  </view>
+</view>
+
+<!-- 营养结构卡片 -->
+<view class="card card--orange">
+  <view class="card-header">
+    <text class="card-title">营养结构</text>
+    <text class="card-sub">近 {{rangeDays}} 天宏量营养素比例</text>
+  </view>
+  <view class="macro-row">
+    <view class="macro-item">
+      <text class="macro-label">碳水</text>
+      <text class="macro-val">{{macroPercentCarb}}%</text>
+    </view>
+    <view class="macro-item">
+      <text class="macro-label">蛋白</text>
+      <text class="macro-val">{{macroPercentProtein}}%</text>
+    </view>
+    <view class="macro-item">
+      <text class="macro-label">脂肪</text>
+      <text class="macro-val">{{macroPercentFat}}%</text>
+    </view>
+  </view>
+</view>
+
+<!-- 每日记录列表 -->
+<view class="card card--plain">
+  <view class="card-header">
+    <text class="card-title">每日记录</text>
+    <text class="card-sub">有记录的 {{recordDays}} 天</text>
+  </view>
+
+  <block wx:if="{{dailyList.length}}">
+    <view
+      class="daily-item"
+      wx:for="{{dailyList}}"
+      wx:key="date"
+    >
+      <view class="daily-main">
+        <text class="daily-date">{{item.date}}</text>
+        <text class="daily-cal">{{item.calories}} kcal</text>
       </view>
-      <view class="rate-bar">
-        <view class="rate-fill" style="width: {{goalRateWidth}};"></view>
-
+      <view class="daily-sub">
+        <text>蛋白 {{item.protein}} g</text>
+        <text>脂肪 {{item.fat}} g</text>
+        <text>碳水 {{item.carbs}} g</text>
       </view>
-      <view class="rate-percent">{{goalRate}}%</view>
     </view>
-  </view>
+  </block>
+  <block wx:else>
+    <view class="empty">
+      <text>当前时间段还没有饮食记录，先去记录一下今天吃了什么吧～</text>
+    </view>
+  </block>
+</view>
 
-  <!-- 体重变化折线图 -->
-  <view class="section-card">
-    <view class="section-header">
-      <view class="section-title">体重变化</view>
-      <view class="section-sub">更直观地看到趋势</view>
-    </view>
-    
-  </view>
-
-  <!-- 热量趋势图 -->
-  <view class="section-card">
-    <view class="section-header">
-      <view class="section-title">热量趋势</view>
-      <view class="section-sub">摄入 / 消耗 / 净差</view>
-    </view>
-    
-  </view>
-
-  <!-- 营养素分布 -->
-  <view class="section-card">
-    <view class="section-header">
-      <view class="section-title">营养素分布</view>
-      <view class="section-sub">平均每日摄入</view>
-    </view>
-    
-  </view>
+<!-- 去周报 -->
+<view class="weekly-entry" bindtap="goWeeklyReport">
+  <text>查看一周周报</text>
+  <text class="weekly-arrow">›</text>
+</view>
 </view>

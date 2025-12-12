@@ -15,6 +15,7 @@ Page({
     progress: 0,          // 完成百分比 (0-100)
     daysElapsed: 0,       // 已完成天数
     daysRemaining: 0,     // 剩余天数
+    calculatedEndDate: '', // 计算得出的结束日期
     
     // 统计数据
     totalWeightChange: 0,
@@ -71,6 +72,10 @@ Page({
         .get();
       
       if (res.data) {
+        // 如果计划中没有 weeklyChange，根据 targetWeightChange 和 totalDays 计算
+        if (!res.data.weeklyChange && res.data.targetWeightChange && res.data.totalDays) {
+          res.data.weeklyChange = Number((res.data.targetWeightChange / res.data.totalDays * 7).toFixed(2));
+        }
         this.setData({ plan: res.data });
         this.calculateProgress();
         wx.hideLoading();
@@ -110,9 +115,14 @@ Page({
         .get();
       
       if (res.data && res.data.length > 0) {
+        const planData = res.data[0];
+        // 如果计划中没有 weeklyChange，根据 targetWeightChange 和 totalDays 计算
+        if (!planData.weeklyChange && planData.targetWeightChange && planData.totalDays) {
+          planData.weeklyChange = Number((planData.targetWeightChange / planData.totalDays * 7).toFixed(2));
+        }
         this.setData({ 
-          plan: res.data[0],
-          planId: res.data[0]._id
+          plan: planData,
+          planId: planData._id
         });
         this.calculateProgress();
         wx.hideLoading();
@@ -173,19 +183,46 @@ Page({
     if (!plan) return;
 
     const startDate = new Date(plan.startDate);
-    const endDate = new Date(plan.endDate);
     const now = new Date();
+    
+    // 如果计划中没有 endDate，根据 startDate 和 totalDays 计算
+    let endDate;
+    if (plan.endDate) {
+      endDate = new Date(plan.endDate);
+    } else if (plan.startDate && plan.totalDays) {
+      // 容错：根据开始日期和总天数计算结束日期
+      endDate = new Date(startDate.getTime() + plan.totalDays * 24 * 60 * 60 * 1000);
+    } else {
+      console.warn('计划数据缺少日期信息，无法计算进度');
+      return;
+    }
+
+    // 验证日期有效性
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+      console.warn('计划日期格式无效，无法计算进度');
+      return;
+    }
 
     const totalDays = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
     const daysElapsed = Math.ceil((now - startDate) / (1000 * 60 * 60 * 24));
     const daysRemaining = Math.max(0, totalDays - daysElapsed);
-    const progress = Math.min(100, Math.round((daysElapsed / totalDays) * 100));
+    const progress = Math.min(100, Math.max(0, Math.round((daysElapsed / totalDays) * 100)));
+
+    // 格式化结束日期为 YYYY-MM-DD 格式
+    const endDateStr = plan.endDate || endDate.toISOString().slice(0, 10);
 
     this.setData({
       progress,
       daysElapsed: Math.max(0, daysElapsed),
-      daysRemaining
+      daysRemaining: Math.max(0, daysRemaining),
+      calculatedEndDate: endDateStr
     });
+
+    // 如果原计划数据中没有 endDate，更新到 plan 对象中（用于显示）
+    if (!plan.endDate) {
+      const updatedPlan = { ...plan, endDate: endDateStr };
+      this.setData({ plan: updatedPlan });
+    }
   },
 
   /**

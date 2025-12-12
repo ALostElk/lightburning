@@ -1,14 +1,13 @@
 <!--pages/plan/generate/index.wxml-->
-<!--pages/plan/generate/index.wxml-->
-<view class="page-container">
+<view class="container">
   <!-- 页面标题 -->
   <view class="header">
     <text class="title">生成健康计划</text>
-    <text class="subtitle">定制您的专属减重计划</text>
+    <text class="subtitle" style="position: relative; left: 29rpx; top: -12rpx">定制您的专属减重计划</text>
   </view>
 
   <!-- 当前用户状态卡片 -->
-  <view class="card card-status" wx:if="{{profile}}">
+  <view class="card" wx:if="{{profile}}" style="width: 572rpx; display: block; box-sizing: border-box; position: relative; left: 1rpx; top: -49rpx">
     <view class="current-status">
       <view class="status-item">
         <text class="status-label">当前体重</text>
@@ -26,10 +25,10 @@
   </view>
 
   <!-- 计划参数卡片 -->
-  <view class="card card-params">
+  <view class="card" style="width: 568rpx; display: block; box-sizing: border-box; position: relative; left: 6rpx; top: -41rpx">
     <view class="card-title">计划参数</view>
     
-    <!-- 目标减重参数 -->
+    <!-- 目标体重变化参数 -->
     <view class="param-item">
       <view class="param-header">
         <text class="param-label">目标体重变化</text>
@@ -38,11 +37,9 @@
           <text class="param-unit">kg</text>
         </view>
       </view>
-      <slider class="slider" min="-20" max="10" step="0.5" value="{{targetWeightChange}}" bindchange="onWeightChangeSlider" activeColor="#3D9BFF" backgroundColor="#E5E7EB" block-size="20" block-color="#3D9BFF" />
-      <view class="slider-labels">
-        <text>-20kg</text>
-        <text>+10kg</text>
-      </view>
+      <picker mode="selector" range="{{weightChangeOptions}}" value="{{weightChangeIndex}}" bindchange="onWeightChangePicker" class="picker">
+        <view class="picker-display">选择体重变化: {{targetWeightChange}}kg</view>
+      </picker>
     </view>
 
     <!-- 计划周期参数 -->
@@ -54,16 +51,14 @@
           <text class="param-unit">天</text>
         </view>
       </view>
-      <slider class="slider" min="30" max="180" step="1" value="{{totalDays}}" bindchange="onDaysSlider" activeColor="#3D9BFF" backgroundColor="#E5E7EB" block-size="20" block-color="#3D9BFF" />
-      <view class="slider-labels">
-        <text>30天</text>
-        <text>180天</text>
-      </view>
+      <picker mode="selector" range="{{daysOptions}}" value="{{daysIndex}}" bindchange="onDaysChangePicker" class="picker">
+        <view class="picker-display">选择计划周期: {{totalDays}}天</view>
+      </picker>
     </view>
   </view>
 
   <!-- 计划预览卡片 -->
-  <view class="card card-preview">
+  <view class="card" style="width: 564rpx; display: block; box-sizing: border-box; position: relative; left: 8rpx; top: -48rpx">
     <view class="card-title">计划预览</view>
     
     <view class="preview-item">
@@ -87,16 +82,16 @@
     </view>
     
     <!-- 健康性评估 -->
-    <view class="health-assessment {{planHealth.status === 'good' ? 'status-good' : (planHealth.status === 'danger' ? 'status-danger' : 'status-warning')}}">
+    <view class="health-assessment" style="background-color: {{planHealth.color}}15; border-color: {{planHealth.color}}">
       <text class="assessment-icon" wx:if="{{planHealth.status === 'good'}}">✅</text>
       <text class="assessment-icon" wx:if="{{planHealth.status === 'danger'}}">⚠️</text>
       <text class="assessment-icon" wx:if="{{planHealth.status === 'slow'}}">🐢</text>
-      <text class="assessment-text">{{planHealth.message}}</text>
+      <text class="assessment-text" style="color: {{planHealth.color}}">{{planHealth.message}}</text>
     </view>
   </view>
 
   <!-- 温馨提示卡片 -->
-  <view class="card tips-card">
+  <view class="card tips-card" style="width: 560rpx; display: block; box-sizing: border-box; position: relative; left: 11rpx; top: -62rpx">
     <view class="card-title">温馨提示</view>
     <view class="tips">
       <text class="tip-item">• 健康减重速度：每周0.5-1kg</text>
