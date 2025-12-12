@@ -1,0 +1,26 @@
+<!--
+  FloatingFab 组件 - 浮动操作按钮
+  特性：
+  - 浮动悬浮动画 (levitate)
+  - 玻璃态背景
+  - 外层发光环
+  - 相机/自定义图标
+-->
+<view class="fab-container {{position}} {{safeArea ? 'safe-area' : ''}} {{pulse ? 'pulse' : ''}}">
+  <!-- 外层发光环 -->
+  <view class="glow-ring"></view>
+
+  <!-- 主按钮 -->
+  <view
+    class="fab-button {{size}} theme-{{theme}}"
+    bindtap="onTap"
+  >
+    <!-- 图标 -->
+    <text class="fab-icon">{{icon}}</text>
+  </view>
+
+  <!-- 标签（可选） -->
+  <view class="fab-label" wx:if="{{label}}">
+    <text>{{label}}</text>
+  </view>
+</view>

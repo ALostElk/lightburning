@@ -1,0 +1,231 @@
+<!--
+  手动输入页面 - diet-manual/index
+-->
+<view class="page">
+  <!-- 背景装饰 -->
+  <view class="page-bg"></view>
+
+  <!-- 头部 -->
+  <view class="header">
+    <view class="back-btn" bindtap="goBack">
+      <text>←</text>
+    </view>
+    <text class="header-title">{{isManualMode ? '手动添加' : '确认份量'}}</text>
+    <view class="header-placeholder"></view>
+  </view>
+
+  <view class="content">
+    <!-- 食物信息卡片 -->
+    <view class="info-card">
+      <view class="food-header">
+        <view class="food-emoji">🍽️</view>
+        <view class="food-name-section">
+          <input wx:if="{{isManualMode}}"
+                 class="name-input"
+                 value="{{name}}"
+                 placeholder="输入食物名称"
+                 bindinput="onNameInput" />
+          <text wx:else class="food-name">{{name}}</text>
+          <text wx:if="{{food.category}}" class="food-category">{{food.category}}</text>
+        </view>
+      </view>
+
+      <!-- 基础营养信息 -->
+      <view class="base-nutrition">
+        <view class="base-label">每 100g 营养成分</view>
+        <view class="base-values">
+          <view class="base-item">
+            <text class="base-value orange">{{baseNutrition.calories}}</text>
+            <text class="base-unit">千卡</text>
+          </view>
+          <view class="base-item">
+            <text class="base-value blue">{{baseNutrition.protein}}g</text>
+            <text class="base-unit">蛋白质</text>
+          </view>
+          <view class="base-item">
+            <text class="base-value amber">{{baseNutrition.carbs}}g</text>
+            <text class="base-unit">碳水</text>
+          </view>
+          <view class="base-item">
+            <text class="base-value purple">{{baseNutrition.fat}}g</text>
+            <text class="base-unit">脂肪</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 手动输入营养 -->
+      <view wx:if="{{isManualMode}}" class="manual-nutrition">
+        <view class="manual-label">营养成分（每100g）</view>
+        <view class="manual-inputs">
+          <view class="manual-input-item">
+            <text class="input-label">热量 (kcal)</text>
+            <input class="nutrition-input"
+                   type="digit"
+                   value="{{baseNutrition.calories || ''}}"
+                   placeholder="0"
+                   data-field="calories"
+                   bindinput="onNutritionInput" />
+          </view>
+          <view class="manual-input-item">
+            <text class="input-label">蛋白质 (g)</text>
+            <input class="nutrition-input"
+                   type="digit"
+                   value="{{baseNutrition.protein || ''}}"
+                   placeholder="0"
+                   data-field="protein"
+                   bindinput="onNutritionInput" />
+          </view>
+          <view class="manual-input-item">
+            <text class="input-label">碳水化合物 (g)</text>
+            <input class="nutrition-input"
+                   type="digit"
+                   value="{{baseNutrition.carbs || ''}}"
+                   placeholder="0"
+                   data-field="carbs"
+                   bindinput="onNutritionInput" />
+          </view>
+          <view class="manual-input-item">
+            <text class="input-label">脂肪 (g)</text>
+            <input class="nutrition-input"
+                   type="digit"
+                   value="{{baseNutrition.fat || ''}}"
+                   placeholder="0"
+                   data-field="fat"
+                   bindinput="onNutritionInput" />
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 份量选择 - 滑动条版本 -->
+    <view class="amount-card">
+      <view class="amount-header">
+        <view class="amount-label">选择份量</view>
+        <view class="amount-display">
+          <text class="amount-value">{{amount}}</text>
+          <text class="amount-unit-text">克</text>
+        </view>
+      </view>
+
+      <!-- 滑动条区域 -->
+      <view class="slider-container">
+        <view class="slider-track">
+          <view class="slider-fill" style="width: {{(amount / 500) * 100}}%"></view>
+        </view>
+        <slider class="amount-slider"
+                min="10"
+                max="500"
+                step="5"
+                value="{{amount}}"
+                activeColor="transparent"
+                backgroundColor="transparent"
+                block-size="0"
+                bindchange="onSliderChange"
+                bindchanging="onSliderChanging" />
+        <!-- 滑块图标 - 根据食物类型变化 -->
+        <view class="slider-thumb" style="left: {{(amount / 500) * 100}}%">
+          <view class="thumb-icon">
+            <text wx:if="{{food.category === '主食'}}">🍚</text>
+            <text wx:elif="{{food.category === '肉类'}}">🥩</text>
+            <text wx:elif="{{food.category === '蛋奶'}}">🥚</text>
+            <text wx:elif="{{food.category === '蔬菜'}}">🥗</text>
+            <text wx:elif="{{food.category === '水果'}}">🍎</text>
+            <text wx:elif="{{food.category === '饮品'}}">🥤</text>
+            <text wx:elif="{{food.category === '零食'}}">🍪</text>
+            <text wx:else>🍽️</text>
+          </view>
+        </view>
+        <!-- 刻度标记 -->
+        <view class="slider-marks">
+          <text class="mark">10g</text>
+          <text class="mark">250g</text>
+          <text class="mark">500g</text>
+        </view>
+      </view>
+
+      <!-- 快捷份量按钮 -->
+      <view class="quick-amounts">
+        <view wx:for="{{quickAmounts}}" wx:key="*this"
+              class="quick-amount {{amount === item ? 'active' : ''}}"
+              bindtap="setQuickAmount" data-amount="{{item}}">
+          {{item}}g
+        </view>
+      </view>
+
+      <!-- 精确调整 -->
+      <view class="fine-adjust">
+        <view class="adjust-btn minus" bindtap="adjustAmount" data-delta="{{-5}}">
+          <text>-5</text>
+        </view>
+        <view class="adjust-btn minus-small" bindtap="adjustAmount" data-delta="{{-1}}">
+          <text>-1</text>
+        </view>
+        <view class="current-amount">
+          <input class="amount-input-field"
+                 type="number"
+                 value="{{amount}}"
+                 bindinput="onAmountInput" />
+          <text class="g-label">g</text>
+        </view>
+        <view class="adjust-btn plus-small" bindtap="adjustAmount" data-delta="{{1}}">
+          <text>+1</text>
+        </view>
+        <view class="adjust-btn plus" bindtap="adjustAmount" data-delta="{{5}}">
+          <text>+5</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 餐次选择 -->
+    <view class="meal-card">
+      <view class="meal-header">
+        <text class="meal-label">添加到</text>
+        <view class="meal-btn" bindtap="toggleMealTypeSelector">
+          <text>{{mealTypeLabels[selectedMealType]}}</text>
+          <text class="arrow">{{showMealTypeSelector ? '▲' : '▼'}}</text>
+        </view>
+      </view>
+      <view wx:if="{{showMealTypeSelector}}" class="meal-options">
+        <view wx:for="{{['breakfast', 'lunch', 'dinner', 'snack']}}" wx:key="*this"
+              class="meal-option {{selectedMealType === item ? 'active' : ''}}"
+              bindtap="selectMealType" data-type="{{item}}">
+          {{mealTypeLabels[item]}}
+        </view>
+      </view>
+    </view>
+
+    <!-- 计算结果 -->
+    <view class="result-card">
+      <view class="result-header">
+        <text class="result-label">本次摄入</text>
+      </view>
+      <view class="result-calories">
+        <text class="result-value">{{calculatedNutrition.calories}}</text>
+        <text class="result-unit">kcal</text>
+      </view>
+      <view class="result-macros">
+        <view class="result-macro">
+          <text class="macro-icon">🥩</text>
+          <text class="macro-value">{{calculatedNutrition.protein}}g</text>
+          <text class="macro-name">蛋白质</text>
+        </view>
+        <view class="result-macro">
+          <text class="macro-icon">🌾</text>
+          <text class="macro-value">{{calculatedNutrition.carbs}}g</text>
+          <text class="macro-name">碳水</text>
+        </view>
+        <view class="result-macro">
+          <text class="macro-icon">💧</text>
+          <text class="macro-value">{{calculatedNutrition.fat}}g</text>
+          <text class="macro-name">脂肪</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 提交按钮 -->
+    <button class="submit-btn" bindtap="submit" disabled="{{isSubmitting || !name}}">
+      <text wx:if="{{isSubmitting}}">保存中...</text>
+      <text wx:else>✓ 确认添加</text>
+    </button>
+  </view>
+</view>

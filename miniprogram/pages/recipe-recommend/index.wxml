@@ -1,0 +1,140 @@
+<!--pages/recipe-recommend/index.wxml-->
+<view class="container">
+  
+  <!-- 标签切换 -->
+  <view class="tabs-container">
+    <view class="tabs">
+      <view 
+        wx:for="{{tabs}}" 
+        wx:key="key"
+        class="tab-item {{recommendType === item.key ? 'active' : ''}}"
+        data-type="{{item.key}}"
+        bindtap="onTabChange"
+      >
+        <text class="tab-icon">{{item.icon}}</text>
+        <text class="tab-label">{{item.label}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- AI智能建议（仅在智能推荐模式显示） -->
+  <view wx:if="{{recommendType === 'ai' && aiSuggestions.length > 0}}" class="ai-suggestions">
+    <view class="ai-title">
+      <text class="ai-icon">🤖</text>
+      <text>AI 营养分析</text>
+    </view>
+    
+    <view 
+      wx:for="{{aiSuggestions}}" 
+      wx:key="type"
+      class="suggestion-item severity-{{item.severity}}"
+    >
+      <text class="suggestion-icon">{{item.icon}}</text>
+      <text class="suggestion-message">{{item.message}}</text>
+    </view>
+  </view>
+
+  <!-- 刷新按钮 -->
+  <view class="refresh-section">
+    <button class="btn-refresh" bindtap="onRefresh">
+      <text class="refresh-icon">🔄</text>
+      <text>换一批推荐</text>
+    </button>
+  </view>
+
+  <!-- 加载中 -->
+  <view wx:if="{{loading}}" class="loading-container">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">正在为您生成个性化推荐...</text>
+  </view>
+
+  <!-- 食谱列表 -->
+  <view wx:else class="recipe-list">
+    <view 
+      wx:for="{{recipes}}" 
+      wx:key="id"
+      class="recipe-card"
+      data-id="{{item.id}}"
+      bindtap="onRecipeClick"
+    >
+      <!-- 食谱图片 -->
+      <view class="recipe-image-container">
+        <image class="recipe-image" src="{{item.image}}" mode="aspectFill" />
+        <view class="recipe-score">
+          <text class="score-icon">⭐</text>
+          <text class="score-value">{{item.recommendScore}}</text>
+        </view>
+      </view>
+
+      <!-- 食谱信息 -->
+      <view class="recipe-info">
+        <view class="recipe-header">
+          <text class="recipe-name">{{item.name}}</text>
+          <view class="recipe-actions">
+            <view 
+              class="action-btn"
+              catchtap="onFavoriteClick"
+              data-id="{{item.id}}"
+              data-index="{{index}}"
+            >
+              <text class="action-icon">{{item.isFavorited ? '❤️' : '🤍'}}</text>
+            </view>
+          </view>
+        </view>
+
+        <text class="recipe-description">{{item.description}}</text>
+
+        <!-- 营养信息 -->
+        <view class="nutrition-info">
+          <view class="nutrition-item">
+            <text class="nutrition-icon">🔥</text>
+            <text class="nutrition-value">{{item.calories}}</text>
+            <text class="nutrition-unit">卡</text>
+          </view>
+          <view class="nutrition-item">
+            <text class="nutrition-icon">💪</text>
+            <text class="nutrition-value">{{item.protein}}</text>
+            <text class="nutrition-unit">g蛋白</text>
+          </view>
+          <view class="nutrition-item">
+            <text class="nutrition-icon">🍚</text>
+            <text class="nutrition-value">{{item.carbs}}</text>
+            <text class="nutrition-unit">g碳水</text>
+          </view>
+          <view class="nutrition-item">
+            <text class="nutrition-icon">🥑</text>
+            <text class="nutrition-value">{{item.fat}}</text>
+            <text class="nutrition-unit">g脂肪</text>
+          </view>
+        </view>
+
+        <!-- 标签 -->
+        <view class="recipe-tags">
+          <view 
+            wx:for="{{item.tags}}" 
+            wx:key="*this"
+            wx:for-item="tag"
+            class="tag {{tag === '高蛋白' ? 'tag-protein' : tag === '低卡' || tag === '低脂' ? 'tag-lowcal' : tag === '素食' ? 'tag-veg' : ''}}"
+          >
+            {{tag}}
+          </view>
+        </view>
+
+        <!-- 烹饪信息 -->
+        <view class="cooking-info">
+          <text class="cooking-time">⏱️ {{item.cookingTime}}分钟</text>
+          <text class="cooking-difficulty">👨‍🍳 {{item.difficulty}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view wx:if="{{!loading && recipes.length === 0}}" class="empty-state">
+    <text class="empty-icon">🍽️</text>
+    <text class="empty-text">暂无推荐食谱</text>
+    <text class="empty-hint">请完善您的个人信息以获得更好的推荐</text>
+  </view>
+
+</view>
+

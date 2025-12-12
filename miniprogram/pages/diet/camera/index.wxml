@@ -1,0 +1,312 @@
+<!--
+  拍照识别页面 - diet-camera/index
+  设计语言: Daylight Futurism (日光未来主义)
+  集成云函数: dietService (recognizeAndSearch)
+-->
+<view class="page-container">
+  <!-- ============ 自定义导航栏 ============ -->
+  <view class="nav-header" style="padding-top: {{statusBarHeight}}px;">
+    <view class="nav-content">
+      <view class="nav-back" bindtap="goBack">
+        <text class="back-icon">‹</text>
+      </view>
+      <text class="nav-title">AI 智能识别</text>
+      <view class="nav-placeholder"></view>
+    </view>
+  </view>
+
+  <!-- ============ 主内容区 ============ -->
+  <view class="main-content">
+    <!-- ====== 未拍照状态：上传区域 ====== -->
+    <view wx:if="{{!imagePreview}}" class="upload-section animate-fade-in">
+      <spotlight-card customClass="upload-card" holo="{{true}}">
+        <view class="upload-card-content">
+          <!-- 图标区域 -->
+          <view class="upload-icon-wrapper">
+            <view class="upload-icon-bg">
+              <text class="upload-icon">✨</text>
+            </view>
+            <!-- 脉冲光环 -->
+            <view class="pulse-ring pulse-ring-1"></view>
+            <view class="pulse-ring pulse-ring-2"></view>
+          </view>
+
+          <!-- 标题描述 -->
+          <view class="upload-text">
+            <text class="upload-title">AI 智能识别</text>
+            <text class="upload-desc">拍摄或上传食物照片，自动识别并计算热量</text>
+          </view>
+
+          <!-- 操作按钮 -->
+          <view class="upload-actions">
+            <view class="action-btn primary" bindtap="chooseImage" data-source="camera">
+              <view class="action-btn-inner">
+                <text class="action-icon">📷</text>
+                <text class="action-text">拍照识别</text>
+              </view>
+              <view class="btn-glow"></view>
+            </view>
+
+            <view class="action-btn secondary" bindtap="chooseImage" data-source="album">
+              <view class="action-btn-inner">
+                <text class="action-icon">🖼️</text>
+                <text class="action-text">从相册选择</text>
+              </view>
+              <view class="btn-glow blue"></view>
+            </view>
+          </view>
+        </view>
+      </spotlight-card>
+
+      <!-- 提示文字 -->
+      <view class="tips-section">
+        <view class="tip-item">
+          <text class="tip-icon">💡</text>
+          <text class="tip-text">确保食物在画面中清晰可见</text>
+        </view>
+        <view class="tip-item">
+          <text class="tip-icon">☀️</text>
+          <text class="tip-text">光线充足的环境识别效果更佳</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- ====== 已拍照状态：结果区域 ====== -->
+    <view wx:else class="result-section">
+      <!-- 图片预览卡片 -->
+      <spotlight-card customClass="preview-card {{isAnalyzing ? 'analyzing' : ''}}" theme="primary">
+        <!-- 旋转光边效果 -->
+        <view class="beam-border {{isAnalyzing ? 'active' : ''}}">
+          <view class="rotating-beam"></view>
+        </view>
+        <view class="preview-wrapper">
+          <image
+            src="{{imagePreview}}"
+            mode="aspectFill"
+            class="preview-image"
+          />
+
+          <!-- 分析中遮罩 -->
+          <view wx:if="{{isAnalyzing}}" class="analyzing-overlay">
+            <view class="analyzing-content">
+              <view class="analyzing-spinner">
+                <view class="spinner-ring"></view>
+                <text class="spinner-icon">🔍</text>
+              </view>
+              <text class="analyzing-text">AI 分析中...</text>
+              <view class="analyzing-progress">
+                <view class="progress-bar"></view>
+              </view>
+            </view>
+          </view>
+
+          <!-- 重拍按钮 -->
+          <view class="retake-btn" bindtap="retake">
+            <text class="retake-icon">✕</text>
+          </view>
+
+          <!-- 图片标签 -->
+          <view class="image-badge" wx:if="{{!isAnalyzing && recognizedFoods.length > 0}}">
+            <text class="badge-icon">✓</text>
+            <text class="badge-text">识别完成</text>
+          </view>
+        </view>
+      </spotlight-card>
+
+      <!-- 错误提示 -->
+      <view wx:if="{{error}}" class="error-banner animate-shake">
+        <view class="error-content">
+          <text class="error-icon">⚠️</text>
+          <text class="error-text">{{error}}</text>
+        </view>
+        <view class="error-action" bindtap="retake">
+          <text>重试</text>
+        </view>
+      </view>
+
+      <!-- 识别结果卡片 -->
+      <spotlight-card
+        wx:if="{{recognizedFoods.length > 0}}"
+        customClass="results-card animate-slide-up"
+        holo="{{true}}"
+      >
+        <view class="results-content">
+          <!-- 结果头部 -->
+          <view class="results-header">
+            <view class="results-title-group">
+              <text class="results-title">识别结果</text>
+              <view class="results-badge">
+                <text>{{recognizedFoods.length}}</text>
+              </view>
+            </view>
+            <text class="results-subtitle">点击选择需要添加的食物</text>
+          </view>
+
+          <!-- 食物列表 -->
+          <view class="food-list">
+            <view
+              wx:for="{{recognizedFoods}}"
+              wx:key="index"
+              class="food-item {{selectedFoods[index] ? 'selected' : ''}}"
+            >
+              <!-- 食物头部 - 可点击选择 -->
+              <view class="food-header" bindtap="toggleFood" data-index="{{index}}">
+                <!-- 选择指示器 -->
+                <view class="food-checkbox {{selectedFoods[index] ? 'checked' : ''}}">
+                  <text wx:if="{{selectedFoods[index]}}" class="check-icon">✓</text>
+                </view>
+
+                <!-- 食物信息 -->
+                <view class="food-info">
+                  <view class="food-name-row">
+                    <text class="food-name">{{item.name}}</text>
+                    <view wx:if="{{item.confidence}}" class="confidence-tag">
+                      <text>{{item.confidence * 100}}%</text>
+                    </view>
+                  </view>
+                  <view class="food-meta">
+                    <text class="food-category">{{item.category || '未分类'}}</text>
+                    <text class="food-dot">·</text>
+                    <text class="food-cal-base">{{item.calories}} kcal/100g</text>
+                  </view>
+                </view>
+
+                <!-- 热量显示 -->
+                <view class="food-calories" wx:if="{{selectedFoods[index]}}">
+                  <text class="cal-value">{{item.calories * (foodAmounts[index] || 100) / 100}}</text>
+                  <text class="cal-unit">kcal</text>
+                </view>
+              </view>
+
+              <!-- 份量调整区域 - 仅选中时显示 -->
+              <view wx:if="{{selectedFoods[index]}}" class="amount-section">
+                <view class="amount-row">
+                  <text class="amount-label">份量调整</text>
+                  <view class="amount-controls">
+                    <view
+                      class="amount-btn minus"
+                      bindtap="adjustAmount"
+                      data-index="{{index}}"
+                      data-delta="{{-10}}"
+                    >
+                      <text>−</text>
+                    </view>
+                    <view class="amount-display">
+                      <text class="amount-value">{{foodAmounts[index] || 100}}</text>
+                      <text class="amount-unit">g</text>
+                    </view>
+                    <view
+                      class="amount-btn plus"
+                      bindtap="adjustAmount"
+                      data-index="{{index}}"
+                      data-delta="{{10}}"
+                    >
+                      <text>+</text>
+                    </view>
+                  </view>
+                </view>
+
+                <!-- 营养详情 -->
+                <view class="nutrition-details">
+                  <view class="nutrition-item protein">
+                    <text class="nutrition-label">蛋白质</text>
+                    <text class="nutrition-value">{{item.protein * (foodAmounts[index] || 100) / 100}}g</text>
+                  </view>
+                  <view class="nutrition-item carbs">
+                    <text class="nutrition-label">碳水</text>
+                    <text class="nutrition-value">{{item.carbs * (foodAmounts[index] || 100) / 100}}g</text>
+                  </view>
+                  <view class="nutrition-item fat">
+                    <text class="nutrition-label">脂肪</text>
+                    <text class="nutrition-value">{{item.fat * (foodAmounts[index] || 100) / 100}}g</text>
+                  </view>
+                </view>
+              </view>
+            </view>
+          </view>
+        </view>
+      </spotlight-card>
+
+      <!-- 餐次选择卡片 -->
+      <spotlight-card
+        wx:if="{{recognizedFoods.length > 0}}"
+        customClass="meal-card animate-slide-up"
+      >
+        <view class="meal-content">
+          <view class="meal-header">
+            <text class="meal-label">添加到</text>
+            <view class="meal-selector" bindtap="toggleMealTypeSelector">
+              <text class="meal-emoji">{{mealEmojis[selectedMealType]}}</text>
+              <text class="meal-name">{{mealTypeLabels[selectedMealType]}}</text>
+              <text class="meal-arrow {{showMealTypeSelector ? 'up' : ''}}">›</text>
+            </view>
+          </view>
+
+          <!-- 餐次选项 -->
+          <view wx:if="{{showMealTypeSelector}}" class="meal-options">
+            <view
+              wx:for="{{['breakfast', 'lunch', 'dinner', 'snack']}}"
+              wx:key="*this"
+              class="meal-option {{selectedMealType === item ? 'active' : ''}}"
+              bindtap="selectMealType"
+              data-type="{{item}}"
+            >
+              <text class="option-emoji">{{mealEmojis[item]}}</text>
+              <text class="option-name">{{mealTypeLabels[item]}}</text>
+            </view>
+          </view>
+        </view>
+      </spotlight-card>
+
+      <!-- 摘要与提交 -->
+      <view wx:if="{{recognizedFoods.length > 0 && hasSelectedFoods}}" class="summary-section animate-slide-up">
+        <spotlight-card customClass="summary-card" theme="primary">
+          <view class="summary-content">
+            <!-- 摘要信息 -->
+            <view class="summary-stats">
+              <view class="summary-left">
+                <text class="summary-label">已选择</text>
+                <text class="summary-count">{{selectedCount}} 项</text>
+              </view>
+              <view class="summary-right">
+                <text class="summary-total">{{totalCalories}}</text>
+                <text class="summary-unit">kcal</text>
+              </view>
+            </view>
+
+            <!-- 营养汇总 -->
+            <view class="summary-macros">
+              <view class="macro-item">
+                <view class="macro-dot protein"></view>
+                <text class="macro-text">蛋白质 {{totalProtein}}g</text>
+              </view>
+              <view class="macro-item">
+                <view class="macro-dot carbs"></view>
+                <text class="macro-text">碳水 {{totalCarbs}}g</text>
+              </view>
+              <view class="macro-item">
+                <view class="macro-dot fat"></view>
+                <text class="macro-text">脂肪 {{totalFat}}g</text>
+              </view>
+            </view>
+          </view>
+        </spotlight-card>
+
+        <!-- 提交按钮 -->
+        <glow-button
+          title="{{isSubmitting ? '保存中...' : '确认添加'}}"
+          subtitle="{{selectedCount}} 项食物将添加到{{mealTypeLabels[selectedMealType]}}"
+          loading="{{isSubmitting}}"
+          bindtap="submit"
+        />
+      </view>
+    </view>
+
+    <!-- 手动搜索链接 -->
+    <view class="manual-search" bindtap="goToSearch">
+      <text class="search-hint">识别不准确？</text>
+      <text class="search-link">手动搜索添加</text>
+      <text class="search-arrow">→</text>
+    </view>
+  </view>
+</view>

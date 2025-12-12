@@ -1,0 +1,113 @@
+<!--pages/plan/generate/index.wxml-->
+<!--pages/plan/generate/index.wxml-->
+<view class="page-container">
+  <!-- 页面标题 -->
+  <view class="header">
+    <text class="title">生成健康计划</text>
+    <text class="subtitle">定制您的专属减重计划</text>
+  </view>
+
+  <!-- 当前用户状态卡片 -->
+  <view class="card card-status" wx:if="{{profile}}">
+    <view class="current-status">
+      <view class="status-item">
+        <text class="status-label">当前体重</text>
+        <text class="status-value">{{profile.weight}}kg</text>
+      </view>
+      <view class="status-item">
+        <text class="status-label">目标体重</text>
+        <text class="status-value">{{profile.targetWeight}}kg</text>
+      </view>
+      <view class="status-item">
+        <text class="status-label">每日消耗</text>
+        <text class="status-value">{{profile.tdee}}kcal</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 计划参数卡片 -->
+  <view class="card card-params">
+    <view class="card-title">计划参数</view>
+    
+    <!-- 目标减重参数 -->
+    <view class="param-item">
+      <view class="param-header">
+        <text class="param-label">目标体重变化</text>
+        <view class="param-input">
+          <input type="digit" value="{{targetWeightChange}}" bindinput="onWeightInput" />
+          <text class="param-unit">kg</text>
+        </view>
+      </view>
+      <slider class="slider" min="-20" max="10" step="0.5" value="{{targetWeightChange}}" bindchange="onWeightChangeSlider" activeColor="#3D9BFF" backgroundColor="#E5E7EB" block-size="20" block-color="#3D9BFF" />
+      <view class="slider-labels">
+        <text>-20kg</text>
+        <text>+10kg</text>
+      </view>
+    </view>
+
+    <!-- 计划周期参数 -->
+    <view class="param-item">
+      <view class="param-header">
+        <text class="param-label">计划周期</text>
+        <view class="param-input">
+          <input type="number" value="{{totalDays}}" bindinput="onDaysInput" />
+          <text class="param-unit">天</text>
+        </view>
+      </view>
+      <slider class="slider" min="30" max="180" step="1" value="{{totalDays}}" bindchange="onDaysSlider" activeColor="#3D9BFF" backgroundColor="#E5E7EB" block-size="20" block-color="#3D9BFF" />
+      <view class="slider-labels">
+        <text>30天</text>
+        <text>180天</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 计划预览卡片 -->
+  <view class="card card-preview">
+    <view class="card-title">计划预览</view>
+    
+    <view class="preview-item">
+      <text class="preview-label">每日热量目标</text>
+      <text class="preview-value primary">{{dailyCalorieGoal}} kcal</text>
+    </view>
+    
+    <view class="preview-item">
+      <text class="preview-label">每日热量差</text>
+      <text class="preview-value {{dailyDeficit < 0 ? 'danger' : 'success'}}">{{dailyDeficit}} kcal</text>
+    </view>
+    
+    <view class="preview-item">
+      <text class="preview-label">每周体重变化</text>
+      <text class="preview-value">{{weeklyChange}} kg/周</text>
+    </view>
+    
+    <view class="preview-item">
+      <text class="preview-label">预计完成时间</text>
+      <text class="preview-value">{{endDate}}</text>
+    </view>
+    
+    <!-- 健康性评估 -->
+    <view class="health-assessment {{planHealth.status === 'good' ? 'status-good' : (planHealth.status === 'danger' ? 'status-danger' : 'status-warning')}}">
+      <text class="assessment-icon" wx:if="{{planHealth.status === 'good'}}">✅</text>
+      <text class="assessment-icon" wx:if="{{planHealth.status === 'danger'}}">⚠️</text>
+      <text class="assessment-icon" wx:if="{{planHealth.status === 'slow'}}">🐢</text>
+      <text class="assessment-text">{{planHealth.message}}</text>
+    </view>
+  </view>
+
+  <!-- 温馨提示卡片 -->
+  <view class="card tips-card">
+    <view class="card-title">温馨提示</view>
+    <view class="tips">
+      <text class="tip-item">• 健康减重速度：每周0.5-1kg</text>
+      <text class="tip-item">• 不建议每日热量摄入低于基础代谢率</text>
+      <text class="tip-item">• 配合适量运动效果更佳</text>
+      <text class="tip-item">• 保持良好作息，不要熬夜</text>
+    </view>
+  </view>
+
+  <!-- 生成计划按钮 -->
+  <button class="generate-btn" loading="{{generating}}" bindtap="onGeneratePlan">
+    生成计划
+  </button>
+</view>

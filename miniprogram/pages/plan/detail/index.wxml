@@ -1,0 +1,117 @@
+<!--pages/plan/detail/index.wxml-->
+<view class="page-container">
+  <!-- 加载状态 -->
+  <view wx:if="{{loading}}" class="loading-container">
+    <text>加载中...</text>
+  </view>
+
+  <!-- 主要内容 -->
+  <view wx:elif="{{plan}}" class="content">
+    <!-- ========== 计划头部卡片 (Active Gradient) ========== -->
+    <view class="card card-header">
+      <view class="header-top">
+        <text class="plan-title">{{plan.name || '我的健康计划'}}</text>
+        <view class="status-badge {{plan.status}}">
+          <text>{{plan.status === 'active' ? '进行中' : plan.status === 'completed' ? '已完成' : '已暂停'}}</text>
+        </view>
+      </view>
+      
+      <!-- 计划简要信息 -->
+      <view class="plan-meta">
+        <view class="meta-item">
+          <text class="meta-icon">📅</text>
+          <text class="meta-text">{{plan.totalDays}}天计划</text>
+        </view>
+        <view class="meta-item">
+          <text class="meta-icon">🎯</text>
+          <text class="meta-text">目标{{plan.targetWeightChange > 0 ? '+' : ''}}{{plan.targetWeightChange}}kg</text>
+        </view>
+        <view class="meta-item">
+          <text class="meta-icon">🔥</text>
+          <text class="meta-text">每日{{Math.abs(plan.dailyDeficit)}}kcal</text>
+        </view>
+      </view>
+
+      <!-- 进度条部分 -->
+      <view class="progress-section">
+        <view class="progress-info">
+          <text class="progress-label">计划进度</text>
+          <text class="progress-text">{{daysElapsed}}/{{plan.totalDays}}天</text>
+        </view>
+        <view class="progress-bar">
+          <view class="progress-fill" style="width: {{progress}}%"></view>
+        </view>
+        <view class="progress-days">
+          <text>已完成 {{daysElapsed}} 天</text>
+          <text>剩余 {{daysRemaining}} 天</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- ========== 时间安排卡片 ========== -->
+    <view class="card glass-card">
+      <view class="card-title">📆 时间安排</view>
+      <view class="info-row">
+        <text class="info-label">开始日期</text>
+        <text class="info-value">{{plan.startDate}}</text>
+      </view>
+      <view class="info-row">
+        <text class="info-label">结束日期</text>
+        <text class="info-value">{{plan.endDate}}</text>
+      </view>
+    </view>
+
+    <!-- ========== 目标设定卡片 ========== -->
+    <view class="card glass-card">
+      <view class="card-title">🎯 目标设定</view>
+      <view class="info-row">
+        <text class="info-label">目标体重变化</text>
+        <text class="info-value highlight">{{plan.targetWeightChange > 0 ? '+' : ''}}{{plan.targetWeightChange}}kg</text>
+      </view>
+      <view class="info-row">
+        <text class="info-label">每周预期变化</text>
+        <text class="info-value">{{plan.weeklyChange}}kg/周</text>
+      </view>
+      <view class="info-row">
+        <text class="info-label">每日热量目标</text>
+        <text class="info-value">{{plan.dailyCalorieGoal}}kcal</text>
+      </view>
+      <view class="info-row">
+        <text class="info-label">每日热量差</text>
+        <text class="info-value">{{plan.dailyDeficit}}kcal</text>
+      </view>
+    </view>
+
+    <!-- ========== 健康评估卡片 ========== -->
+    <view class="card glass-card" wx:if="{{plan.planHealth}}">
+      <view class="card-title">💪 健康评估</view>
+      <view class="health-card {{plan.planHealth.isHealthy ? 'healthy' : 'warning'}}">
+        <view class="health-status">
+          <text class="health-icon">{{plan.planHealth.isHealthy ? '✓' : '⚠️'}}</text>
+          <text class="health-text">{{plan.planHealth.isHealthy ? '计划合理健康' : '建议调整计划'}}</text>
+        </view>
+        <text class="health-desc">{{plan.planHealth.message}}</text>
+      </view>
+    </view>
+
+    <!-- ========== 健康建议卡片 ========== -->
+    <view class="card glass-card" wx:if="{{plan.suggestions && plan.suggestions.length > 0}}">
+      <view class="card-title">💡 健康建议</view>
+      <view class="suggestions">
+        <view wx:for="{{plan.suggestions}}" wx:key="index" class="suggestion-item">
+          <text class="suggestion-text">• {{item}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- ========== 操作按钮 ========== -->
+    <view class="action-buttons" wx:if="{{plan.status === 'active'}}">
+      <view class="action-btn secondary-btn" bindtap="editPlan">
+        <text>调整计划</text>
+      </view>
+      <view class="action-btn primary-btn" bindtap="completePlan">
+        <text>完成计划</text>
+      </view>
+    </view>
+  </view>
+</view>

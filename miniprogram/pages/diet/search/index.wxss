@@ -1,0 +1,745 @@
+/* 食物搜索页面样式 - 优化版 */
+
+.page {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #FFF5EB 0%, #FEF0E3 15%, #F8F4FF 50%, #EEF4FF 100%);
+  position: relative;
+  padding-top: 88rpx; /* 状态栏高度适配 */
+}
+
+/* 背景装饰 */
+.page-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 320rpx;
+  background: linear-gradient(135deg, #FF8C42 0%, #FF6B35 50%, #FF9A56 100%);
+  border-radius: 0 0 60rpx 60rpx;
+  z-index: 0;
+}
+
+.search-header {
+  display: flex;
+  align-items: center;
+  padding: 24rpx 30rpx;
+  position: relative;
+  z-index: 1;
+}
+
+.back-btn {
+  width: 70rpx;
+  height: 70rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40rpx;
+  color: #fff;
+  background: rgba(255,255,255,0.2);
+  border-radius: 50%;
+  margin-right: 16rpx;
+  backdrop-filter: blur(10rpx);
+}
+
+.search-input-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  background: rgba(255,255,255,0.95);
+  border-radius: 24rpx;
+  padding: 0 24rpx;
+  height: 88rpx;
+  box-shadow: 0 8rpx 24rpx rgba(0,0,0,0.08);
+}
+
+.search-icon {
+  font-size: 32rpx;
+  margin-right: 16rpx;
+}
+
+.search-input {
+  flex: 1;
+  font-size: 30rpx;
+  color: #333;
+}
+
+.clear-btn {
+  padding: 16rpx;
+  color: #999;
+}
+
+.meal-hint {
+  margin: 0 30rpx 20rpx;
+  padding: 20rpx 24rpx;
+  background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,247,237,0.95) 100%);
+  border-radius: 20rpx;
+  font-size: 28rpx;
+  color: #666;
+  box-shadow: 0 4rpx 16rpx rgba(0,0,0,0.04);
+  position: relative;
+  z-index: 1;
+}
+
+.meal-name {
+  font-weight: 700;
+  color: #FF6B00;
+}
+
+.source-hint {
+  color: #999;
+  margin-left: 8rpx;
+}
+
+.content {
+  padding: 0 30rpx;
+  padding-bottom: 120rpx;
+  position: relative;
+  z-index: 1;
+}
+
+/* 错误提示 */
+.error-box {
+  background: linear-gradient(135deg, #FEF2F2 0%, #FEE2E2 100%);
+  border: 2rpx solid #FECACA;
+  border-radius: 24rpx;
+  padding: 24rpx;
+  display: flex;
+  align-items: center;
+  margin-bottom: 24rpx;
+  box-shadow: 0 4rpx 16rpx rgba(239,68,68,0.1);
+}
+
+.error-icon {
+  margin-right: 16rpx;
+  font-size: 32rpx;
+}
+
+.error-text {
+  color: #DC2626;
+  font-size: 28rpx;
+  font-weight: 500;
+}
+
+/* 加载状态 */
+.loading-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60rpx 0;
+  background: rgba(255,255,255,0.8);
+  border-radius: 24rpx;
+  margin-bottom: 20rpx;
+}
+
+.loading-spinner {
+  width: 48rpx;
+  height: 48rpx;
+  border: 4rpx solid rgba(255,107,0,0.2);
+  border-top-color: #FF6B00;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-right: 16rpx;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-text {
+  color: #666;
+  font-size: 28rpx;
+  font-weight: 500;
+}
+
+/* 最近搜索 */
+.recent-section {
+  margin-bottom: 32rpx;
+  background: linear-gradient(135deg, #F5F3FF 0%, #EDE9FE 100%);
+  border-radius: 28rpx;
+  padding: 24rpx;
+  box-shadow: 0 6rpx 24rpx rgba(139, 92, 246, 0.06);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #333;
+}
+
+.section-icon {
+  margin-right: 10rpx;
+  font-size: 28rpx;
+}
+
+.clear-link {
+  font-size: 24rpx;
+  color: #999;
+  padding: 8rpx 16rpx;
+  background: #F3F4F6;
+  border-radius: 12rpx;
+}
+
+.recent-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+
+.recent-tag {
+  padding: 14rpx 28rpx;
+  background: linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%);
+  border: 2rpx solid #E2E8F0;
+  border-radius: 32rpx;
+  font-size: 26rpx;
+  color: #475569;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.recent-tag:active {
+  background: linear-gradient(135deg, #FFF7ED 0%, #FFEDD5 100%);
+  border-color: #FDBA74;
+  color: #FF6B00;
+}
+
+/* 结果区域 */
+.results-section {
+  margin-bottom: 32rpx;
+}
+
+.section-title-simple {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 20rpx;
+  padding-left: 8rpx;
+  display: flex;
+  align-items: center;
+}
+
+.section-title-simple::before {
+  content: '';
+  width: 6rpx;
+  height: 28rpx;
+  background: linear-gradient(180deg, #FF8C42, #FF6B35);
+  border-radius: 3rpx;
+  margin-right: 12rpx;
+}
+
+.food-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.food-card {
+  display: flex;
+  align-items: center;
+  background: linear-gradient(135deg, #ECFEFF 0%, #CFFAFE 100%);
+  border-radius: 28rpx;
+  padding: 24rpx;
+  box-shadow: 0 6rpx 24rpx rgba(6, 182, 212, 0.06);
+  border: 2rpx solid rgba(6, 182, 212, 0.1);
+  transition: all 0.2s ease;
+}
+
+.food-card:active {
+  transform: scale(0.98);
+  box-shadow: 0 4rpx 16rpx rgba(0,0,0,0.04);
+}
+
+.food-card.user-dish {
+  background: linear-gradient(135deg, #FFF7ED 0%, #FFEDD5 100%);
+  border-color: rgba(255, 140, 66, 0.2);
+  box-shadow: 0 6rpx 24rpx rgba(255, 107, 53, 0.06);
+}
+
+.food-emoji {
+  width: 88rpx;
+  height: 88rpx;
+  background: linear-gradient(145deg, #F8FAFC 0%, #F1F5F9 100%);
+  border-radius: 24rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40rpx;
+  margin-right: 20rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0,0,0,0.06);
+}
+
+.food-card.user-dish .food-emoji {
+  background: linear-gradient(145deg, #FFF7ED 0%, #FFE4CC 100%);
+}
+
+.food-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.food-name-row {
+  display: flex;
+  align-items: center;
+}
+
+.food-name {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #333;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.source-badge {
+  margin-left: 12rpx;
+  font-size: 20rpx;
+  padding: 6rpx 14rpx;
+  border-radius: 10rpx;
+  font-weight: 600;
+}
+
+.source-badge.green {
+  background: linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%);
+  color: #059669;
+}
+
+.source-badge.purple {
+  background: linear-gradient(135deg, #EDE9FE 0%, #DDD6FE 100%);
+  color: #7C3AED;
+}
+
+.source-badge.blue {
+  background: linear-gradient(135deg, #DBEAFE 0%, #BFDBFE 100%);
+  color: #2563EB;
+}
+
+.food-meta {
+  font-size: 24rpx;
+  color: #888;
+  margin-top: 6rpx;
+  display: block;
+}
+
+.food-macros {
+  display: flex;
+  gap: 16rpx;
+  margin-top: 8rpx;
+}
+
+.macro {
+  font-size: 22rpx;
+  font-weight: 600;
+  padding: 2rpx 8rpx;
+  border-radius: 6rpx;
+}
+
+.macro.protein {
+  color: #2563EB;
+  background: rgba(59,130,246,0.1);
+}
+.macro.carbs {
+  color: #D97706;
+  background: rgba(245,158,11,0.1);
+}
+.macro.fat {
+  color: #7C3AED;
+  background: rgba(139,92,246,0.1);
+}
+
+.food-calories {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  margin-left: 16rpx;
+}
+
+.cal-value {
+  font-size: 32rpx;
+  font-weight: 800;
+  background: linear-gradient(135deg, #FF6B35, #FF9040);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.cal-unit {
+  font-size: 22rpx;
+  color: #999;
+}
+
+/* 深度搜索按钮 */
+.deep-search-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 28rpx;
+  background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,247,237,0.95) 100%);
+  border: 3rpx solid #FDBA74;
+  border-radius: 28rpx;
+  color: #FF6B00;
+  font-size: 30rpx;
+  font-weight: 700;
+  margin-top: 24rpx;
+  box-shadow: 0 4rpx 16rpx rgba(255,107,0,0.12);
+  transition: all 0.2s ease;
+}
+
+.deep-search-btn:active {
+  transform: scale(0.98);
+  background: linear-gradient(135deg, #FFF7ED 0%, #FFEDD5 100%);
+}
+
+.btn-icon {
+  margin-right: 12rpx;
+  font-size: 28rpx;
+}
+
+/* 空状态 */
+.empty-state {
+  text-align: center;
+  padding: 80rpx 40rpx;
+  background: rgba(255,255,255,0.8);
+  border-radius: 32rpx;
+}
+
+.empty-icon {
+  font-size: 100rpx;
+  margin-bottom: 24rpx;
+}
+
+.empty-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 12rpx;
+}
+
+.empty-desc {
+  font-size: 28rpx;
+  color: #666;
+  margin-bottom: 32rpx;
+}
+
+/* 手动输入链接 */
+.manual-link {
+  text-align: center;
+  margin-top: 48rpx;
+  font-size: 28rpx;
+  color: #666;
+  padding: 20rpx;
+}
+
+.link-text {
+  color: #FF6B00;
+  font-weight: 700;
+  margin-left: 8rpx;
+}
+
+/* ============ 标签切换 ============ */
+.tabs-wrapper {
+  padding: 0 30rpx 20rpx;
+  position: relative;
+  z-index: 1;
+}
+
+.tabs-container {
+  display: flex;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 24rpx;
+  padding: 8rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
+}
+
+.tab-item {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  padding: 20rpx 0;
+  border-radius: 20rpx;
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #666;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.tab-item.active {
+  background: linear-gradient(135deg, #FF8C42 0%, #FF6B35 100%);
+  color: #fff;
+  font-weight: 700;
+  box-shadow: 0 4rpx 16rpx rgba(255, 107, 53, 0.3);
+}
+
+.tab-icon {
+  font-size: 28rpx;
+}
+
+.tab-badge {
+  position: absolute;
+  top: 8rpx;
+  right: 20rpx;
+  min-width: 32rpx;
+  height: 32rpx;
+  background: #FF4D4F;
+  border-radius: 16rpx;
+  font-size: 20rpx;
+  color: #fff;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 8rpx;
+}
+
+/* ============ 我的常用内容区 ============ */
+.favorites-content {
+  padding-bottom: 40rpx;
+}
+
+/* 餐次筛选标签 */
+.meal-filter {
+  display: flex;
+  gap: 12rpx;
+  margin-bottom: 24rpx;
+  padding: 8rpx;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 20rpx;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.meal-filter::-webkit-scrollbar {
+  display: none;
+}
+
+.meal-filter-item {
+  flex-shrink: 0;
+  padding: 14rpx 28rpx;
+  font-size: 26rpx;
+  font-weight: 500;
+  color: #666;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 16rpx;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.meal-filter-item.active {
+  background: linear-gradient(135deg, #FF8C42 0%, #FF6B35 100%);
+  color: #fff;
+  font-weight: 700;
+  box-shadow: 0 4rpx 12rpx rgba(255, 107, 53, 0.3);
+}
+
+.meal-filter-item:active {
+  transform: scale(0.95);
+}
+
+.favorites-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20rpx;
+}
+
+.favorite-card {
+  background: linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%);
+  border-radius: 28rpx;
+  padding: 24rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  box-shadow: 0 6rpx 24rpx rgba(34, 197, 94, 0.06);
+  border: 2rpx solid rgba(34, 197, 94, 0.1);
+  transition: all 0.2s ease;
+}
+
+.favorite-card:active {
+  transform: scale(0.96);
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
+}
+
+.favorite-avatar {
+  width: 100rpx;
+  height: 100rpx;
+  background: linear-gradient(145deg, #FFF7ED 0%, #FFE4CC 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16rpx;
+  box-shadow: 0 4rpx 12rpx rgba(255, 107, 53, 0.15);
+}
+
+.favorite-emoji {
+  font-size: 48rpx;
+}
+
+.favorite-info {
+  text-align: center;
+  width: 100%;
+}
+
+.favorite-name {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #333;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-bottom: 6rpx;
+}
+
+.favorite-calories {
+  font-size: 24rpx;
+  color: #888;
+  display: block;
+}
+
+.favorite-count {
+  position: absolute;
+  top: 16rpx;
+  left: 16rpx;
+  background: linear-gradient(135deg, #FF8C42 0%, #FF6B35 100%);
+  color: #fff;
+  font-size: 20rpx;
+  font-weight: 700;
+  padding: 4rpx 12rpx;
+  border-radius: 12rpx;
+  box-shadow: 0 2rpx 8rpx rgba(255, 107, 53, 0.3);
+}
+
+.favorite-add-icon {
+  position: absolute;
+  top: 16rpx;
+  right: 16rpx;
+  width: 44rpx;
+  height: 44rpx;
+  background: linear-gradient(135deg, #52C41A 0%, #73D13D 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 32rpx;
+  font-weight: 300;
+  box-shadow: 0 4rpx 12rpx rgba(82, 196, 26, 0.3);
+}
+
+/* 手动添加卡片 */
+.favorite-card.add-card {
+  background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%);
+  border: 2rpx dashed rgba(251, 191, 36, 0.4);
+  box-shadow: 0 6rpx 24rpx rgba(251, 191, 36, 0.06);
+}
+
+.add-card-icon {
+  width: 100rpx;
+  height: 100rpx;
+  background: linear-gradient(145deg, #FFF7ED 0%, #FFE4CC 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16rpx;
+  font-size: 48rpx;
+  box-shadow: 0 4rpx 12rpx rgba(255, 107, 53, 0.15);
+}
+
+/* ============ 常用食物空状态 ============ */
+.favorites-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 80rpx 40rpx;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 32rpx;
+}
+
+.empty-heart {
+  font-size: 100rpx;
+  margin-bottom: 24rpx;
+  animation: heartbeat 1.5s ease-in-out infinite;
+}
+
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.favorites-empty .empty-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 12rpx;
+}
+
+.favorites-empty .empty-desc {
+  font-size: 26rpx;
+  color: #888;
+  margin-bottom: 32rpx;
+}
+
+.empty-tips {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+  margin-bottom: 32rpx;
+  width: 100%;
+}
+
+.tip-item {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  padding: 16rpx 24rpx;
+  background: linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%);
+  border-radius: 16rpx;
+  font-size: 26rpx;
+  color: #666;
+}
+
+.tip-icon {
+  font-size: 24rpx;
+}
+
+.start-search-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24rpx 48rpx;
+  background: linear-gradient(135deg, #FF8C42 0%, #FF6B35 100%);
+  border-radius: 28rpx;
+  color: #fff;
+  font-size: 30rpx;
+  font-weight: 700;
+  box-shadow: 0 8rpx 24rpx rgba(255, 107, 53, 0.35);
+  transition: all 0.2s ease;
+}
+
+.start-search-btn:active {
+  transform: scale(0.96);
+  box-shadow: 0 4rpx 16rpx rgba(255, 107, 53, 0.25);
+}
+
+/* ============ 底部提示 ============ */
+.favorites-footer {
+  text-align: center;
+  padding: 32rpx 0;
+}
+
+.footer-hint {
+  font-size: 24rpx;
+  color: #999;
+}

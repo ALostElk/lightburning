@@ -1,0 +1,367 @@
+/* pages/recipe-detail/index.wxss */
+
+.container {
+  min-height: 100vh;
+  background: #F5F5F5;
+  padding-bottom: 140rpx;
+}
+
+/* 顶部英雄区 */
+.hero-section {
+  position: relative;
+  width: 100%;
+  height: 500rpx;
+}
+
+.hero-image {
+  width: 100%;
+  height: 100%;
+}
+
+.hero-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+  padding: 40rpx 32rpx;
+  color: #fff;
+}
+
+.recipe-title {
+  display: block;
+  font-size: 48rpx;
+  font-weight: 700;
+  margin-bottom: 12rpx;
+}
+
+.recipe-subtitle {
+  display: block;
+  font-size: 28rpx;
+  opacity: 0.9;
+  line-height: 1.5;
+}
+
+/* 快捷操作栏 */
+.action-bar {
+  display: flex;
+  justify-content: space-around;
+  background: #fff;
+  padding: 24rpx 32rpx;
+  border-bottom: 1rpx solid #F0F0F0;
+}
+
+.action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: transparent;
+  border: none;
+  padding: 0;
+  font-size: 24rpx;
+}
+
+.action-btn::after {
+  border: none;
+}
+
+.action-icon {
+  font-size: 44rpx;
+  margin-bottom: 8rpx;
+}
+
+.action-text {
+  color: #666;
+  font-size: 24rpx;
+}
+
+/* 卡片通用样式 */
+.card {
+  margin: 20rpx 32rpx;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24rpx;
+}
+
+.card-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+/* 营养信息卡片 */
+.nutrition-card {
+  background: linear-gradient(135deg, #FF6B35 0%, #FF8C42 100%);
+  color: #fff;
+}
+
+.toggle-btn {
+  display: flex;
+  align-items: center;
+  padding: 8rpx 16rpx;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 20rpx;
+  font-size: 24rpx;
+}
+
+.toggle-text {
+  margin-right: 4rpx;
+}
+
+.toggle-icon {
+  font-size: 20rpx;
+}
+
+.nutrition-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20rpx;
+}
+
+.nutrition-main-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20rpx;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 16rpx;
+  backdrop-filter: blur(10rpx);
+}
+
+.nutrition-main-icon {
+  font-size: 40rpx;
+  margin-bottom: 8rpx;
+}
+
+.nutrition-main-value {
+  font-size: 32rpx;
+  font-weight: 700;
+  margin-bottom: 4rpx;
+}
+
+.nutrition-main-label {
+  font-size: 22rpx;
+  opacity: 0.9;
+}
+
+.nutrition-detail {
+  margin-top: 24rpx;
+  padding-top: 24rpx;
+  border-top: 1rpx solid rgba(255, 255, 255, 0.3);
+}
+
+.nutrition-highlight {
+  display: flex;
+  align-items: flex-start;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 12rpx;
+  padding: 16rpx;
+}
+
+.highlight-icon {
+  font-size: 32rpx;
+  margin-right: 12rpx;
+  flex-shrink: 0;
+}
+
+.highlight-text {
+  font-size: 26rpx;
+  line-height: 1.6;
+  flex: 1;
+}
+
+/* 烹饪信息 */
+.cooking-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20rpx;
+}
+
+.cooking-info-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24rpx;
+  background: #FFF5F0;
+  border-radius: 16rpx;
+}
+
+.cooking-info-icon {
+  font-size: 44rpx;
+  margin-bottom: 12rpx;
+}
+
+.cooking-info-label {
+  font-size: 24rpx;
+  color: #999;
+  margin-bottom: 8rpx;
+}
+
+.cooking-info-value {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #FF6B35;
+}
+
+/* 标签 */
+.tags-list {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 16rpx;
+}
+
+/* 食材清单 */
+.copy-btn {
+  display: flex;
+  align-items: center;
+  background: #FFF5F0;
+  color: #FF6B35;
+  border: none;
+  border-radius: 20rpx;
+  padding: 8rpx 20rpx;
+  font-size: 24rpx;
+}
+
+.copy-btn::after {
+  border: none;
+}
+
+.copy-icon {
+  margin-right: 4rpx;
+}
+
+.ingredients-list {
+  margin-top: 16rpx;
+}
+
+.ingredient-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid #F0F0F0;
+}
+
+.ingredient-item:last-child {
+  border-bottom: none;
+}
+
+.ingredient-info {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.ingredient-name {
+  font-size: 28rpx;
+  color: #333;
+  margin-right: 16rpx;
+}
+
+.ingredient-amount {
+  font-size: 26rpx;
+  color: #999;
+}
+
+.ingredient-calories {
+  font-size: 24rpx;
+  color: #FF6B35;
+  font-weight: 500;
+}
+
+/* 烹饪步骤 */
+.steps-list {
+  margin-top: 24rpx;
+}
+
+.step-item {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 32rpx;
+}
+
+.step-item:last-child {
+  margin-bottom: 0;
+}
+
+.step-number {
+  flex-shrink: 0;
+  width: 56rpx;
+  height: 56rpx;
+  background: linear-gradient(135deg, #FF6B35 0%, #FF8C42 100%);
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+  font-weight: 700;
+  margin-right: 20rpx;
+}
+
+.step-content {
+  flex: 1;
+  font-size: 28rpx;
+  line-height: 1.8;
+  color: #333;
+  padding-top: 8rpx;
+}
+
+/* 底部操作 */
+.bottom-actions {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20rpx 32rpx;
+  background: #fff;
+  box-shadow: 0 -4rpx 12rpx rgba(0, 0, 0, 0.08);
+  z-index: 100;
+}
+
+.start-cooking-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+  font-weight: 600;
+}
+
+.btn-icon {
+  margin-right: 12rpx;
+  font-size: 36rpx;
+}
+
+/* 加载状态 */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+.loading-spinner {
+  width: 80rpx;
+  height: 80rpx;
+  border: 6rpx solid #FFE8E0;
+  border-top-color: #FF6B35;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-text {
+  margin-top: 24rpx;
+  font-size: 28rpx;
+  color: #999;
+}
+

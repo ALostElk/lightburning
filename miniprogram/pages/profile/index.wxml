@@ -1,0 +1,145 @@
+<!--pages/profile/index.wxml-->
+<view class="container">
+  <!-- 标题 -->
+  <view class="header">
+    <text class="title">个人信息</text>
+    <text class="subtitle">完善信息后系统将为您生成专属健康计划</text>
+  </view>
+
+  <!-- 基本信息卡片 -->
+  <view class="card">
+    <view class="card-title">基本信息</view>
+    
+    <!-- 性别 -->
+    <view class="form-item">
+      <text class="label">性别</text>
+      <picker mode="selector" range="['男', '女']" value="{{profile.gender === 'male' ? 0 : 1}}" bindchange="onGenderChange">
+        <view class="picker">{{profile.gender === 'male' ? '男' : '女'}} ></view>
+      </picker>
+    </view>
+
+    <!-- 年龄 -->
+    <view class="form-item">
+      <text class="label">年龄</text>
+      <input class="input" type="number" placeholder="请输入年龄" value="{{profile.age}}" data-field="age" bindinput="onInputChange" />
+      <text class="unit">岁</text>
+    </view>
+
+    <!-- 身高 -->
+    <view class="form-item">
+      <text class="label">身高</text>
+      <input class="input" type="digit" placeholder="请输入身高" value="{{profile.height}}" data-field="height" bindinput="onInputChange" />
+      <text class="unit">cm</text>
+    </view>
+
+    <!-- 体重 -->
+    <view class="form-item">
+      <text class="label">当前体重</text>
+      <input class="input" type="digit" placeholder="请输入体重" value="{{profile.weight}}" data-field="weight" bindinput="onInputChange" />
+      <text class="unit">kg</text>
+    </view>
+
+    <!-- 目标体重 -->
+    <view class="form-item">
+      <text class="label">目标体重</text>
+      <input class="input" type="digit" placeholder="请输入目标体重" value="{{profile.targetWeight}}" data-field="targetWeight" bindinput="onInputChange" />
+      <text class="unit">kg</text>
+    </view>
+  </view>
+
+  <!-- 目标与活动 -->
+  <view class="card">
+    <view class="card-title">目标与活动</view>
+    
+    <!-- 健康目标 -->
+    <view class="form-item">
+      <text class="label">健康目标</text>
+      <picker mode="selector" range="{{goals}}" value="{{goalIndex}}" bindchange="onGoalChange">
+        <view class="picker">{{profile.goal}} ></view>
+      </picker>
+    </view>
+
+    <!-- 活动等级 -->
+    <view class="form-item">
+      <text class="label">活动等级</text>
+      <picker mode="selector" range="{{activityLevels}}" range-key="label" value="{{activityLevelIndex}}" bindchange="onActivityLevelChange">
+        <view class="picker">
+          {{activityLevels[activityLevelIndex].label}} >
+        </view>
+      </picker>
+    </view>
+  </view>
+
+  <!-- 健康指标卡片 -->
+  <view class="card">
+    <view class="card-title">健康指标</view>
+    
+    <!-- BMI -->
+    <view class="indicator">
+      <view class="indicator-label">
+        <text>BMI</text>
+        <text class="indicator-desc">身体质量指数</text>
+      </view>
+      <view class="indicator-value">
+        <text class="value">{{bmi}}</text>
+        <text class="category" style="color: {{bmiCategory.color}}">{{bmiCategory.category}}</text>
+      </view>
+    </view>
+
+    <!-- BMR -->
+    <view class="indicator">
+      <view class="indicator-label">
+        <text>BMR</text>
+        <text class="indicator-desc">基础代谢率</text>
+      </view>
+      <view class="indicator-value">
+        <text class="value">{{bmr}}</text>
+        <text class="unit-text">kcal/天</text>
+      </view>
+    </view>
+
+    <!-- TDEE -->
+    <view class="indicator">
+      <view class="indicator-label">
+        <text>TDEE</text>
+        <text class="indicator-desc">每日总消耗</text>
+      </view>
+      <view class="indicator-value">
+        <text class="value">{{tdee}}</text>
+        <text class="unit-text">kcal/天</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 营养素推荐 -->
+  <view class="card">
+    <view class="card-title">每日营养素推荐</view>
+    
+    <view class="macro-item">
+      <text class="macro-label">蛋白质</text>
+      <text class="macro-value">{{macros.protein}}g</text>
+    </view>
+    
+    <view class="macro-item">
+      <text class="macro-label">碳水化合物</text>
+      <text class="macro-value">{{macros.carbs}}g</text>
+    </view>
+    
+    <view class="macro-item">
+      <text class="macro-label">脂肪</text>
+      <text class="macro-value">{{macros.fat}}g</text>
+    </view>
+    
+    <view class="macro-item">
+      <text class="macro-label">水分</text>
+      <text class="macro-value">{{waterIntake}}ml</text>
+    </view>
+  </view>
+
+  <!-- 操作按钮 -->
+  <view class="button-group">
+    <button class="btn-secondary" bindtap="onReset">重置</button>
+    <button class="btn-primary" loading="{{loading}}" bindtap="onSave">保存</button>
+  </view>
+</view>
+

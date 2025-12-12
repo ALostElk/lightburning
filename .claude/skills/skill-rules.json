@@ -1,0 +1,216 @@
+{
+    "version": "1.0",
+    "description": "轻燃小程序项目专属技能配置",
+    "skills": {
+        "skill-developer": {
+            "type": "domain",
+            "enforcement": "suggest",
+            "priority": "high",
+            "description": "技能系统开发 - 创建和管理 Claude Code 技能",
+            "promptTriggers": {
+                "keywords": [
+                    "skill system",
+                    "create skill",
+                    "add skill",
+                    "skill triggers",
+                    "skill rules",
+                    "hook system",
+                    "skill-rules.json",
+                    "技能",
+                    "创建技能",
+                    "hooks"
+                ],
+                "intentPatterns": [
+                    "(how do|how does|explain|如何).*?skill",
+                    "(create|add|modify|build|创建|添加|修改).*?skill",
+                    "skill.*?(work|trigger|activate|system)"
+                ]
+            }
+        },
+        "wechat-miniprogram": {
+            "type": "domain",
+            "enforcement": "suggest",
+            "priority": "high",
+            "description": "微信小程序开发规范和最佳实践",
+            "promptTriggers": {
+                "keywords": [
+                    "小程序",
+                    "miniprogram",
+                    "微信",
+                    "wx.",
+                    "wxml",
+                    "wxss",
+                    "页面",
+                    "组件",
+                    "tabBar",
+                    "app.json",
+                    "setData"
+                ],
+                "intentPatterns": [
+                    "(create|add|implement|创建|添加|实现).*?(page|component|页面|组件)",
+                    "(fix|debug|修复|调试).*?(小程序|miniprogram)",
+                    "(how to|如何).*?(小程序|wx\\.)"
+                ]
+            },
+            "fileTriggers": {
+                "pathPatterns": [
+                    "miniprogram/**/*.js",
+                    "miniprogram/**/*.wxml",
+                    "miniprogram/**/*.wxss",
+                    "miniprogram/**/*.json"
+                ]
+            }
+        },
+        "wechat-cloud-function": {
+            "type": "domain",
+            "enforcement": "suggest",
+            "priority": "high",
+            "description": "微信云函数开发规范",
+            "promptTriggers": {
+                "keywords": [
+                    "云函数",
+                    "cloud function",
+                    "wx.cloud",
+                    "callFunction",
+                    "云开发",
+                    "wx-server-sdk",
+                    "cloud.database",
+                    "云数据库"
+                ],
+                "intentPatterns": [
+                    "(create|add|implement|deploy|创建|添加|实现|部署).*?(云函数|cloud function)",
+                    "(fix|debug|修复|调试).*?(云函数|cloud)",
+                    "(how to|如何).*?(云函数|云开发)"
+                ]
+            },
+            "fileTriggers": {
+                "pathPatterns": [
+                    "cloudfunctions/**/*.js",
+                    "cloudfunctions/**/package.json",
+                    "cloudfunctions/**/config.json"
+                ],
+                "contentPatterns": [
+                    "wx-server-sdk",
+                    "cloud.init",
+                    "exports.main"
+                ]
+            }
+        },
+        "diet-module": {
+            "type": "domain",
+            "enforcement": "suggest",
+            "priority": "high",
+            "description": "饮食模块开发 - 食物识别与个人食品库",
+            "promptTriggers": {
+                "keywords": [
+                    "饮食",
+                    "食物",
+                    "识别",
+                    "营养",
+                    "热量",
+                    "卡路里",
+                    "calories",
+                    "FoodDB",
+                    "DietLog",
+                    "dietService",
+                    "foodRecognition",
+                    "通义千问",
+                    "AI识别"
+                ],
+                "intentPatterns": [
+                    "(add|create|implement|添加|创建|实现).*?(食物|饮食|记录)",
+                    "(search|query|搜索|查询).*?(食物|营养)",
+                    "(recognize|identify|识别).*?(food|食物)"
+                ]
+            },
+            "fileTriggers": {
+                "pathPatterns": [
+                    "cloudfunctions/dietService/**",
+                    "cloudfunctions/foodRecognitionQwen/**",
+                    "miniprogram/pages/diet/**"
+                ]
+            }
+        },
+        "ai-integration": {
+            "type": "domain",
+            "enforcement": "suggest",
+            "priority": "medium",
+            "description": "AI API 集成（通义千问、百度AI等）",
+            "promptTriggers": {
+                "keywords": [
+                    "AI",
+                    "通义千问",
+                    "qwen",
+                    "dashscope",
+                    "百度AI",
+                    "文心一言",
+                    "API Key",
+                    "视觉模型",
+                    "图像识别"
+                ],
+                "intentPatterns": [
+                    "(integrate|call|use|集成|调用|使用).*?(AI|API|模型)",
+                    "(configure|setup|配置|设置).*?(API|Key|密钥)"
+                ]
+            },
+            "fileTriggers": {
+                "pathPatterns": [
+                    "cloudfunctions/**/ai-api.js",
+                    "cloudfunctions/foodRecognitionQwen/**"
+                ],
+                "contentPatterns": [
+                    "dashscope",
+                    "qwen",
+                    "DASHSCOPE_API_KEY"
+                ]
+            }
+        },
+        "database-operations": {
+            "type": "guardrail",
+            "enforcement": "suggest",
+            "priority": "medium",
+            "description": "云数据库操作规范",
+            "promptTriggers": {
+                "keywords": [
+                    "数据库",
+                    "database",
+                    "collection",
+                    "集合",
+                    "CRUD",
+                    "查询",
+                    "索引",
+                    "权限"
+                ],
+                "intentPatterns": [
+                    "(create|add|delete|update|创建|添加|删除|更新).*?(数据|记录|collection)",
+                    "(query|search|查询|搜索).*?(database|数据库)"
+                ]
+            },
+            "fileTriggers": {
+                "contentPatterns": [
+                    "db\\.collection",
+                    "\\.add\\(",
+                    "\\.get\\(",
+                    "\\.update\\(",
+                    "\\.remove\\(",
+                    "\\.aggregate\\("
+                ]
+            }
+        }
+    },
+    "notes": {
+        "scope": "轻燃AI运动饮食健康小程序项目配置",
+        "modules": {
+            "diet": "饮食管理模块 - AI拍照识别 + 手动记录",
+            "training": "训练管理模块 - AI实时动作指导",
+            "ai": "AI智能助手 - 健康问答",
+            "dashboard": "今日数据看板",
+            "user": "个人中心"
+        },
+        "enforcement_types": {
+            "suggest": "技能建议会出现但不阻止执行",
+            "block": "需要使用技能才能继续（护栏）",
+            "warn": "显示警告但允许继续"
+        }
+    }
+}

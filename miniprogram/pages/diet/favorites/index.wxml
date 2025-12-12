@@ -1,0 +1,157 @@
+<!--
+  我的常用页面 - diet-favorites/index
+-->
+<view class="page">
+  <!-- 背景装饰 -->
+  <view class="page-bg"></view>
+
+  <!-- 头部 -->
+  <view class="header">
+    <view class="back-btn" bindtap="goBack">
+      <text>←</text>
+    </view>
+    <text class="header-title">我的常用</text>
+    <view class="header-placeholder"></view>
+  </view>
+
+  <!-- Tab 切换 -->
+  <view class="tab-bar">
+    <view class="tab-item {{activeTab === 'frequent' ? 'active' : ''}}"
+          bindtap="switchTab" data-tab="frequent">
+      <text class="tab-icon">🔥</text>
+      <text>常吃食物</text>
+    </view>
+    <view class="tab-item {{activeTab === 'custom' ? 'active' : ''}}"
+          bindtap="switchTab" data-tab="custom">
+      <text class="tab-icon">📝</text>
+      <text>自定义菜品</text>
+    </view>
+  </view>
+
+  <!-- 餐次筛选（仅常吃食物Tab显示） -->
+  <view wx:if="{{activeTab === 'frequent'}}" class="meal-filter-bar">
+    <text class="filter-label">筛选餐次:</text>
+    <view class="filter-btn" bindtap="toggleMealFilter">
+      <text>{{filterMealType ? mealTypeLabels[filterMealType] : '全部'}}</text>
+      <text class="filter-arrow">{{showMealFilter ? '▲' : '▼'}}</text>
+    </view>
+  </view>
+
+  <!-- 餐次筛选下拉 -->
+  <view wx:if="{{showMealFilter}}" class="meal-filter-dropdown">
+    <view class="filter-option {{filterMealType === '' ? 'active' : ''}}"
+          bindtap="selectMealFilter" data-type="">
+      全部餐次
+    </view>
+    <view class="filter-option {{filterMealType === 'breakfast' ? 'active' : ''}}"
+          bindtap="selectMealFilter" data-type="breakfast">
+      🌅 早餐常用
+    </view>
+    <view class="filter-option {{filterMealType === 'lunch' ? 'active' : ''}}"
+          bindtap="selectMealFilter" data-type="lunch">
+      ☀️ 午餐常用
+    </view>
+    <view class="filter-option {{filterMealType === 'dinner' ? 'active' : ''}}"
+          bindtap="selectMealFilter" data-type="dinner">
+      🌙 晚餐常用
+    </view>
+    <view class="filter-option {{filterMealType === 'snack' ? 'active' : ''}}"
+          bindtap="selectMealFilter" data-type="snack">
+      ☕ 加餐常用
+    </view>
+  </view>
+
+  <!-- 餐次提示 -->
+  <view class="meal-hint">
+    <text>添加到: </text>
+    <text class="meal-name">{{mealTypeLabels[selectedMealType]}}</text>
+  </view>
+
+  <view class="content">
+    <!-- 加载状态 -->
+    <view wx:if="{{isLoading}}" class="loading-box">
+      <view class="loading-spinner"></view>
+      <text class="loading-text">加载中...</text>
+    </view>
+
+    <!-- 常吃食物列表 -->
+    <view wx:elif="{{activeTab === 'frequent'}}">
+      <view wx:if="{{frequentFoods.length > 0}}" class="food-list">
+        <view wx:for="{{frequentFoods}}" wx:key="name" class="food-card"
+              bindtap="selectFood" data-food="{{item}}">
+          <view class="food-emoji">{{item.emoji || '🍽️'}}</view>
+          <view class="food-info">
+            <view class="food-name-row">
+              <text class="food-name">{{item.name}}</text>
+              <text class="use-count">使用 {{item.count}} 次</text>
+            </view>
+            <text class="food-meta">平均 {{item.avgCalories}} kcal/次</text>
+          </view>
+          <view class="food-action">
+            <text class="action-icon">+</text>
+          </view>
+        </view>
+      </view>
+      <view wx:else class="empty-state">
+        <view class="empty-icon">📊</view>
+        <view class="empty-title">暂无常用食物</view>
+        <view class="empty-desc">记录更多饮食后，这里会显示你最常吃的食物</view>
+      </view>
+    </view>
+
+    <!-- 自定义菜品列表 -->
+    <view wx:elif="{{activeTab === 'custom'}}">
+      <view wx:if="{{customDishes.length > 0}}" class="food-list">
+        <view wx:for="{{customDishes}}" wx:key="_id" class="food-card"
+              bindtap="selectCustomDish" data-dish="{{item}}">
+          <view class="food-emoji">
+            <image wx:if="{{item.imageUrl}}" src="{{item.imageUrl}}" class="dish-image" mode="aspectFill"/>
+            <text wx:else>🍳</text>
+          </view>
+          <view class="food-info">
+            <view class="food-name-row">
+              <text class="food-name">{{item.name}}</text>
+              <text class="custom-badge">自定义</text>
+            </view>
+            <text class="food-meta">{{item.servingSize}} · {{item.calories}} kcal</text>
+            <view class="food-macros">
+              <text class="macro protein">蛋白 {{item.protein}}g</text>
+              <text class="macro carbs">碳水 {{item.carbs}}g</text>
+              <text class="macro fat">脂肪 {{item.fat}}g</text>
+            </view>
+          </view>
+          <view class="food-actions">
+            <view class="action-btn add" catchtap="selectCustomDish" data-dish="{{item}}">
+              <text>+</text>
+            </view>
+            <view class="action-btn edit" catchtap="editDish" data-dish="{{item}}">
+              <text>✏️</text>
+            </view>
+            <view class="action-btn delete" catchtap="deleteDish" data-id="{{item._id}}">
+              <text>🗑️</text>
+            </view>
+          </view>
+        </view>
+      </view>
+      <view wx:else class="empty-state">
+        <view class="empty-icon">📝</view>
+        <view class="empty-title">暂无自定义菜品</view>
+        <view class="empty-desc">点击下方按钮添加你的专属菜品</view>
+      </view>
+
+      <!-- 添加自定义菜品按钮 -->
+      <view class="add-custom-btn" bindtap="goToAddCustom">
+        <text class="btn-icon">+</text>
+        <text>添加自定义菜品</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部搜索入口 -->
+  <view class="bottom-bar">
+    <view class="search-entry" bindtap="goToSearch">
+      <text class="search-icon">🔍</text>
+      <text>搜索更多食物</text>
+    </view>
+  </view>
+</view>

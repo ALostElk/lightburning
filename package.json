@@ -1,0 +1,19 @@
+{
+  "name": "agent_server",
+  "version": "1.0.0",
+  "description": "Fitness mini-program backend with long-term plan, daily plan and agent (DashScope)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "skill": "cd .claude/hooks && npx tsx skill-activation-prompt.ts",
+    "track": "PROJECT_ROOT=$(pwd) && cd .claude/hooks && CLAUDE_PROJECT_DIR=\"$PROJECT_ROOT\" ./post-tool-use-tracker.sh",
+    "track:watch": ".claude/hooks/auto-track.sh",
+    "track:setup-git": ".claude/hooks/setup-git-hook.sh"
+  },
+  "dependencies": {
+    "body-parser": "^1.20.3",
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "node-fetch": "^2.7.0"
+  }
+}

@@ -1,0 +1,64 @@
+// handler.wxs - 修复交互的核心
+function handleTouchStart(event, ownerInstance) {
+  // 获取当前组件实例
+  var card = event.instance;
+  var touch = event.touches[0];
+  if (!touch) return false;
+
+  // 获取触摸坐标
+  var x = touch.clientX;
+  var y = touch.clientY;
+
+  // 立即更新 CSS 变量（高性能动画）
+  card.setStyle({
+    '--spotlight-x': x + 'px',
+    '--spotlight-y': y + 'px',
+    '--spotlight-opacity': '1'
+  });
+
+  // 添加激活状态类名
+  card.addClass('prism-active');
+  card.addClass('touch-active');
+  
+  // 阻止冒泡，保证手势被捕获
+  return false;
+}
+
+function handleTouchMove(event, ownerInstance) {
+  var card = event.instance;
+  var touch = event.touches[0];
+  if (!touch) return false;
+
+  var x = touch.clientX;
+  var y = touch.clientY;
+
+  card.setStyle({
+    '--spotlight-x': x + 'px',
+    '--spotlight-y': y + 'px',
+    '--spotlight-opacity': '1'
+  });
+  
+  return false;
+}
+
+function handleTouchEnd(event, ownerInstance) {
+  var card = event.instance;
+  
+  // 隐藏光效
+  card.setStyle({
+    '--spotlight-opacity': '0'
+  });
+
+  // 移除状态类
+  card.removeClass('prism-active');
+  card.removeClass('touch-active');
+  
+  return false;
+}
+
+module.exports = {
+  handleTouchStart: handleTouchStart,
+  handleTouchMove: handleTouchMove,
+  handleTouchEnd: handleTouchEnd,
+  handleTouchCancel: handleTouchEnd
+};

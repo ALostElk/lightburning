@@ -1,0 +1,28 @@
+# .gitignore
+
+# 微信小程序
+miniprogram_npm/
+node_modules/
+
+# 项目配置
+project.private.config.json
+
+# 日志
+*.log
+npm-debug.log*
+
+# 编辑器
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 临时文件
+*.tmp
+.temp/
+
+# Claude Hooks 追踪日志（测试会话）
+.claude/tsc-cache/test-*
+.claude/.last-track
+

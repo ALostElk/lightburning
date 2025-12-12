@@ -1,0 +1,166 @@
+<!--pages/recipe-detail/index.wxml-->
+<view class="container" wx:if="{{!loading}}">
+  
+  <!-- 顶部图片 -->
+  <view class="hero-section">
+    <image 
+      class="hero-image" 
+      src="{{recipe.image}}" 
+      mode="aspectFill"
+      bindtap="onPreviewImage"
+    />
+    <view class="hero-overlay">
+      <text class="recipe-title">{{recipe.name}}</text>
+      <text class="recipe-subtitle">{{recipe.description}}</text>
+    </view>
+  </view>
+
+  <!-- 快捷操作栏 -->
+  <view class="action-bar">
+    <button class="action-btn" bindtap="onToggleFavorite">
+      <text class="action-icon">{{isFavorited ? '❤️' : '🤍'}}</text>
+      <text class="action-text">{{isFavorited ? '已收藏' : '收藏'}}</text>
+    </button>
+    
+    <button class="action-btn" open-type="share">
+      <text class="action-icon">📤</text>
+      <text class="action-text">分享</text>
+    </button>
+    
+    <button class="action-btn" bindtap="onSaveToMyRecipes">
+      <text class="action-icon">📋</text>
+      <text class="action-text">保存</text>
+    </button>
+  </view>
+
+  <!-- 营养信息卡片 -->
+  <view class="card nutrition-card">
+    <view class="card-header">
+      <text class="card-title">营养成分</text>
+      <view 
+        class="toggle-btn" 
+        bindtap="onToggleNutritionDetail"
+      >
+        <text class="toggle-text">{{showNutritionDetail ? '收起' : '展开'}}</text>
+        <text class="toggle-icon">{{showNutritionDetail ? '▲' : '▼'}}</text>
+      </view>
+    </view>
+
+    <view class="nutrition-grid">
+      <view class="nutrition-main-item">
+        <text class="nutrition-main-icon">🔥</text>
+        <text class="nutrition-main-value">{{recipe.calories}}</text>
+        <text class="nutrition-main-label">千卡</text>
+      </view>
+      <view class="nutrition-main-item">
+        <text class="nutrition-main-icon">💪</text>
+        <text class="nutrition-main-value">{{recipe.protein}}g</text>
+        <text class="nutrition-main-label">蛋白质</text>
+      </view>
+      <view class="nutrition-main-item">
+        <text class="nutrition-main-icon">🍚</text>
+        <text class="nutrition-main-value">{{recipe.carbs}}g</text>
+        <text class="nutrition-main-label">碳水</text>
+      </view>
+      <view class="nutrition-main-item">
+        <text class="nutrition-main-icon">🥑</text>
+        <text class="nutrition-main-value">{{recipe.fat}}g</text>
+        <text class="nutrition-main-label">脂肪</text>
+      </view>
+    </view>
+
+    <view wx:if="{{showNutritionDetail}}" class="nutrition-detail">
+      <view class="nutrition-highlight">
+        <text class="highlight-icon">💡</text>
+        <text class="highlight-text">{{recipe.nutritionHighlight}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 烹饪信息 -->
+  <view class="card cooking-card">
+    <view class="cooking-info-grid">
+      <view class="cooking-info-item">
+        <text class="cooking-info-icon">⏱️</text>
+        <text class="cooking-info-label">烹饪时间</text>
+        <text class="cooking-info-value">{{recipe.cookingTime}}分钟</text>
+      </view>
+      <view class="cooking-info-item">
+        <text class="cooking-info-icon">👨‍🍳</text>
+        <text class="cooking-info-label">难度</text>
+        <text class="cooking-info-value">{{recipe.difficulty}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 标签 -->
+  <view class="card tags-card">
+    <view class="card-title">特色标签</view>
+    <view class="tags-list">
+      <view 
+        wx:for="{{recipe.tags}}" 
+        wx:key="*this"
+        class="tag {{item === '高蛋白' ? 'tag-protein' : item === '低卡' || item === '低脂' ? 'tag-lowcal' : item === '素食' ? 'tag-veg' : ''}}"
+      >
+        {{item}}
+      </view>
+    </view>
+  </view>
+
+  <!-- 食材清单 -->
+  <view class="card ingredients-card">
+    <view class="card-header">
+      <text class="card-title">🛒 食材清单</text>
+      <button class="copy-btn" bindtap="onCopyIngredients">
+        <text class="copy-icon">📋</text>
+        <text>复制</text>
+      </button>
+    </view>
+    
+    <view class="ingredients-list">
+      <view 
+        wx:for="{{recipe.ingredients}}" 
+        wx:key="name"
+        class="ingredient-item"
+      >
+        <view class="ingredient-info">
+          <text class="ingredient-name">{{item.name}}</text>
+          <text class="ingredient-amount">{{item.amount}}</text>
+        </view>
+        <text class="ingredient-calories">{{item.calories}}卡</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 烹饪步骤 -->
+  <view class="card steps-card">
+    <view class="card-title">👩‍🍳 烹饪步骤</view>
+    
+    <view class="steps-list">
+      <view 
+        wx:for="{{recipe.steps}}" 
+        wx:key="*this"
+        class="step-item"
+      >
+        <view class="step-number">{{index + 1}}</view>
+        <text class="step-content">{{item}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部操作按钮 -->
+  <view class="bottom-actions">
+    <button class="btn-primary start-cooking-btn" bindtap="onStartCooking">
+      <text class="btn-icon">🔪</text>
+      <text>开始烹饪</text>
+    </button>
+  </view>
+
+</view>
+
+<!-- 加载中 -->
+<view wx:if="{{loading}}" class="loading-container">
+  <view class="loading-spinner"></view>
+  <text class="loading-text">加载中...</text>
+</view>
+
