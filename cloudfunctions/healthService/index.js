@@ -396,6 +396,25 @@ async function recommendExercise(openid) {
 }
 
 /**
+ * 获取运动记录
+ * @param {string} openid - 用户openid
+ * @param {string} date - 日期
+ * @returns {Array} 运动记录列表
+ */
+async function getExerciseLogs(openid, date) {
+  const db = cloud.database();
+
+  const result = await db.collection('exercise_records')
+    .where({
+      _openid: openid,
+      recordDate: date
+    })
+    .get();
+
+  return result.data || [];
+}
+
+/**
  * 记录运动
  */
 async function logExercise(openid, data) {
@@ -439,6 +458,8 @@ exports.main = async (event) => {
       // 运动
       case 'recommendExercise':
         return ok(await recommendExercise(OPENID));
+      case 'getExerciseLogs':
+        return ok(await getExerciseLogs(OPENID, payload.date));
       case 'logExercise':
         return ok(await logExercise(OPENID, payload));
 

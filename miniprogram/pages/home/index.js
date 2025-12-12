@@ -4,43 +4,102 @@ import * as api from '../../utils/cloudApi.js';
 Page({
   data: {
     profile: null,
-    
-    // 今日数据
+
+    // 格式化后的日期显示
+    formattedDate: '',
+
+    // 当前显示的日期
+    currentDate: '',
+
+    // ========== 计划相关数据 ==========
+    activePlan: null,
+    planProgress: {
+      completionRate: 0,      // 总体完成率
+      daysElapsed: 0,         // 已进行天数
+      daysRemaining: 0,       // 剩余天数
+      weightChange: 0,        // 体重变化
+      weeklyTarget: 0,        // 周目标体重变化
+      status: 'active'        // 计划状态
+    },
+
+    // ========== 今日综合数据 ==========
     todayData: {
       dietCalories: 0,
       exerciseCalories: 0,
       targetCalories: 2000,
       netCalories: 0,
       waterIntake: 0,
-      targetWater: 2000
+      targetWater: 2000,
+      // 新增智能目标
+      exerciseTargetCalories: 0,  // 智能运动目标
+      calorieBalance: 0         // 热量平衡度
     },
-    
-    // 进度百分比
-    calorieProgress: 0,
-    waterProgress: 0,
-    
-    // 营养素数据
+
+    // ========== 进度百分比（优化计算）==========
+    progressMetrics: {
+      dietProgress: 0,         // 饮食进度
+      exerciseProgress: 0,     // 运动进度
+      overallProgress: 0,      // 综合进度
+      balanceScore: 0          // 平衡得分
+    },
+
+    // ========== 双环形图数据 ==========
+    dualRingData: {
+      dietAngle: 0,            // 饮食环角度
+      exerciseAngle: 0,        // 运动环角度
+      dietPercentage: 0,       // 饮食百分比
+      exercisePercentage: 0    // 运动百分比
+    },
+
+    // ========== 营养素数据（增强版）==========
     macros: {
-      protein: { current: 0, target: 0 },
-      carbs: { current: 0, target: 0 },
-      fat: { current: 0, target: 0 }
+      protein: { current: 0, target: 0, status: 'normal' },
+      carbs: { current: 0, target: 0, status: 'normal' },
+      fat: { current: 0, target: 0, status: 'normal' }
     },
-    
-    // 快捷操作
+
+    // ========== 运动细分数据 ==========
+    exerciseBreakdown: {
+      aerobic: { calories: 0, target: 0, progress: 0 },
+      strength: { calories: 0, target: 0, progress: 0 },
+      flexibility: { calories: 0, target: 0, progress: 0 },
+      sports: { calories: 0, target: 0, progress: 0 }
+    },
+
+    // ========== 周度概览数据 ==========
+    weeklyOverview: {
+      weekCalories: [],        // 本周每日热量
+      weekExercise: [],        // 本周每日运动
+      weekBalance: [],         // 本周每日平衡
+      adherenceRate: 0,        // 遵守率
+      bestDay: '',             // 表现最好的一天
+      trend: 'stable'          // 趋势：up/down/stable
+    },
+
+    // ========== AI 分析洞察（增强版）==========
+    aiInsight: {
+      message: '建议多摄入蛋白质，保持运动习惯！',
+      priority: 'normal',      // high/medium/normal
+      type: 'general'          // diet/exercise/balance/general
+    },
+
+    // 快捷操作 - 优化后的设计
     quickActions: [
       { icon: '🍽️', title: '记录饮食', url: '/pages/diet/index/index', color: '#FF6B6B' },
       { icon: '💪', title: '记录运动', url: '/pages/exercise/index/index', color: '#4ECDC4' },
       { icon: '📊', title: '每日报告', url: '/pages/report/daily/index', color: '#FFD93D' },
       { icon: '📝', title: '我的计划', url: '/pages/plan/detail/index', color: '#A78BFA' }
     ],
-    
-    // 推荐卡片
+
+    // 推荐内容
     recommendations: [],
-    
+
     loading: false
   },
 
   onLoad() {
+    // 初始化格式化日期
+    this.setFormattedDate();
     this.loadData();
   },
 
@@ -49,15 +108,34 @@ Page({
   },
 
   /**
+   * 设置格式化日期
+   */
+  setFormattedDate(date) {
+    const targetDate = date || new Date();
+    const formatted = targetDate.toLocaleDateString('zh-CN', {
+      month: 'long',
+      day: 'numeric'
+    });
+    const dateString = targetDate.toISOString().slice(0, 10);
+
+    this.setData({
+      formattedDate: formatted,
+      currentDate: dateString
+    });
+  },
+
+  /**
    * 加载数据
    */
   async loadData() {
     this.setData({ loading: true });
-    
+
     try {
       await Promise.all([
         this.loadProfile(),
+        this.loadActivePlan(),
         this.loadTodayData(),
+        this.loadWeeklyOverview(),
         this.loadRecommendations()
       ]);
     } catch (error) {
@@ -101,12 +179,12 @@ Page({
   async loadTodayData() {
     try {
       const today = api.getTodayString();
-      
+
       // 加载饮食记录
       const dietRes = await api.getDietLogs(today);
       let dietCalories = 0;
       let protein = 0, carbs = 0, fat = 0;
-      
+
       if (dietRes.result?.success && dietRes.result?.data) {
         const logs = dietRes.result.data.logs || [];
         logs.forEach(log => {
@@ -117,41 +195,320 @@ Page({
         });
       }
 
-      // 加载运动记录
-      const db = wx.cloud.database();
-      const todayStart = new Date(today);
-      todayStart.setHours(0, 0, 0, 0);
-      const todayEnd = new Date(today);
-      todayEnd.setHours(23, 59, 59, 999);
-
-      const exerciseRes = await db.collection('exercise_records')
-        .where({
-          _openid: '{openid}',
-          recordDate: db.command.gte(todayStart).and(db.command.lte(todayEnd))
-        })
-        .get();
-
+      // 加载运动记录及细分数据
+      const exerciseRes = await api.getExerciseLogs(today);
       let exerciseCalories = 0;
-      if (exerciseRes.data) {
-        exerciseCalories = exerciseRes.data.reduce((sum, log) => sum + (log.calories || 0), 0);
+      let exerciseBreakdown = {
+        aerobic: { calories: 0, target: 0, progress: 0 },
+        strength: { calories: 0, target: 0, progress: 0 },
+        flexibility: { calories: 0, target: 0, progress: 0 },
+        sports: { calories: 0, target: 0, progress: 0 }
+      };
+
+      if (exerciseRes.result?.success && exerciseRes.result?.data) {
+        const logs = exerciseRes.result.data;
+        logs.forEach(log => {
+          exerciseCalories += log.calories || 0;
+          // 按类型统计
+          const type = log.exerciseType || 'aerobic';
+          if (exerciseBreakdown[type]) {
+            exerciseBreakdown[type].calories += log.calories || 0;
+          }
+        });
       }
 
-      // 计算净热量和进度
+      // 获取智能目标
       const targetCalories = this.data.todayData.targetCalories;
-      const netCalories = dietCalories - exerciseCalories;
-      const calorieProgress = Math.min(100, Math.round((dietCalories / targetCalories) * 100));
+      const exerciseTargetCalories = this.calculateExerciseTarget();
+
+      // 计算各种进度指标
+      const progressMetrics = this.calculateProgressMetrics(dietCalories, exerciseCalories, targetCalories, exerciseTargetCalories);
+
+      // 计算双环形图数据
+      const dualRingData = this.calculateDualRingData(dietCalories, exerciseCalories, targetCalories, exerciseTargetCalories);
+
+      // 计算热量平衡度
+      const calorieBalance = this.calculateCalorieBalance(dietCalories, exerciseCalories, targetCalories);
+
+      // 更新运动细分进度
+      this.updateExerciseBreakdown(exerciseBreakdown, exerciseTargetCalories);
+
+      // 计算营养素状态
+      this.updateMacrosStatus(protein, carbs, fat);
+
+      // 生成AI洞察
+      this.generateAIInsight(progressMetrics, calorieBalance);
 
       this.setData({
         'todayData.dietCalories': Math.round(dietCalories),
         'todayData.exerciseCalories': Math.round(exerciseCalories),
-        'todayData.netCalories': Math.round(netCalories),
-        calorieProgress,
+        'todayData.netCalories': Math.round(dietCalories - exerciseCalories),
+        'todayData.exerciseTargetCalories': exerciseTargetCalories,
+        'todayData.calorieBalance': calorieBalance,
+        progressMetrics,
+        dualRingData,
+        exerciseBreakdown,
         'macros.protein.current': Math.round(protein),
         'macros.carbs.current': Math.round(carbs),
         'macros.fat.current': Math.round(fat)
       });
     } catch (error) {
       console.error('加载今日数据失败:', error);
+    }
+  },
+
+  /**
+   * 计算智能运动目标
+   */
+  calculateExerciseTarget() {
+    const profile = this.data.profile;
+    const activePlan = this.data.activePlan;
+
+    // 基础目标：TDEE的30%
+    let baseTarget = 300; // 默认值
+
+    if (profile && profile.tdee) {
+      baseTarget = Math.round(profile.tdee * 0.3); // 30% 的TDEE作为运动目标
+    }
+
+    // 根据计划调整
+    if (activePlan && activePlan.type === 'weight_loss') {
+      baseTarget = Math.max(baseTarget, 500); // 减重计划提高目标
+    } else if (activePlan && activePlan.type === 'muscle_gain') {
+      baseTarget = Math.max(baseTarget, 400); // 增肌计划适中目标
+    }
+
+    return baseTarget;
+  },
+
+  /**
+   * 计算各种进度指标
+   */
+  calculateProgressMetrics(dietCalories, exerciseCalories, targetCalories, exerciseTarget) {
+    const dietProgress = Math.min(100, Math.round((dietCalories / targetCalories) * 100));
+    const exerciseProgress = Math.min(100, Math.round((exerciseCalories / exerciseTarget) * 100));
+
+    // 综合进度：饮食和运动的加权平均
+    const overallProgress = Math.min(100, Math.round((dietProgress * 0.6) + (exerciseProgress * 0.4)));
+
+    // 平衡得分：基于饮食和运动的平衡程度
+    const balanceScore = this.calculateBalanceScore(dietCalories, exerciseCalories, targetCalories, exerciseTarget);
+
+    return {
+      dietProgress,
+      exerciseProgress,
+      overallProgress,
+      balanceScore
+    };
+  },
+
+  /**
+   * 计算平衡得分
+   */
+  calculateBalanceScore(dietCalories, exerciseCalories, targetCalories, exerciseTarget) {
+    // 理想的饮食:运动比为 7:3
+    const idealDietRatio = 0.7;
+    const idealExerciseRatio = 0.3;
+
+    const totalTarget = targetCalories + exerciseTarget;
+    const currentTotal = dietCalories + exerciseCalories;
+
+    if (currentTotal === 0) return 0;
+
+    const dietRatio = dietCalories / currentTotal;
+    const exerciseRatio = exerciseCalories / currentTotal;
+
+    // 计算与理想比例的偏差
+    const dietDeviation = Math.abs(dietRatio - idealDietRatio);
+    const exerciseDeviation = Math.abs(exerciseRatio - idealExerciseRatio);
+
+    // 平衡得分 = (1 - 平均偏差) * 100，范围0-100
+    const balanceScore = Math.max(0, Math.round((1 - (dietDeviation + exerciseDeviation) / 2) * 100));
+
+    return balanceScore;
+  },
+
+  /**
+   * 计算双环形图数据
+   */
+  calculateDualRingData(dietCalories, exerciseCalories, targetCalories, exerciseTarget) {
+    const dietAngle = Math.min(360, (dietCalories / targetCalories) * 360);
+    const exerciseAngle = Math.min(360, (exerciseCalories / exerciseTarget) * 360);
+
+    return {
+      dietAngle: Math.round(dietAngle),
+      exerciseAngle: Math.round(exerciseAngle),
+      dietPercentage: Math.min(100, Math.round((dietCalories / targetCalories) * 100)),
+      exercisePercentage: Math.min(100, Math.round((exerciseCalories / exerciseTarget) * 100))
+    };
+  },
+
+  /**
+   * 计算热量平衡度
+   */
+  calculateCalorieBalance(dietCalories, exerciseCalories, targetCalories) {
+    const netCalories = dietCalories - exerciseCalories;
+    const deficit = targetCalories - netCalories;
+
+    // 平衡度：负值表示赤字，正值表示盈余，0最平衡
+    return Math.round(deficit);
+  },
+
+  /**
+   * 更新运动细分进度
+   */
+  updateExerciseBreakdown(breakdown, totalTarget) {
+    // 为不同类型分配目标（有氧60%，力量25%，柔韧10%，球类5%）
+    const targets = {
+      aerobic: Math.round(totalTarget * 0.6),
+      strength: Math.round(totalTarget * 0.25),
+      flexibility: Math.round(totalTarget * 0.1),
+      sports: Math.round(totalTarget * 0.05)
+    };
+
+    const updatedBreakdown = {};
+    Object.keys(breakdown).forEach(type => {
+      updatedBreakdown[type] = {
+        calories: breakdown[type].calories,
+        target: targets[type],
+        progress: Math.min(100, Math.round((breakdown[type].calories / targets[type]) * 100))
+      };
+    });
+
+    this.setData({ exerciseBreakdown: updatedBreakdown });
+  },
+
+  /**
+   * 更新营养素状态
+   */
+  updateMacrosStatus(protein, carbs, fat) {
+    const macros = this.data.macros;
+    const updatedMacros = {};
+
+    Object.keys(macros).forEach(key => {
+      const current = key === 'protein' ? protein : key === 'carbs' ? carbs : fat;
+      const target = macros[key].target;
+      let status = 'normal';
+
+      if (target > 0) {
+        const percentage = (current / target) * 100;
+        if (percentage < 70) status = 'low';
+        else if (percentage > 130) status = 'high';
+      }
+
+      updatedMacros[`macros.${key}.status`] = status;
+    });
+
+    this.setData(updatedMacros);
+  },
+
+  /**
+   * 生成AI洞察
+   */
+  generateAIInsight(progressMetrics, calorieBalance) {
+    let message = '今日表现不错，继续保持！';
+    let priority = 'normal';
+    let type = 'general';
+
+    // 基于进度和平衡度生成洞察
+    if (progressMetrics.dietProgress < 50) {
+      message = '今日饮食摄入不足，建议适当增加健康食物';
+      priority = 'high';
+      type = 'diet';
+    } else if (progressMetrics.exerciseProgress < 30) {
+      message = '今日运动量偏少，适量运动有助于保持健康';
+      priority = 'medium';
+      type = 'exercise';
+    } else if (Math.abs(calorieBalance) > 500) {
+      message = `热量${calorieBalance > 0 ? '盈余' : '赤字'}较大，建议调整饮食和运动平衡`;
+      priority = 'medium';
+      type = 'balance';
+    } else if (progressMetrics.balanceScore > 80) {
+      message = '饮食和运动搭配很均衡，保持这个好习惯！';
+      priority = 'normal';
+      type = 'general';
+    }
+
+    this.setData({
+      aiInsight: {
+        message,
+        priority,
+        type
+      }
+    });
+  },
+
+  /**
+   * 加载活跃计划
+   */
+  async loadActivePlan() {
+    try {
+      const res = await api.getActivePlan();
+      if (res.result?.success && res.result?.data) {
+        const plan = res.result.data;
+        this.setData({ activePlan: plan });
+        this.calculatePlanProgress(plan);
+      }
+    } catch (error) {
+      console.log('加载活跃计划失败:', error);
+    }
+  },
+
+  /**
+   * 计算计划进度
+   */
+  calculatePlanProgress(plan) {
+    if (!plan) return;
+
+    const startDate = new Date(plan.startDate);
+    const today = new Date();
+    const endDate = new Date(plan.endDate || plan.calculatedEndDate);
+
+    const daysElapsed = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
+    const totalDays = Math.floor((endDate - startDate) / (1000 * 60 * 60 * 24));
+    const daysRemaining = Math.max(0, totalDays - daysElapsed);
+
+    // 计算完成率（基于时间进度和体重变化）
+    const timeProgress = Math.min(100, (daysElapsed / totalDays) * 100);
+    const weightProgress = plan.targetWeightChange ?
+      Math.abs(plan.currentWeight - plan.startWeight) / Math.abs(plan.targetWeightChange) * 100 : 0;
+
+    const completionRate = Math.min(100, Math.max(timeProgress, weightProgress));
+
+    // 计算每周目标体重变化
+    const weeklyTarget = plan.weeklyChange || (plan.targetWeightChange / totalDays * 7);
+
+    this.setData({
+      'planProgress.completionRate': Math.round(completionRate),
+      'planProgress.daysElapsed': daysElapsed,
+      'planProgress.daysRemaining': daysRemaining,
+      'planProgress.weightChange': plan.currentWeight - plan.startWeight,
+      'planProgress.weeklyTarget': weeklyTarget,
+      'planProgress.status': plan.status || 'active'
+    });
+  },
+
+  /**
+   * 加载周度概览数据
+   */
+  async loadWeeklyOverview() {
+    try {
+      const res = await api.getWeeklyOverview();
+      if (res.result?.success && res.result?.data) {
+        const data = res.result.data;
+        this.setData({
+          weeklyOverview: {
+            weekCalories: data.calories || [],
+            weekExercise: data.exercise || [],
+            weekBalance: data.balance || [],
+            adherenceRate: data.adherenceRate || 0,
+            bestDay: data.bestDay || '',
+            trend: data.trend || 'stable'
+          }
+        });
+      }
+    } catch (error) {
+      console.log('加载周度概览失败:', error);
     }
   },
 
@@ -195,8 +552,89 @@ Page({
    * 跳转到AI建议
    */
   onAISuggestion() {
-  wx.navigateTo({ url: '/pages/ai-suggestion/index' });
-},
+    wx.navigateTo({ url: '/pages/ai-suggestion/index' });
+  },
+
+  /**
+   * 日期导航 - 前一天
+   */
+  goToPrevDay() {
+    const currentDate = new Date(this.data.currentDate);
+    currentDate.setDate(currentDate.getDate() - 1);
+
+    this.setFormattedDate(currentDate);
+    this.loadData();
+  },
+
+  /**
+   * 日期导航 - 后一天
+   */
+  goToNextDay() {
+    const currentDate = new Date(this.data.currentDate);
+    const today = new Date();
+    const todayString = today.toISOString().slice(0, 10);
+    const nextDateString = new Date(currentDate.getTime() + 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+
+    // 如果已经是今天，继续点击下一天显示提示
+    if (this.data.currentDate >= todayString) {
+      wx.showToast({
+        title: '美好的未来尚未发生',
+        icon: 'none',
+        duration: 2000
+      });
+      return;
+    }
+
+    this.setFormattedDate(new Date(nextDateString));
+    this.loadData();
+  },
+
+  /**
+   * 显示日历选择器
+   */
+  showCalendar() {
+    wx.showToast({
+      title: '日历功能',
+      icon: 'none',
+      duration: 1000
+    });
+  },
+
+  /**
+   * 关闭AI横幅
+   */
+  closeAIBanner() {
+    this.setData({
+      'aiInsight.message': null
+    });
+  },
+
+  /**
+   * 查看营养素详情
+   */
+  onViewNutritionDetail() {
+    wx.navigateTo({
+      url: '/pages/diet/index/index'
+    });
+  },
+
+  /**
+   * 查看运动详情
+   */
+  onViewExerciseDetail() {
+    wx.navigateTo({
+      url: '/pages/exercise/index/index'
+    });
+  },
+
+  /**
+   * 查看计划详情
+   */
+  onViewPlanDetail() {
+    wx.navigateTo({
+      url: '/pages/plan/detail/index'
+    });
+  },
 // pages/home/index.js
 
 onQuickAction(e) {
