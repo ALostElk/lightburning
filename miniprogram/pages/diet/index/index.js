@@ -30,8 +30,9 @@ Page({
     isAnalyzing: false,
     aiInsight: '',
 
-    // 环形图计算值
+    // 环形图/液态球计算值
     consumedDegrees: 0,
+    liquidProgress: 0,
 
     // 餐次数据（含折叠状态）
     meals: [
@@ -290,6 +291,20 @@ Page({
     }
   },
 
+  // 点击卡片空白区域：折叠时展开，展开时折叠
+  onMealCardTap(e) {
+    const mealType = e.currentTarget.dataset.mealtype;
+    const index = this.data.meals.findIndex(m => m.type === mealType);
+    if (index !== -1) {
+      const newCollapsed = !this.data.meals[index].collapsed;
+      this.setData({
+        [`meals[${index}].collapsed`]: newCollapsed
+      }, () => {
+        this.saveCollapseState();
+      });
+    }
+  },
+
   // 获取有记录的日期列表
   async fetchRecordDates() {
     try {
@@ -510,7 +525,7 @@ Page({
 
     // 不能选择未来日期（字符串比较）
     if (nextDateStr > todayStr) {
-      wx.showToast({ title: '美好的未来尚未发生', icon: 'none' });
+      wx.showToast({ title: '不能选择未来日期', icon: 'none' });
       return;
     }
     this.changeDate(nextDateStr);
@@ -627,7 +642,7 @@ Page({
       fatPercentage: Math.min(Math.round(((summary.totalFat || 0) / fatTarget) * 100), 100)
     };
 
-    this.setData({ meals, stats, consumedDegrees });
+    this.setData({ meals, stats, consumedDegrees, liquidProgress: consumedPercent });
   },
 
   // AI 洞察
@@ -1317,11 +1332,13 @@ Page({
           action: 'updateDietLog',
           payload: {
             logId: editingFood.id,
-            grams: editingFood.grams,
-            calories: editingFood.calculatedCalories,
-            protein: editingFood.calculatedProtein,
-            carbs: editingFood.calculatedCarbs,
-            fat: editingFood.calculatedFat
+            updates: {
+              grams: editingFood.grams,
+              calories: editingFood.calculatedCalories,
+              protein: editingFood.calculatedProtein,
+              carbs: editingFood.calculatedCarbs,
+              fat: editingFood.calculatedFat
+            }
           }
         }
       });

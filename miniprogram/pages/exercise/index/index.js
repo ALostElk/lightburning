@@ -30,8 +30,9 @@ Page({
     isAnalyzing: false,
     aiInsight: '',
 
-    // 环形图计算值
+    // 环形图/液态球计算值
     consumedDegrees: 0,
+    liquidProgress: 0,
 
     // 运动类型数据（含折叠状态）
     exerciseTypes: [
@@ -271,6 +272,20 @@ Page({
     }
   },
 
+  // 点击卡片空白区域：折叠时展开，展开时折叠
+  onTypeCardTap(e) {
+    const exerciseType = e.currentTarget.dataset.type;
+    const index = this.data.exerciseTypes.findIndex(t => t.type === exerciseType);
+    if (index !== -1) {
+      const newCollapsed = !this.data.exerciseTypes[index].collapsed;
+      this.setData({
+        [`exerciseTypes[${index}].collapsed`]: newCollapsed
+      }, () => {
+        this.saveCollapseState();
+      });
+    }
+  },
+
   // 获取有记录的日期列表
   async fetchRecordDates() {
     try {
@@ -482,7 +497,7 @@ Page({
     const todayStr = this.getTodayString();
 
     if (nextDateStr > todayStr) {
-      wx.showToast({ title: '美好的未来尚未发生', icon: 'none' });
+      wx.showToast({ title: '不能选择未来日期', icon: 'none' });
       return;
     }
     this.changeDate(nextDateStr);
@@ -577,7 +592,7 @@ Page({
       durationPercentage: Math.min(Math.round((totalDur / targetDur) * 100), 100)
     };
 
-    this.setData({ exerciseTypes, stats, consumedDegrees });
+    this.setData({ exerciseTypes, stats, consumedDegrees, liquidProgress: consumedPercent });
   },
 
   // AI 洞察

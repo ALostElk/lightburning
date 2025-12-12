@@ -61,13 +61,32 @@
       <view class="dashboard-content">
         <!-- 热量环形图 + 核心数据 -->
         <view class="calories-dashboard">
-          <!-- 左侧：环形进度图 -->
-          <view class="donut-chart-wrapper">
-            <view class="donut-chart">
-              <view
-                class="donut-ring"
-                style="background: conic-gradient(#FF6B35 0deg {{consumedDegrees}}deg, #E5E7EB {{consumedDegrees}}deg 360deg);"
-              ></view>
+            <!-- Liquid Sphere Dashboard -->
+            <view class="liquid-sphere">
+              <!-- 玻璃球内部光晕 -->
+              <view class="sphere-inner-glow"></view>
+
+              <!-- 液体容器 - 只有进度大于0时才显示液体 -->
+              <view class="liquid-container">
+                <view
+                  wx:if="{{liquidProgress > 0}}"
+                  class="liquid-fluid"
+                  style="height: {{liquidProgress}}%"
+                >
+                  <!-- 额外波浪层 - 用于更丰富的波浪效果 -->
+                  <view class="wave-layer wave-1"></view>
+                  <view class="wave-layer wave-2"></view>
+                  <view class="wave-layer wave-3"></view>
+
+                  <!-- 液体内部高光 -->
+                  <view class="liquid-highlight"></view>
+                </view>
+              </view>
+
+              <!-- 玻璃球边缘光泽 -->
+              <view class="sphere-rim-light"></view>
+
+              <!-- 中心数据 -->
               <view class="donut-center">
                 <view class="donut-value-wrapper">
                   <text class="donut-value">{{stats.totalCalories}}</text>
@@ -76,7 +95,6 @@
                 <text class="donut-label">已消耗</text>
               </view>
             </view>
-          </view>
 
           <!-- 右侧：详细数据 -->
           <view class="calories-details">
@@ -91,7 +109,10 @@
             <view class="calorie-row">
               <view class="calorie-indicator duration"></view>
               <text class="calorie-label">总时长</text>
-              <text class="calorie-value">{{stats.totalDuration}}分</text>
+              <view class="calorie-value-wrapper">
+                <text class="calorie-value">{{stats.totalDuration}}</text>
+                <text class="calorie-unit">分钟</text>
+              </view>
             </view>
             <view class="calorie-row goal">
               <view class="calorie-indicator goal-ind"></view>
@@ -153,10 +174,11 @@
                 customClass="type-card {{item.type}} {{item.totalCalories > 0 ? 'has-data' : ''}}"
                 customStyle="{{item.bgStyle}}"
               >
-                <view class="type-card-content">
-                  <!-- 卡片头部 - 点击可折叠 -->
+                <!-- 点击卡片空白区域切换折叠状态 -->
+                <view class="type-card-content" bindtap="onTypeCardTap" data-type="{{item.type}}">
+                  <!-- 卡片头部 -->
                   <view class="type-header">
-                    <view class="type-title-group" catchtap="toggleTypeCollapse" data-type="{{item.type}}">
+                    <view class="type-title-group">
                       <text class="type-title">{{item.title}}</text>
                       <text class="type-time">{{item.suggestMin}}-{{item.suggestMax}} 分钟</text>
                     </view>
@@ -213,14 +235,14 @@
                                 <text wx:if="{{exercise.selected}}">✓</text>
                               </view>
                             </view>
-                            <view class="exercise-left" catchtap="{{isEditMode || item.isEditing ? '' : 'openExerciseEdit'}}" data-exercise="{{exercise}}" data-type="{{item.type}}">
+                            <view class="exercise-left" catchtap="{{isEditMode || item.isEditing ? 'stopPropagation' : 'openExerciseEdit'}}" data-exercise="{{exercise}}" data-type="{{item.type}}">
                               <text class="exercise-emoji">{{exercise.emoji}}</text>
                               <view class="exercise-info">
                                 <text class="exercise-name">{{exercise.name}}</text>
                                 <text class="exercise-duration">{{exercise.duration}}分钟</text>
                               </view>
                             </view>
-                            <view class="exercise-right" catchtap="{{isEditMode || item.isEditing ? '' : 'openExerciseEdit'}}" data-exercise="{{exercise}}" data-type="{{item.type}}">
+                            <view class="exercise-right" catchtap="{{isEditMode || item.isEditing ? 'stopPropagation' : 'openExerciseEdit'}}" data-exercise="{{exercise}}" data-type="{{item.type}}">
                               <text class="exercise-cal">{{exercise.calories}}</text>
                               <text class="exercise-cal-unit">kcal</text>
                             </view>

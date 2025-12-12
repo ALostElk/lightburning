@@ -61,13 +61,32 @@
       <view class="dashboard-content">
         <!-- 热量环形图 + 核心数据 -->
         <view class="calories-dashboard">
-          <!-- 左侧：环形进度图 -->
-          <view class="donut-chart-wrapper">
-            <view class="donut-chart">
-              <view
-                class="donut-ring"
-                style="background: conic-gradient(#FF6B35 0deg {{consumedDegrees}}deg, #E5E7EB {{consumedDegrees}}deg 360deg);"
-              ></view>
+            <!-- Liquid Sphere Dashboard -->
+            <view class="liquid-sphere">
+              <!-- 玻璃球内部光晕 -->
+              <view class="sphere-inner-glow"></view>
+
+              <!-- 液体容器 - 只有进度大于0时才显示液体 -->
+              <view class="liquid-container">
+                <view
+                  wx:if="{{liquidProgress > 0}}"
+                  class="liquid-fluid"
+                  style="height: {{liquidProgress}}%"
+                >
+                  <!-- 额外波浪层 - 用于更丰富的波浪效果 -->
+                  <view class="wave-layer wave-1"></view>
+                  <view class="wave-layer wave-2"></view>
+                  <view class="wave-layer wave-3"></view>
+
+                  <!-- 液体内部高光 -->
+                  <view class="liquid-highlight"></view>
+                </view>
+              </view>
+
+              <!-- 玻璃球边缘光泽 -->
+              <view class="sphere-rim-light"></view>
+
+              <!-- 中心数据 -->
               <view class="donut-center">
                 <view class="donut-value-wrapper">
                   <text class="donut-value">{{stats.remainingCalories}}</text>
@@ -76,7 +95,6 @@
                 <text class="donut-label">剩余</text>
               </view>
             </view>
-          </view>
 
           <!-- 右侧：详细数据 -->
           <view class="calories-details">
@@ -182,10 +200,11 @@
                 customClass="meal-card {{item.type}} {{item.totalCalories > 0 ? 'has-data' : ''}}"
                 customStyle="{{item.bgStyle}}"
               >
-                <view class="meal-card-content">
-                  <!-- 卡片头部 - 点击可折叠 -->
+                <!-- 点击卡片空白区域切换折叠状态 -->
+                <view class="meal-card-content" bindtap="onMealCardTap" data-mealtype="{{item.type}}">
+                  <!-- 卡片头部 -->
                   <view class="meal-header">
-                    <view class="meal-title-group" catchtap="toggleMealCollapse" data-mealtype="{{item.type}}">
+                    <view class="meal-title-group">
                       <text class="meal-title">{{item.title}}</text>
                       <text class="meal-time">{{item.suggestMin}}-{{item.suggestMax}} kcal</text>
                     </view>
@@ -203,7 +222,7 @@
                         <text class="cal-number">{{item.totalCalories}}</text>
                         <text class="cal-unit">kcal</text>
                       </view>
-                      <!-- 折叠/展开图标 -->
+                      <!-- 折叠/展开图标 - 只有这里可以折叠 -->
                       <view class="collapse-icon {{item.collapsed ? 'collapsed' : ''}}" catchtap="toggleMealCollapse" data-mealtype="{{item.type}}">
                         <text>▼</text>
                       </view>
@@ -242,14 +261,14 @@
                                 <text wx:if="{{food.selected}}">✓</text>
                               </view>
                             </view>
-                            <view class="food-left" catchtap="{{isEditMode || item.isEditing ? '' : 'openFoodEdit'}}" data-food="{{food}}" data-mealtype="{{item.type}}">
+                            <view class="food-left" catchtap="{{isEditMode || item.isEditing ? 'stopPropagation' : 'openFoodEdit'}}" data-food="{{food}}" data-mealtype="{{item.type}}">
                               <text class="food-emoji">{{food.emoji}}</text>
                               <view class="food-info">
                                 <text class="food-name">{{food.name}}</text>
                                 <text class="food-portion">{{food.portion}}</text>
                               </view>
                             </view>
-                            <view class="food-right" catchtap="{{isEditMode || item.isEditing ? '' : 'openFoodEdit'}}" data-food="{{food}}" data-mealtype="{{item.type}}">
+                            <view class="food-right" catchtap="{{isEditMode || item.isEditing ? 'stopPropagation' : 'openFoodEdit'}}" data-food="{{food}}" data-mealtype="{{item.type}}">
                               <text class="food-cal">{{food.calories}}</text>
                               <text class="food-cal-unit">kcal</text>
                             </view>

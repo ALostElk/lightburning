@@ -296,82 +296,313 @@
   margin-bottom: 32rpx;
 }
 
-/* 环形图 */
-.donut-chart-wrapper {
-  flex-shrink: 0;
-}
-
-.donut-chart {
+/* ============ 高级液态球体 - 3D 玻璃效果 ============ */
+.liquid-sphere {
   position: relative;
-  width: 260rpx;
-  height: 260rpx;
-}
-
-.donut-ring {
-  width: 100%;
-  height: 100%;
+  width: 280rpx;
+  height: 280rpx;
   border-radius: 50%;
-  mask: radial-gradient(transparent 58%, black 59%);
-  -webkit-mask: radial-gradient(transparent 58%, black 59%);
-  transition: background 0.5s ease;
-  position: relative;
-  overflow: hidden;
+
+  /* 3D 玻璃球体基础 - 深色底部模拟深度 */
+  background:
+    /* 顶部高光 */
+    radial-gradient(
+      ellipse 60% 40% at 30% 20%,
+      rgba(255, 255, 255, 0.6) 0%,
+      transparent 50%
+    ),
+    /* 中心透明区域 */
+    radial-gradient(
+      circle at 50% 50%,
+      rgba(255, 255, 255, 0.05) 0%,
+      rgba(255, 255, 255, 0.02) 40%,
+      rgba(0, 0, 0, 0.03) 70%,
+      rgba(0, 0, 0, 0.08) 100%
+    );
+
+  /* 多层阴影营造 3D 深度 */
   box-shadow:
-    0 0 30rpx rgba(255, 107, 53, 0.3),
-    inset 0 0 20rpx rgba(255, 255, 255, 0.2);
+    /* 外部投影 - 营造悬浮感 */
+    0 30rpx 60rpx rgba(255, 107, 53, 0.2),
+    0 15rpx 30rpx rgba(0, 0, 0, 0.1),
+    /* 内部阴影 - 球体边缘暗部 */
+    inset 0 -20rpx 40rpx rgba(0, 0, 0, 0.1),
+    inset 0 20rpx 40rpx rgba(255, 255, 255, 0.3),
+    /* 边缘光晕 */
+    0 0 0 1rpx rgba(255, 255, 255, 0.3),
+    0 0 40rpx rgba(255, 200, 150, 0.15);
+
+  overflow: hidden;
+  z-index: 1;
+
+  /* 添加轻微动画让球体有呼吸感 */
+  animation: sphere-breathe 4s ease-in-out infinite;
 }
 
-/* 圆环液态流动效果 */
-.donut-ring::before {
+@keyframes sphere-breathe {
+  0%, 100% {
+    box-shadow:
+      0 30rpx 60rpx rgba(255, 107, 53, 0.2),
+      0 15rpx 30rpx rgba(0, 0, 0, 0.1),
+      inset 0 -20rpx 40rpx rgba(0, 0, 0, 0.1),
+      inset 0 20rpx 40rpx rgba(255, 255, 255, 0.3),
+      0 0 0 1rpx rgba(255, 255, 255, 0.3),
+      0 0 40rpx rgba(255, 200, 150, 0.15);
+  }
+  50% {
+    box-shadow:
+      0 35rpx 70rpx rgba(255, 107, 53, 0.25),
+      0 18rpx 35rpx rgba(0, 0, 0, 0.12),
+      inset 0 -20rpx 40rpx rgba(0, 0, 0, 0.1),
+      inset 0 20rpx 40rpx rgba(255, 255, 255, 0.35),
+      0 0 0 1rpx rgba(255, 255, 255, 0.35),
+      0 0 50rpx rgba(255, 200, 150, 0.2);
+  }
+}
+
+/* 主高光点 - 左上角椭圆形 */
+.liquid-sphere::before {
   content: '';
   position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: conic-gradient(
-    from 0deg,
-    transparent 0deg,
-    rgba(255, 255, 255, 0.3) 60deg,
-    transparent 120deg,
-    transparent 360deg
+  top: 8%;
+  left: 12%;
+  width: 35%;
+  height: 20%;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at 50% 50%,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(255, 255, 255, 0.6) 30%,
+    transparent 70%
   );
-  animation: ring-rotate 4s linear infinite;
+  transform: rotate(-30deg);
+  z-index: 30;
+  filter: blur(1rpx);
+  animation: highlight-shimmer 3s ease-in-out infinite;
 }
 
-/* 圆环光泽扫过效果 */
-.donut-ring::after {
+@keyframes highlight-shimmer {
+  0%, 100% {
+    opacity: 0.9;
+    transform: rotate(-30deg) scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: rotate(-30deg) scale(1.05);
+  }
+}
+
+/* 次高光 - 边缘反射 */
+.liquid-sphere::after {
   content: '';
+  position: absolute;
+  bottom: 10%;
+  right: 8%;
+  width: 15%;
+  height: 25%;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at 50% 50%,
+    rgba(255, 255, 255, 0.3) 0%,
+    transparent 70%
+  );
+  z-index: 30;
+  filter: blur(3rpx);
+}
+
+/* 液体容器 - 圆形裁切 */
+.liquid-container {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    135deg,
-    transparent 40%,
-    rgba(255, 255, 255, 0.4) 50%,
-    transparent 60%
-  );
-  animation: ring-shine 3s ease-in-out infinite;
+  border-radius: 50%;
+  overflow: hidden;
+  z-index: 2;
 }
 
-@keyframes ring-rotate {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+/* 液体主体 - 统一的单层液体 */
+.liquid-fluid {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  /* Height controlled by JS */
+  background: rgba(255, 180, 140, 0.92);
+  transition: height 1s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-@keyframes ring-shine {
+/* 移除伪元素波浪，使用子元素代替 */
+.liquid-fluid::before,
+.liquid-fluid::after {
+  display: none;
+}
+
+/* ============ 波浪表面层 ============ */
+.wave-layer {
+  position: absolute;
+  left: -50%;
+  width: 200%;
+}
+
+/* 波浪层 1 - 底层波浪 */
+.wave-layer.wave-1 {
+  height: 60rpx;
+  top: -30rpx;
+  background: rgba(255, 180, 140, 0.92);
+  border-radius: 43% 57% 44% 56%;
+  animation: wave-sway-1 3.5s ease-in-out infinite;
+  z-index: 1;
+}
+
+/* 波浪层 2 - 中层波浪 */
+.wave-layer.wave-2 {
+  height: 50rpx;
+  top: -25rpx;
+  background: rgba(255, 180, 140, 0.92);
+  border-radius: 57% 43% 56% 44%;
+  animation: wave-sway-2 3s ease-in-out infinite;
+  z-index: 2;
+}
+
+/* 波浪层 3 - 表面波浪 */
+.wave-layer.wave-3 {
+  height: 40rpx;
+  top: -20rpx;
+  background: rgba(255, 180, 140, 0.92);
+  border-radius: 45% 55% 48% 52%;
+  animation: wave-sway-3 2.5s ease-in-out infinite;
+  z-index: 3;
+}
+
+/* 波浪动画 1 */
+@keyframes wave-sway-1 {
   0%, 100% {
-    opacity: 0;
-    transform: scale(0.8);
+    transform: translateX(0);
+    border-radius: 40% 60% 38% 62%;
   }
   50% {
-    opacity: 1;
-    transform: scale(1.1);
+    transform: translateX(35%);
+    border-radius: 60% 40% 62% 38%;
   }
 }
 
+/* 波浪动画 2 - 反向 */
+@keyframes wave-sway-2 {
+  0%, 100% {
+    transform: translateX(0);
+    border-radius: 60% 40% 58% 42%;
+  }
+  50% {
+    transform: translateX(-35%);
+    border-radius: 40% 60% 42% 58%;
+  }
+}
+
+/* 波浪动画 3 - 更快 */
+@keyframes wave-sway-3 {
+  0%, 100% {
+    transform: translateX(0);
+    border-radius: 42% 58% 45% 55%;
+  }
+  25% {
+    transform: translateX(20%);
+    border-radius: 55% 45% 58% 42%;
+  }
+  50% {
+    transform: translateX(0);
+    border-radius: 58% 42% 55% 45%;
+  }
+  75% {
+    transform: translateX(-20%);
+    border-radius: 45% 55% 42% 58%;
+  }
+}
+
+/* 液体内部高光 - 漂浮感 */
+.liquid-highlight {
+  position: absolute;
+  top: 20%;
+  left: 15%;
+  width: 45%;
+  height: 35%;
+  background: radial-gradient(
+    ellipse at 40% 40%,
+    rgba(255, 255, 255, 0.4) 0%,
+    rgba(255, 255, 255, 0.15) 50%,
+    transparent 70%
+  );
+  border-radius: 50%;
+  z-index: 10;
+  animation: highlight-drift 4s ease-in-out infinite;
+}
+
+@keyframes highlight-drift {
+  0%, 100% {
+    transform: translate(0, 0);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translate(8%, 12%);
+    opacity: 0.9;
+  }
+}
+
+/* 球体内部光晕 */
+.sphere-inner-glow {
+  position: absolute;
+  top: 5%;
+  left: 5%;
+  right: 5%;
+  bottom: 5%;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse 80% 60% at 35% 25%,
+    rgba(255, 255, 255, 0.15) 0%,
+    transparent 50%
+  );
+  z-index: 25;
+  pointer-events: none;
+}
+
+/* 球体边缘光泽 */
+.sphere-rim-light {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 50%;
+  background: transparent;
+  border: 2rpx solid transparent;
+  box-shadow:
+    inset 0 0 30rpx rgba(255, 255, 255, 0.2),
+    inset 0 -30rpx 60rpx rgba(0, 0, 0, 0.05);
+  z-index: 28;
+  pointer-events: none;
+
+  /* 边缘渐变光泽 */
+  background-image: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.3) 0%,
+    transparent 40%,
+    transparent 60%,
+    rgba(255, 255, 255, 0.1) 100%
+  );
+  mask: radial-gradient(
+    circle,
+    transparent 85%,
+    black 100%
+  );
+  -webkit-mask: radial-gradient(
+    circle,
+    transparent 85%,
+    black 100%
+  );
+}
+
+/* Center Content */
 .donut-center {
   position: absolute;
   top: 50%;
@@ -380,7 +611,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  z-index: 10;
+  z-index: 50;
 }
 
 .donut-value-wrapper {
@@ -396,19 +627,31 @@
   color: #1F2937;
   font-family: 'SF Mono', 'Menlo', monospace;
   line-height: 1;
+  /* 多层文字阴影增强可读性 */
+  text-shadow:
+    0 2rpx 4rpx rgba(255, 255, 255, 1),
+    0 0 20rpx rgba(255, 255, 255, 0.9),
+    0 0 40rpx rgba(255, 255, 255, 0.5);
 }
 
 .donut-unit {
   font-size: 20rpx;
-  color: #9CA3AF;
-  font-weight: 500;
+  color: #4B5563;
+  font-weight: 700;
   line-height: 1;
+  text-shadow:
+    0 1rpx 2rpx rgba(255, 255, 255, 1),
+    0 0 10rpx rgba(255, 255, 255, 0.8);
 }
 
 .donut-label {
   font-size: 22rpx;
-  color: #9CA3AF;
+  color: #4B5563;
   margin-top: 4rpx;
+  font-weight: 600;
+  text-shadow:
+    0 1rpx 2rpx rgba(255, 255, 255, 1),
+    0 0 10rpx rgba(255, 255, 255, 0.8);
 }
 
 /* 热量详细数据 */
