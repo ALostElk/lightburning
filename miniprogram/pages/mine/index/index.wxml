@@ -99,123 +99,90 @@
     </view>
 
     <!-- 功能按钮区域 -->
-    <view class="timeline-section">
+    <view class="function-section">
       <view class="section-header">
         <text class="section-title">功能中心</text>
       </view>
-      <view class="timeline-container">
+      
+      <view class="function-grid">
         <!-- 功能项1：我的计划 -->
-        <view class="timeline-item" bindtap="goToPlan">
-          <view class="timeline-track">
-            <view class="timeline-dot active">
-              <text class="dot-icon">📋</text>
-            </view>
-            <view class="timeline-line"></view>
-          </view>
-          <view class="meal-card-wrapper">
-            <view class="meal-card plan has-data">
-              <view class="meal-card-content">
-                <view class="meal-header">
-                  <view class="meal-title-group">
-                    <text class="meal-title">我的计划</text>
-                    <text class="meal-time">查看管理计划</text>
-                  </view>
-                  <text class="func-arrow">→</text>
-                </view>
+        <view class="grid-item" bindtap="goToPlan">
+          <spotlight-card customClass="func-card plan" holo="{{true}}" customStyle="background: linear-gradient(135deg, #FFF7ED 0%, #FFEDD5 100%)">
+            <view class="func-content">
+              <view class="func-icon-wrapper plan">
+                <text class="func-icon">📋</text>
               </view>
+              <view class="func-info">
+                <text class="func-title">我的计划</text>
+                <text class="func-desc">查看管理计划</text>
+              </view>
+              <view class="func-arrow">→</view>
             </view>
-          </view>
+          </spotlight-card>
         </view>
 
         <!-- 功能项2：自定义菜品管理 -->
-        <view class="timeline-item" bindtap="goToCustomDishes">
-          <view class="timeline-track">
-            <view class="timeline-dot active">
-              <text class="dot-icon">🍽️</text>
-            </view>
-            <view class="timeline-line"></view>
-          </view>
-          <view class="meal-card-wrapper">
-            <view class="meal-card product has-data">
-              <view class="meal-card-content">
-                <view class="meal-header">
-                  <view class="meal-title-group">
-                    <text class="meal-title">自定义菜品管理</text>
-                    <text class="meal-time">我的菜品</text>
-                  </view>
-                  <text class="func-arrow">→</text>
-                </view>
+        <view class="grid-item" bindtap="goToCustomDishes">
+          <spotlight-card customClass="func-card dish" holo="{{true}}" customStyle="background: linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%)">
+            <view class="func-content">
+              <view class="func-icon-wrapper dish">
+                <text class="func-icon">🍽️</text>
               </view>
+              <view class="func-info">
+                <text class="func-title">自定义菜品</text>
+                <text class="func-desc">管理我的菜品</text>
+              </view>
+              <view class="func-arrow">→</view>
             </view>
-          </view>
+          </spotlight-card>
         </view>
 
         <!-- 功能项3：收藏食谱 -->
-        <view class="timeline-item" bindtap="goToFavorites">
-          <view class="timeline-track">
-            <view class="timeline-dot active">
-              <text class="dot-icon">⭐</text>
-            </view>
-            <view class="timeline-line"></view>
-          </view>
-          <view class="meal-card-wrapper">
-            <view class="meal-card collect has-data">
-              <view class="meal-card-content">
-                <view class="meal-header">
-                  <view class="meal-title-group">
-                    <text class="meal-title">收藏食谱</text>
-                    <text class="meal-time">我的收藏</text>
-                  </view>
-                  <text class="func-arrow">→</text>
-                </view>
+        <view class="grid-item" bindtap="goToFavorites">
+          <spotlight-card customClass="func-card fav" holo="{{true}}" customStyle="background: linear-gradient(135deg, #F5F3FF 0%, #EDE9FE 100%)">
+            <view class="func-content">
+              <view class="func-icon-wrapper fav">
+                <text class="func-icon">⭐</text>
               </view>
+              <view class="func-info">
+                <text class="func-title">收藏食谱</text>
+                <text class="func-desc">我的收藏列表</text>
+              </view>
+              <view class="func-arrow">→</view>
             </view>
-          </view>
+          </spotlight-card>
         </view>
 
         <!-- 功能项4：数据统计 -->
-        <view class="timeline-item" bindtap="goToStats">
-          <view class="timeline-track">
-            <view class="timeline-dot active">
-              <text class="dot-icon">📊</text>
-            </view>
-            <view class="timeline-line"></view>
-          </view>
-          <view class="meal-card-wrapper">
-            <view class="meal-card statistics has-data">
-              <view class="meal-card-content">
-                <view class="meal-header">
-                  <view class="meal-title-group">
-                    <text class="meal-title">数据统计</text>
-                    <text class="meal-time">查看数据趋势</text>
-                  </view>
-                  <text class="func-arrow">→</text>
-                </view>
+        <view class="grid-item" bindtap="goToStats">
+          <spotlight-card customClass="func-card stats" holo="{{true}}" customStyle="background: linear-gradient(135deg, #FFF1F2 0%, #FFE4E6 100%)">
+            <view class="func-content">
+              <view class="func-icon-wrapper stats">
+                <text class="func-icon">📊</text>
               </view>
+              <view class="func-info">
+                <text class="func-title">数据统计</text>
+                <text class="func-desc">查看数据趋势</text>
+              </view>
+              <view class="func-arrow">→</view>
             </view>
-          </view>
+          </spotlight-card>
         </view>
 
-        <!-- 功能项5：使用帮助 -->
-        <view class="timeline-item" bindtap="goToHelp">
-          <view class="timeline-track">
-            <view class="timeline-dot active">
-              <text class="dot-icon">❓</text>
-            </view>
-          </view>
-          <view class="meal-card-wrapper">
-            <view class="meal-card help has-data">
-              <view class="meal-card-content">
-                <view class="meal-header">
-                  <view class="meal-title-group">
-                    <text class="meal-title">使用帮助</text>
-                    <text class="meal-time">了解如何使用</text>
-                  </view>
-                  <text class="func-arrow">→</text>
-                </view>
+        <!-- 功能项5：使用帮助 (横跨两列) -->
+        <view class="grid-item full-width" bindtap="goToHelp">
+          <spotlight-card customClass="func-card help" holo="{{true}}" customStyle="background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%)">
+            <view class="func-content">
+              <view class="func-icon-wrapper help">
+                <text class="func-icon">❓</text>
               </view>
+              <view class="func-info">
+                <text class="func-title">使用帮助</text>
+                <text class="func-desc">了解如何使用本小程序</text>
+              </view>
+              <view class="func-arrow">→</view>
             </view>
-          </view>
+          </spotlight-card>
         </view>
       </view>
     </view>

@@ -1,6 +1,5 @@
 // pages/home/index.js
 import * as api from '../../utils/cloudApi.js';
-import * as calc from '../../utils/calculator.js';
 
 Page({
   data: {
@@ -44,6 +43,10 @@ Page({
       balanceScore: 0          // 平衡得分
     },
 
+    // ========== 新增：红绿灯状态 ==========
+    heroStatus: 'green',       // green/yellow/red
+    heroStatusText: '能量平衡', // 对应状态文字
+
     // ========== 双环形图数据 ==========
     dualRingData: {
       dietAngle: 0,            // 饮食环角度
@@ -72,16 +75,9 @@ Page({
       weekCalories: [],        // 本周每日热量
       weekExercise: [],        // 本周每日运动
       weekBalance: [],         // 本周每日平衡
-      dates: [],               // 日期标签
       adherenceRate: 0,        // 遵守率
       bestDay: '',             // 表现最好的一天
-      trend: 'stable',         // 趋势：up/down/stable
-      avgCalories: 0,          // 平均热量
-      avgExercise: 0,          // 平均运动
-      totalCalories: 0,        // 总热量
-      totalExercise: 0,        // 总运动
-      maxValue: 2000,          // 最大值（用于图表）
-      targetCalories: 2000      // 目标热量
+      trend: 'stable'          // 趋势：up/down/stable
     },
 
     // ========== AI 分析洞察（增强版）==========
@@ -124,8 +120,7 @@ Page({
       month: 'long',
       day: 'numeric'
     });
-    // 使用 formatDate 函数确保日期格式正确，避免时区问题
-    const dateString = api.formatDate(targetDate);
+    const dateString = targetDate.toISOString().slice(0, 10);
 
     this.setData({
       formattedDate: formatted,
@@ -162,35 +157,20 @@ Page({
       const res = await api.getProfile();
       if (res.result?.success && res.result?.data) {
         const profile = res.result.data;
-        const tdee = profile.tdee || 2000;
-        const goal = profile.goal || '减脂';
-        
-        this.setData({ 
+        this.setData({
           profile,
-          'todayData.targetCalories': tdee,
+          'todayData.targetCalories': profile.tdee || 2000,
           'todayData.targetWater': profile.waterIntake || 2000
         });
-        
-        // 设置营养素目标：优先使用 profile.macros，否则根据 TDEE 和 goal 计算
-        let macrosTarget = { protein: 0, carbs: 0, fat: 0 };
-        
-        if (profile.macros && profile.macros.protein && profile.macros.carbs && profile.macros.fat) {
-          // 使用已有的 macros 数据
-          macrosTarget = {
-            protein: profile.macros.protein || 0,
-            carbs: profile.macros.carbs || 0,
-            fat: profile.macros.fat || 0
-          };
-        } else {
-          // 根据 TDEE 和 goal 计算营养素目标值
-          macrosTarget = calc.calculateMacroNutrients(tdee, goal);
+
+        // 设置营养素目标
+        if (profile.macros) {
+          this.setData({
+            'macros.protein.target': profile.macros.protein || 0,
+            'macros.carbs.target': profile.macros.carbs || 0,
+            'macros.fat.target': profile.macros.fat || 0
+          });
         }
-        
-        this.setData({
-          'macros.protein.target': macrosTarget.protein,
-          'macros.carbs.target': macrosTarget.carbs,
-          'macros.fat.target': macrosTarget.fat
-        });
       }
     } catch (error) {
       console.error('加载用户信息失败:', error);
@@ -202,11 +182,10 @@ Page({
    */
   async loadTodayData() {
     try {
-      // 使用当前选择的日期，如果没有则使用今天
-      const targetDate = this.data.currentDate || api.getTodayString();
+      const today = api.getTodayString();
 
       // 加载饮食记录
-      const dietRes = await api.getDietLogs(targetDate);
+      const dietRes = await api.getDietLogs(today);
       let dietCalories = 0;
       let protein = 0, carbs = 0, fat = 0;
 
@@ -221,7 +200,7 @@ Page({
       }
 
       // 加载运动记录及细分数据
-      const exerciseRes = await api.getExerciseLogs(targetDate);
+      const exerciseRes = await api.getExerciseLogs(today);
       let exerciseCalories = 0;
       let exerciseBreakdown = {
         aerobic: { calories: 0, target: 0, progress: 0 },
@@ -231,11 +210,11 @@ Page({
       };
 
       if (exerciseRes.result?.success && exerciseRes.result?.data) {
-        const logs = Array.isArray(exerciseRes.result.data) ? exerciseRes.result.data : [];
+        const logs = exerciseRes.result.data;
         logs.forEach(log => {
           exerciseCalories += log.calories || 0;
-          // 按类型统计，确保类型字段正确
-          const type = log.exerciseType || log.type || 'aerobic';
+          // 按类型统计
+          const type = log.exerciseType || 'aerobic';
           if (exerciseBreakdown[type]) {
             exerciseBreakdown[type].calories += log.calories || 0;
           }
@@ -255,17 +234,18 @@ Page({
       // 计算热量平衡度
       const calorieBalance = this.calculateCalorieBalance(dietCalories, exerciseCalories, targetCalories);
 
-      // 更新运动细分进度（会通过 setData 更新 exerciseBreakdown）
+      // 更新运动细分进度
       this.updateExerciseBreakdown(exerciseBreakdown, exerciseTargetCalories);
 
-      // 计算营养素状态（会通过 setData 更新 macros.status）
+      // 计算营养素状态
       this.updateMacrosStatus(protein, carbs, fat);
 
       // 生成AI洞察
       this.generateAIInsight(progressMetrics, calorieBalance);
 
-      // 注意：exerciseBreakdown 和 macros.status 已经在各自的更新函数中通过 setData 设置了
-      // 这里只需要设置其他数据，避免覆盖已更新的数据
+      // 更新红绿灯状态
+      this.updateHeroStatus(calorieBalance);
+
       this.setData({
         'todayData.dietCalories': Math.round(dietCalories),
         'todayData.exerciseCalories': Math.round(exerciseCalories),
@@ -274,6 +254,7 @@ Page({
         'todayData.calorieBalance': calorieBalance,
         progressMetrics,
         dualRingData,
+        exerciseBreakdown,
         'macros.protein.current': Math.round(protein),
         'macros.carbs.current': Math.round(carbs),
         'macros.fat.current': Math.round(fat)
@@ -394,12 +375,10 @@ Page({
 
     const updatedBreakdown = {};
     Object.keys(breakdown).forEach(type => {
-      const target = targets[type] || 1; // 避免除以0
-      const calories = breakdown[type].calories || 0;
       updatedBreakdown[type] = {
-        calories: calories,
-        target: target,
-        progress: target > 0 ? Math.min(100, Math.round((calories / target) * 100)) : 0
+        calories: breakdown[type].calories,
+        target: targets[type],
+        progress: Math.min(100, Math.round((breakdown[type].calories / targets[type]) * 100))
       };
     });
 
@@ -428,6 +407,44 @@ Page({
     });
 
     this.setData(updatedMacros);
+  },
+
+  /**
+   * 更新红绿灯状态
+   */
+  updateHeroStatus(balance) {
+    let status = 'green';
+    let text = '能量完美'; // Perfect
+
+    // 逻辑：
+    // -100 ~ +100: 绿色 (完美)
+    // -300 ~ +300: 黄色 (注意)
+    // 其他: 红色 (警示)
+
+    // 注意：balance = Target - Net. 
+    // 其实这里 balance 直接用 net - target 更直观吗？
+    // 上面 calculateCalorieBalance 是: deficit = target - net.
+    // 所以 input balance 是 "差额"。
+    // 如果 balance > 0, 说明 target > net, 即 亏空 (defict), 还在吃
+    // 如果 balance < 0, 说明 net > target, 即 盈余 (surplus), 吃多了
+
+    const absBalance = Math.abs(balance);
+
+    if (absBalance <= 150) {
+      status = 'green';
+      text = '能量完美';
+    } else if (absBalance <= 400) {
+      status = 'yellow';
+      text = balance > 0 ? '需补充能量' : '注意控制';
+    } else {
+      status = 'red';
+      text = balance > 0 ? '能量严重不足' : '能量超标警示';
+    }
+
+    this.setData({
+      heroStatus: status,
+      heroStatusText: text
+    });
   },
 
   /**
@@ -524,120 +541,19 @@ Page({
       const res = await api.getWeeklyOverview();
       if (res.result?.success && res.result?.data) {
         const data = res.result.data;
-        
-        // 计算统计数据
-        const avgCalories = data.calories && data.calories.length > 0 
-          ? Math.round(data.calories.reduce((a, b) => a + b, 0) / data.calories.length) 
-          : 0;
-        const avgExercise = data.exercise && data.exercise.length > 0
-          ? Math.round(data.exercise.reduce((a, b) => a + b, 0) / data.exercise.length)
-          : 0;
-        const totalCalories = data.calories ? data.calories.reduce((a, b) => a + b, 0) : 0;
-        const totalExercise = data.exercise ? data.exercise.reduce((a, b) => a + b, 0) : 0;
-        
-        // 找出最高和最低值（用于图表显示）
-        const maxCalories = data.calories && data.calories.length > 0 
-          ? Math.max(...data.calories) 
-          : 0;
-        const maxExercise = data.exercise && data.exercise.length > 0
-          ? Math.max(...data.exercise)
-          : 0;
-        const maxValue = Math.max(maxCalories, maxExercise, data.targetCalories || 2000);
-        
-        // 预处理平衡度数据，计算宽度百分比
-        const weekBalanceWithWidth = (data.balance || []).map(balance => {
-          const absBalance = Math.abs(balance);
-          const width = absBalance > 500 ? 100 : (absBalance / 500 * 100);
-          return {
-            value: balance,
-            width: width
-          };
-        });
-        
         this.setData({
           weeklyOverview: {
             weekCalories: data.calories || [],
             weekExercise: data.exercise || [],
             weekBalance: data.balance || [],
-            weekBalanceWithWidth: weekBalanceWithWidth,
-            dates: data.dates || [],
             adherenceRate: data.adherenceRate || 0,
             bestDay: data.bestDay || '',
-            trend: data.trend || 'stable',
-            avgCalories,
-            avgExercise,
-            totalCalories,
-            totalExercise,
-            maxValue,
-            targetCalories: data.targetCalories || 2000
-          }
-        });
-      } else {
-        // 如果没有数据，设置默认值
-        const defaultDates = [];
-        const today = new Date();
-        for (let i = 6; i >= 0; i--) {
-          const date = new Date(today);
-          date.setDate(date.getDate() - i);
-          const month = date.getMonth() + 1;
-          const day = date.getDate();
-          defaultDates.push(`${month}/${day}`);
-        }
-        
-        const defaultBalanceWithWidth = Array(7).fill(0).map(() => ({ value: 0, width: 0 }));
-        
-        this.setData({
-          weeklyOverview: {
-            weekCalories: Array(7).fill(0),
-            weekExercise: Array(7).fill(0),
-            weekBalance: Array(7).fill(0),
-            weekBalanceWithWidth: defaultBalanceWithWidth,
-            dates: defaultDates,
-            adherenceRate: 0,
-            bestDay: '',
-            trend: 'stable',
-            avgCalories: 0,
-            avgExercise: 0,
-            totalCalories: 0,
-            totalExercise: 0,
-            maxValue: 2000,
-            targetCalories: this.data.todayData.targetCalories || 2000
+            trend: data.trend || 'stable'
           }
         });
       }
     } catch (error) {
-      console.error('加载周度概览失败:', error);
-      // 设置默认值
-      const defaultDates = [];
-      const today = new Date();
-      for (let i = 6; i >= 0; i--) {
-        const date = new Date(today);
-        date.setDate(date.getDate() - i);
-        const month = date.getMonth() + 1;
-        const day = date.getDate();
-        defaultDates.push(`${month}/${day}`);
-      }
-      
-      const defaultBalanceWithWidth = Array(7).fill(0).map(() => ({ value: 0, width: 0 }));
-      
-      this.setData({
-        weeklyOverview: {
-          weekCalories: Array(7).fill(0),
-          weekExercise: Array(7).fill(0),
-          weekBalance: Array(7).fill(0),
-          weekBalanceWithWidth: defaultBalanceWithWidth,
-          dates: defaultDates,
-          adherenceRate: 0,
-          bestDay: '',
-          trend: 'stable',
-          avgCalories: 0,
-          avgExercise: 0,
-          totalCalories: 0,
-          totalExercise: 0,
-          maxValue: 2000,
-          targetCalories: this.data.todayData.targetCalories || 2000
-        }
-      });
+      console.log('加载周度概览失败:', error);
     }
   },
 
@@ -660,7 +576,23 @@ Page({
    */
   onQuickAction(e) {
     const { url } = e.currentTarget.dataset;
-    wx.navigateTo({ url });
+    if (!url) return;
+
+    // 这里写你的 tabBar 页面路径（和 app.json 里保持一致）
+    const tabBarPages = [
+      '/pages/home/index',
+      '/pages/diet/index/index',
+      '/pages/exercise/index/index',
+      '/pages/profile/index'
+    ];
+
+    if (tabBarPages.includes(url)) {
+      // tabBar 页面用 switchTab
+      wx.switchTab({ url });
+    } else {
+      // 非 tabBar 页面用 navigateTo
+      wx.navigateTo({ url });
+    }
   },
 
   /**
@@ -688,25 +620,24 @@ Page({
    * 日期导航 - 前一天
    */
   goToPrevDay() {
-    // 确保 currentDate 存在，如果不存在则使用今天
-    const dateStr = this.data.currentDate || api.getTodayString();
-    const currentDate = new Date(dateStr);
+    const currentDate = new Date(this.data.currentDate);
     currentDate.setDate(currentDate.getDate() - 1);
 
     this.setFormattedDate(currentDate);
-    this.loadTodayData();
+    this.loadData();
   },
 
   /**
    * 日期导航 - 后一天
    */
   goToNextDay() {
-    // 确保 currentDate 存在，如果不存在则使用今天
-    const dateStr = this.data.currentDate || api.getTodayString();
-    const todayString = api.getTodayString();
+    const currentDate = new Date(this.data.currentDate);
+    const today = new Date();
+    const todayString = today.toISOString().slice(0, 10);
+    const nextDateString = new Date(currentDate.getTime() + 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
 
-    // 如果已经是今天或未来，继续点击下一天显示提示
-    if (dateStr >= todayString) {
+    // 如果已经是今天，继续点击下一天显示提示
+    if (this.data.currentDate >= todayString) {
       wx.showToast({
         title: '美好的未来尚未发生',
         icon: 'none',
@@ -715,11 +646,8 @@ Page({
       return;
     }
 
-    const currentDate = new Date(dateStr);
-    const nextDate = new Date(currentDate.getTime() + 24 * 60 * 60 * 1000);
-
-    this.setFormattedDate(nextDate);
-    this.loadTodayData();
+    this.setFormattedDate(new Date(nextDateString));
+    this.loadData();
   },
 
   /**
@@ -768,29 +696,6 @@ Page({
       url: '/pages/plan/detail/index'
     });
   },
-// pages/home/index.js
-
-onQuickAction(e) {
-  const { url } = e.currentTarget.dataset;
-  if (!url) return;
-
-  // 这里写你的 tabBar 页面路径（和 app.json 里保持一致）
-  const tabBarPages = [
-    '/pages/home/index',
-    '/pages/diet/index/index',
-    '/pages/exercise/index/index',
-    '/pages/profile/index'
-  ];
-
-  if (tabBarPages.includes(url)) {
-    // tabBar 页面用 switchTab
-    wx.switchTab({ url });
-  } else {
-    // 非 tabBar 页面用 navigateTo
-    wx.navigateTo({ url });
-  }
-},
-
 
   /**
    * 查看食谱详情

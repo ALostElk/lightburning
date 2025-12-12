@@ -1,390 +1,116 @@
 <!-- pages/home/index.wxml -->
-<view class="page">
+<view class="page-container">
 
-    <!-- ============ 粘性头部 ============ -->
-  <view class="sticky-header" style="padding-top: {{statusBarHeight}}px;">
-    <view class="header-content">
-      <!-- 左侧：用户信息 -->
-      <view class="user-info">
-        <view class="avatar-wrapper">
-          <image
-            class="user-avatar"
-            src="{{profile && profile.avatar ? profile.avatar : '/images/default-avatar.png'}}"
-            mode="aspectFill"
-          />
-          <view class="status-dot"></view>
-        </view>
-        <view class="user-text">
-          <text class="greeting">{{formattedDate}}</text>
-          <text class="user-name">{{profile && profile.name ? profile.name : '健康达人'}}</text>
-        </view>
+
+  <!-- 日期导航 (可选，保持在设计中以备用) -->
+  <view class="date-navigator">
+      <view class="nav-arrow" bindtap="goToPrevDay">‹</view>
+      <view class="date-display" bindtap="showCalendar">
+        <text class="date-text">{{formattedDate}}</text>
       </view>
+      <view class="nav-arrow" bindtap="goToNextDay">›</view>
+  </view>
 
-      <!-- 右侧：目标状态 -->
-      <view class="goal-status" wx:if="{{profile && profile.goal}}">
-        <view class="status-badge" wx:if="{{progressMetrics.overallProgress >= 80}}">
-          <text class="status-icon">🎯</text>
-          <text class="status-text">目标达成</text>
+  <!-- 2. 核心区：能量红绿灯 Hero Card -->
+  <view class="hero-section">
+    <view class="hero-card" data-status="{{heroStatus}}">
+      <!-- 动态光晕 -->
+      <view class="hero-glow"></view>
+      
+      <view class="hero-content">
+        <text class="hero-label">今日能量平衡</text>
+        <view class="hero-value-group">
+            <text class="hero-value">{{todayData.calorieBalance > 0 ? '+' : ''}}{{todayData.calorieBalance}}</text>
+            <text class="hero-unit">kcal</text>
         </view>
-        <view class="status-badge progress" wx:elif="{{progressMetrics.overallProgress >= 50}}">
-          <text class="status-icon">📈</text>
-          <text class="status-text">进度良好</text>
-        </view>
-        <view class="status-badge" wx:else>
-          <text class="status-icon">💪</text>
-          <text class="status-text">继续努力</text>
+        
+        <!-- 状态胶囊 -->
+        <view class="hero-status-pill">
+            <view class="status-dot"></view>
+            <text class="status-text">{{heroStatusText}}</text>
         </view>
       </view>
     </view>
   </view>
 
-  <!-- ============ 主内容区 ============ -->
-  <view class="main-content">
-    <!-- ============ 日期切换导航栏 ============ -->
-    <view class="date-nav-bar">
-      <view class="date-nav-arrow" bindtap="goToPrevDay">
-        <text class="arrow-icon">‹</text>
-      </view>
-      <view class="date-nav-center" bindtap="showCalendar">
-        <text class="date-nav-text">{{formattedDate}}</text>
-      </view>
-      <view class="date-nav-arrow" bindtap="goToNextDay">
-        <text class="arrow-icon">›</text>
-      </view>
+  <!-- 3. 数据双球 Stats Grid -->
+  <view class="stats-grid">
+    <!-- 饮食球 -->
+    <view class="stat-card diet-card" bindtap="onViewNutritionDetail">
+        <view class="mini-sphere diet-sphere">
+            <view class="sphere-glass"></view>
+            <!-- 液体高度根据百分比变化 -->
+            <view class="liquid" style="height: {{progressMetrics.dietProgress}}%">
+                <view class="wave-layer wave-1"></view>
+                <view class="wave-layer wave-2"></view>
+                <view class="wave-layer wave-3"></view>
+            </view>
+        </view>
+        <view class="stat-info">
+            <text class="stat-label">饮食摄入</text>
+            <view>
+                <text class="stat-num">{{todayData.dietCalories}}</text>
+                <text class="stat-target">/ {{todayData.targetCalories}}</text>
+            </view>
+        </view>
     </view>
 
-    <!-- ============ 计划概览卡片 ============ -->
-    <view class="plan-overview-card" wx:if="{{activePlan}}">
-      <view class="plan-header">
-        <view class="plan-title">
-          <text class="plan-name">{{activePlan.name || '健康计划'}}</text>
-          <view class="plan-status" data-status="{{planProgress.status}}">
-            <text class="status-text">{{planProgress.status === 'active' ? '进行中' : '已完成'}}</text>
-          </view>
-        </view>
-        <view class="plan-meta">
-          <text class="meta-text">已进行 {{planProgress.daysElapsed}} 天 · 还剩 {{planProgress.daysRemaining}} 天</text>
-        </view>
-      </view>
-
-      <view class="plan-progress">
-        <view class="progress-bar-bg">
-          <view class="progress-bar-fill" style="width: {{planProgress.completionRate}}%"></view>
-        </view>
-        <view class="progress-stats">
-          <text class="progress-text">{{planProgress.completionRate}}% 完成</text>
-          <text class="weight-text">体重变化: {{planProgress.weightChange > 0 ? '+' : ''}}{{planProgress.weightChange}}kg</text>
-        </view>
-      </view>
-    </view>
-
-    <!-- ============ 今日综合进度卡片 ============ -->
-    <spotlight-card customClass="progress-card" holo="{{true}}" customStyle="background: linear-gradient(135deg, #FFF7ED 0%, #FFEDD5 100%)">
-      <view class="progress-content">
-
-        <!-- 双环形图区域 -->
-        <view class="dual-ring-section">
-          <!-- 饮食环 -->
-          <view class="ring-item">
-            <view class="ring-wrapper">
-              <view class="progress-ring diet-ring">
-                <view class="ring-bg"></view>
-                <view class="ring-fill" style="background: conic-gradient(#FF6B35 0deg {{dualRingData.dietAngle}}deg, #E5E7EB {{dualRingData.dietAngle}}deg 360deg);"></view>
-                <view class="ring-center">
-                  <text class="ring-value">{{dualRingData.dietPercentage}}</text>
-                  <text class="ring-unit">%</text>
-                </view>
-              </view>
+    <!-- 运动球 -->
+    <view class="stat-card exercise-card" bindtap="onViewExerciseDetail">
+        <view class="mini-sphere exercise-sphere">
+            <view class="sphere-glass"></view>
+            <view class="liquid" style="height: {{progressMetrics.exerciseProgress}}%">
+                <view class="wave-layer wave-1"></view>
+                <view class="wave-layer wave-2"></view>
+                <view class="wave-layer wave-3"></view>
             </view>
-            <view class="ring-info">
-              <text class="ring-label">饮食进度</text>
-              <text class="ring-detail">{{todayData.dietCalories}} / {{todayData.targetCalories}}kcal</text>
+        </view>
+        <view class="stat-info">
+            <text class="stat-label">运动消耗</text>
+            <view>
+                <text class="stat-num">{{todayData.exerciseCalories}}</text>
+                <text class="stat-target">/ {{todayData.exerciseTargetCalories}}</text>
             </view>
-          </view>
-
-          <!-- 运动环 -->
-          <view class="ring-item">
-            <view class="ring-wrapper">
-              <view class="progress-ring exercise-ring">
-                <view class="ring-bg"></view>
-                <view class="ring-fill" style="background: conic-gradient(#4ECDC4 0deg {{dualRingData.exerciseAngle}}deg, #E5E7EB {{dualRingData.exerciseAngle}}deg 360deg);"></view>
-                <view class="ring-center">
-                  <text class="ring-value">{{dualRingData.exercisePercentage}}</text>
-                  <text class="ring-unit">%</text>
-                </view>
-              </view>
-            </view>
-            <view class="ring-info">
-              <text class="ring-label">运动进度</text>
-              <text class="ring-detail">{{todayData.exerciseCalories}} / {{todayData.exerciseTargetCalories}}kcal</text>
-            </view>
-          </view>
         </view>
-
-        <!-- 平衡指标 -->
-        <view class="balance-indicator">
-          <view class="balance-bar">
-            <view class="balance-fill" style="width: {{progressMetrics.balanceScore}}%"></view>
-          </view>
-          <view class="balance-info">
-            <text class="balance-label">平衡得分</text>
-            <text class="balance-score">{{progressMetrics.balanceScore}}</text>
-          </view>
-          <view class="balance-status">
-            <text class="status-text" data-status="{{progressMetrics.balanceScore >= 80 ? 'good' : progressMetrics.balanceScore >= 60 ? 'fair' : 'poor'}}">
-              {{progressMetrics.balanceScore >= 80 ? '优秀' : progressMetrics.balanceScore >= 60 ? '良好' : '需调整'}}
-            </text>
-          </view>
-        </view>
-
-        <!-- 热量平衡状态 -->
-        <view class="calorie-balance">
-          <view class="balance-status-card" data-balance="{{todayData.calorieBalance}}">
-            <text class="balance-icon">{{todayData.calorieBalance > 0 ? '📈' : todayData.calorieBalance < 0 ? '📉' : '⚖️'}}</text>
-            <view class="balance-text">
-              <text class="balance-title">热量平衡</text>
-              <text class="balance-value">
-                {{todayData.calorieBalance > 0 ? '盈余' : todayData.calorieBalance < 0 ? '赤字' : '平衡'}} {{Math.abs(todayData.calorieBalance)}}kcal
-              </text>
-            </view>
-          </view>
-        </view>
-      </view>
-    </spotlight-card>
-
-    <!-- ============ 详细指标面板 ============ -->
-    <view class="detailed-metrics">
-
-      <!-- 营养素指标 -->
-      <view class="metric-section">
-        <view class="section-header">
-          <text class="section-title">营养素摄入</text>
-          <view class="section-action" bindtap="onViewNutritionDetail">
-            <text class="action-text">详情</text>
-            <text class="action-arrow">›</text>
-          </view>
-        </view>
-
-        <view class="macros-grid">
-          <view class="macro-item" wx:for="{{['protein', 'carbs', 'fat']}}" wx:key="*this">
-            <view class="macro-header">
-              <text class="macro-name">
-                {{item === 'protein' ? '蛋白质' : item === 'carbs' ? '碳水' : '脂肪'}}
-              </text>
-              <view class="macro-status" data-status="{{macros[item].status}}">
-                <text class="status-dot"></text>
-              </view>
-            </view>
-            <view class="macro-progress">
-              <view class="progress-bg">
-                <view class="progress-fill {{item}}" style="width: {{macros[item].target > 0 ? (macros[item].current / macros[item].target * 100) : 0}}%"></view>
-              </view>
-              <text class="progress-text">{{macros[item].current}}g / {{macros[item].target}}g</text>
-            </view>
-          </view>
-        </view>
-      </view>
-
-      <!-- 运动细分 -->
-      <view class="metric-section">
-        <view class="section-header">
-          <text class="section-title">运动分解</text>
-          <view class="section-action" bindtap="onViewExerciseDetail">
-            <text class="action-text">详情</text>
-            <text class="action-arrow">›</text>
-          </view>
-        </view>
-
-        <view class="exercise-breakdown">
-          <view class="exercise-item" wx:for="{{[{key: 'aerobic', name: '有氧运动', icon: '🏃'}, {key: 'strength', name: '力量训练', icon: '💪'}, {key: 'flexibility', name: '拉伸放松', icon: '🧘'}, {key: 'sports', name: '球类运动', icon: '⚽'}]}}" wx:key="key">
-            <view class="exercise-icon">
-              <text class="icon-emoji">{{item.icon}}</text>
-            </view>
-            <view class="exercise-info">
-              <text class="exercise-name">{{item.name}}</text>
-              <view class="exercise-progress">
-                <view class="progress-mini-bg">
-                  <view class="progress-mini-fill" style="width: {{exerciseBreakdown[item.key].progress}}%"></view>
-                </view>
-                <text class="progress-mini-text">{{exerciseBreakdown[item.key].calories}}kcal</text>
-              </view>
-            </view>
-          </view>
-        </view>
-      </view>
-    </view>
-
-    <!-- ============ 周度概览 ============ -->
-    <spotlight-card customClass="weekly-overview-card" holo="{{true}}" customStyle="background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%);">
-      <view class="weekly-overview">
-        <!-- 头部统计 -->
-        <view class="overview-header">
-          <view class="header-left">
-            <text class="overview-title">本周概览</text>
-            <text class="overview-subtitle">最近7天数据统计</text>
-          </view>
-          <view class="header-right">
-            <view class="adherence-badge" data-rate="{{weeklyOverview.adherenceRate}}">
-              <text class="adherence-label">遵守率</text>
-              <text class="adherence-value">{{weeklyOverview.adherenceRate}}%</text>
-            </view>
-            <view class="trend-indicator" data-trend="{{weeklyOverview.trend}}">
-              <text class="trend-icon">{{weeklyOverview.trend === 'up' ? '📈' : weeklyOverview.trend === 'down' ? '📉' : '➡️'}}</text>
-            </view>
-          </view>
-        </view>
-
-        <!-- 统计卡片 -->
-        <view class="stats-cards">
-          <view class="stat-card">
-            <text class="stat-label">平均热量</text>
-            <text class="stat-value">{{weeklyOverview.avgCalories}}</text>
-            <text class="stat-unit">kcal/天</text>
-          </view>
-          <view class="stat-card">
-            <text class="stat-label">平均运动</text>
-            <text class="stat-value">{{weeklyOverview.avgExercise}}</text>
-            <text class="stat-unit">kcal/天</text>
-          </view>
-          <view class="stat-card" wx:if="{{weeklyOverview.bestDay}}">
-            <text class="stat-label">最佳表现</text>
-            <text class="stat-value">{{weeklyOverview.bestDay}}</text>
-            <text class="stat-unit">日期</text>
-          </view>
-        </view>
-
-        <!-- 趋势图表 -->
-        <view class="weekly-chart">
-          <view class="chart-header">
-            <text class="chart-title">热量趋势</text>
-            <view class="chart-legend">
-              <view class="legend-item">
-                <view class="legend-dot" style="background: #FF6B35;"></view>
-                <text class="legend-text">饮食</text>
-              </view>
-              <view class="legend-item">
-                <view class="legend-dot" style="background: #4ECDC4;"></view>
-                <text class="legend-text">运动</text>
-              </view>
-            </view>
-          </view>
-          
-          <view class="chart-container">
-            <view class="chart-bars">
-              <view class="chart-bar-group" wx:for="{{weeklyOverview.dates}}" wx:key="index" wx:for-item="date">
-                <view class="bar-wrapper">
-                  <!-- 饮食柱状图 -->
-                  <view class="bar-item diet-bar" style="height: {{weeklyOverview.maxValue > 0 ? (weeklyOverview.weekCalories[index] / weeklyOverview.maxValue * 100) : 0}}%;">
-                    <view class="bar-value" wx:if="{{weeklyOverview.weekCalories[index] > 0}}">
-                      {{weeklyOverview.weekCalories[index]}}
-                    </view>
-                  </view>
-                  <!-- 运动柱状图 -->
-                  <view class="bar-item exercise-bar" style="height: {{weeklyOverview.maxValue > 0 ? (weeklyOverview.weekExercise[index] / weeklyOverview.maxValue * 100) : 0}}%;">
-                    <view class="bar-value" wx:if="{{weeklyOverview.weekExercise[index] > 0}}">
-                      {{weeklyOverview.weekExercise[index]}}
-                    </view>
-                  </view>
-                </view>
-                <text class="bar-label">{{date}}</text>
-              </view>
-            </view>
-          </view>
-        </view>
-
-        <!-- 平衡度展示 -->
-        <view class="balance-overview">
-          <view class="balance-header">
-            <text class="balance-title">每日热量平衡</text>
-          </view>
-          <view class="balance-bars">
-            <view class="balance-bar-item" wx:for="{{weeklyOverview.weekBalanceWithWidth}}" wx:key="index" wx:for-item="item">
-              <view class="balance-bar-wrapper">
-                <view 
-                  class="balance-bar" 
-                  data-balance="{{item.value}}"
-                  style="width: {{item.width}}%; background: {{item.value > 0 ? '#FF6B6B' : item.value < 0 ? '#51CF66' : '#95A5A6'}};"
-                ></view>
-              </view>
-              <text class="balance-value">{{item.value > 0 ? '+' : ''}}{{item.value}}</text>
-            </view>
-          </view>
-        </view>
-      </view>
-    </spotlight-card>
-
-    <!-- AI 分析横幅（条件渲染） -->
-    <view class="ai-banner animate-fade-in-up" wx:if="{{aiInsight.message}}" data-priority="{{aiInsight.priority}}">
-      <view class="ai-banner-content">
-        <view class="ai-icon-wrapper">
-          <text class="ai-icon">{{aiInsight.type === 'diet' ? '🍽️' : aiInsight.type === 'exercise' ? '💪' : aiInsight.type === 'balance' ? '⚖️' : '🧠'}}</text>
-        </view>
-        <view class="ai-text">
-          <text class="ai-title">AI 健康助手</text>
-          <text class="ai-message">{{aiInsight.message}}</text>
-        </view>
-        <view class="ai-priority" wx:if="{{aiInsight.priority === 'high'}}">
-          <text class="priority-dot"></text>
-        </view>
-      </view>
-      <view class="ai-close" bindtap="closeAIBanner">
-        <text>×</text>
-      </view>
-    </view>
-
-    <!-- 快捷操作网格 -->
-    <view class="quick-actions">
-      <view class="actions-grid">
-        <view
-          wx:for="{{quickActions}}"
-          wx:key="title"
-          class="action-card"
-          data-url="{{item.url}}"
-          bindtap="onQuickAction"
-        >
-          <view class="action-icon" style="background: {{item.color}}20">
-            <text class="icon-text">{{item.icon}}</text>
-          </view>
-          <text class="action-title">{{item.title}}</text>
-        </view>
-      </view>
-    </view>
-
-    <!-- 推荐内容 -->
-    <view class="recommendations" wx:if="{{recommendations.length > 0}}">
-      <view class="section-header">
-        <text class="section-title">今日推荐</text>
-        <view class="section-link" bindtap="onRecipeRecommend">
-          <text class="link-text">查看更多</text>
-          <text class="link-arrow">›</text>
-        </view>
-      </view>
-
-      <scroll-view scroll-x="true" class="recipe-scroll" show-scrollbar="false">
-        <view class="recipe-list">
-          <view
-            wx:for="{{recommendations}}"
-            wx:key="id"
-            class="recipe-item"
-            data-id="{{item.id}}"
-            bindtap="viewRecipe"
-          >
-            <image class="recipe-image" src="{{item.image || '/images/default-goods-image.png'}}" mode="aspectFill" />
-            <view class="recipe-overlay">
-              <text class="recipe-name">{{item.name}}</text>
-              <text class="recipe-calories">{{item.calories}} kcal</text>
-            </view>
-          </view>
-        </view>
-      </scroll-view>
-    </view>
-
-    <!-- 加载状态 -->
-    <view class="loading-overlay" wx:if="{{loading}}">
-      <view class="loading-content">
-        <view class="loading-spinner"></view>
-        <text class="loading-text">加载中...</text>
-      </view>
     </view>
   </view>
+
+  <!-- 4. 行动胶囊 Actions -->
+  <view class="actions-grid">
+    <!-- 主操作：拍一拍 -->
+    <view class="action-card primary" bindtap="onQuickAction" data-url="/pages/camera/index">
+        <view class="action-glow"></view>
+        <view class="action-content">
+            <text class="action-label">饮食记录</text>
+        </view>
+    </view>
+
+    <!-- 记运动 -->
+    <view class="action-card" bindtap="onQuickAction" data-url="/pages/exercise/index/index">
+        <view class="action-content">
+            <text class="action-label">运动记录</text>
+        </view>
+    </view>
+
+    <!-- 看计划 -->
+    <view class="action-card" bindtap="onQuickAction" data-url="/pages/plan/detail/index">
+        <view class="action-content">
+            <text class="action-label">我的计划</text>
+        </view>
+    </view>
+
+    <!-- 问 AI -->
+    <view class="action-card" bindtap="onAISuggestion">
+        <view class="action-content">
+            <text class="action-label">AI分析</text>
+        </view>
+    </view>
+  </view>
+
+  <!-- 5. AI 建议条 (悬浮) -->
+  <view class="ai-floating-bar animate-fade-in" wx:if="{{aiInsight.message}}" bindtap="onAISuggestion">
+      <text class="ai-bar-icon">💡</text>
+      <text class="ai-bar-text">{{aiInsight.message}}</text>
+  </view>
+
 </view>

@@ -438,9 +438,9 @@
   font-weight: 500;
 }
 
-/* ============ 功能按钮区域（替换原function-list） ============ */
-.timeline-section {
-  margin-top: 0;
+/* ============ 功能按钮区域 ============ */
+.function-section {
+  margin-top: 24rpx;
 }
 
 .section-header {
@@ -449,8 +449,6 @@
   justify-content: space-between;
   margin-bottom: 24rpx;
   padding: 0 8rpx;
-  position: relative;
-  z-index: 20;
 }
 
 .section-title {
@@ -459,147 +457,125 @@
   color: #1F2937;
 }
 
-/* 功能列表（液态玻璃卡片） */
-.timeline-container {
-  display: flex;
-  flex-direction: column;
-  padding: 0 16rpx;
+/* 宫格布局 */
+.function-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20rpx;
+  padding: 0 4rpx;
 }
 
-.timeline-item {
-  display: flex;
-  gap: 16rpx;
-  margin-bottom: 20rpx;
+.grid-item {
+  width: 100%;
 }
 
-/* 时间线轨道（功能项左侧标记） */
-.timeline-track {
+.grid-item.full-width {
+  grid-column: span 2;
+}
+
+/* 功能卡片 */
+.func-card {
+  height: 100%;
+  border-radius: 36rpx !important;
+  /* 基础玻璃质感由组件内部 spotlight-card 处理，这里只需覆盖背景 */
+}
+
+.func-content {
+  padding: 28rpx;
   display: flex;
   flex-direction: column;
+  height: 100%;
+  position: relative;
+  z-index: 2;
+}
+
+/* 全宽卡片变为横向排列 */
+.full-width .func-content {
+  flex-direction: row;
   align-items: center;
-  width: 56rpx;
-  flex-shrink: 0;
+  gap: 24rpx;
 }
 
-.timeline-dot {
-  width: 48rpx;
-  height: 48rpx;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.9);
-  border: 3rpx solid #E5E7EB;
+.full-width .func-arrow {
+  margin-top: 0;
+  margin-left: auto;
+}
+
+/* 图标容器 */
+.func-icon-wrapper {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 24rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1;
-  transition: all 0.3s ease;
-  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.06);
+  margin-bottom: 20rpx;
+  backdrop-filter: blur(10rpx);
+  -webkit-backdrop-filter: blur(10rpx);
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
 }
 
-.timeline-dot.active {
-  border-color: #FF6B35;
-  background: rgba(255, 255, 255, 0.95);
-  box-shadow: 0 2rpx 12rpx rgba(255, 107, 53, 0.2);
+.full-width .func-icon-wrapper {
+  margin-bottom: 0;
+  flex-shrink: 0;
 }
 
-.dot-icon {
-  font-size: 24rpx;
-  line-height: 1;
+/* 不同类型的图标背景 */
+.func-icon-wrapper.plan {
+  background: rgba(255, 137, 27, 0.15);
+  border: 1rpx solid rgba(255, 137, 27, 0.2);
 }
 
-.timeline-line {
-  width: 4rpx;
-  flex: 1;
-  min-height: 40rpx;
-  background: linear-gradient(180deg, #E5E7EB 0%, transparent 100%);
-  margin: 8rpx 0;
+.func-icon-wrapper.dish {
+  background: rgba(82, 196, 26, 0.15);
+  border: 1rpx solid rgba(82, 196, 26, 0.2);
 }
 
-/* 功能项卡片 */
-.meal-card-wrapper {
-  flex: 1;
+.func-icon-wrapper.fav {
+  background: rgba(139, 92, 246, 0.15);
+  border: 1rpx solid rgba(139, 92, 246, 0.2);
 }
 
-.meal-card {
-  border-radius: 28rpx;
-  background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%) !important;
+.func-icon-wrapper.stats {
+  background: rgba(244, 63, 94, 0.15);
+  border: 1rpx solid rgba(244, 63, 94, 0.2);
 }
 
-/* 不同功能项的渐变背景（区分功能） */
-.meal-card.plan {
-  background: linear-gradient(135deg, #FFF7ED 0%, #FFEDD5 100%) !important;
-}
-.meal-card.plan.has-data {
-  box-shadow: 0 8rpx 32rpx rgba(255, 107, 53, 0.12);
+.func-icon-wrapper.help {
+  background: rgba(59, 130, 246, 0.15);
+  border: 1rpx solid rgba(59, 130, 246, 0.2);
 }
 
-.meal-card.product {
-  background: linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%) !important;
-}
-.meal-card.product.has-data {
-  box-shadow: 0 8rpx 32rpx rgba(82, 196, 26, 0.12);
+.func-icon {
+  font-size: 36rpx;
 }
 
-.meal-card.collect {
-  background: linear-gradient(135deg, #F5F3FF 0%, #EDE9FE 100%) !important;
-}
-.meal-card.collect.has-data {
-  box-shadow: 0 8rpx 32rpx rgba(139, 92, 246, 0.12);
-}
-
-.meal-card.statistics {
-  background: linear-gradient(135deg, #FFF1F2 0%, #FFE4E6 100%) !important;
-}
-.meal-card.statistics.has-data {
-  box-shadow: 0 8rpx 32rpx rgba(244, 63, 94, 0.12);
-}
-
-.meal-card.help {
-  background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%) !important;
-}
-.meal-card.help.has-data {
-  box-shadow: 0 8rpx 32rpx rgba(59, 130, 246, 0.12);
-}
-
-.meal-card-content {
-  padding: 24rpx;
-}
-
-/* 功能项头部 */
-.meal-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 16rpx;
-}
-
-.meal-title-group {
+/* 文字信息 */
+.func-info {
   display: flex;
   flex-direction: column;
-  gap: 4rpx;
+  gap: 6rpx;
+  flex: 1;
 }
 
-.meal-title {
+.func-title {
   font-size: 30rpx;
   font-weight: 700;
   color: #1F2937;
 }
 
-.meal-time {
-  font-size: 22rpx;
-  color: #9CA3AF;
-}
-
-/* 功能项描述（对应原func-desc） */
 .func-desc {
-  font-size: 24rpx;
-  color: #888;
-  margin-right: 20rpx;
+  font-size: 22rpx;
+  color: #6B7280;
 }
 
-/* 功能项箭头 */
+/* 箭头 */
 .func-arrow {
+  margin-top: 16rpx;
+  align-self: flex-end;
   font-size: 28rpx;
-  color: #ccc;
+  color: #9CA3AF;
+  font-weight: 300;
 }
 
 /* ============ 弹窗样式（适配新风格） ============ */
