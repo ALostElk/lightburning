@@ -11,6 +11,13 @@ Page({
     // 当前显示的日期
     currentDate: '',
 
+    // 日历相关
+    showCalendarModal: false,
+    calendarYear: 2024,
+    calendarMonth: 12,
+    calendarDays: [],
+    recordDates: [], // 有记录的日期列表
+
     // ========== 计划相关数据 ==========
     activePlan: null,
     planProgress: {
@@ -182,7 +189,7 @@ Page({
    */
   async loadTodayData() {
     try {
-      const today = api.getTodayString();
+      const today = this.data.currentDate || api.getTodayString();
 
       // 加载饮食记录
       const dietRes = await api.getDietLogs(today);
@@ -435,10 +442,10 @@ Page({
       text = '能量完美';
     } else if (absBalance <= 400) {
       status = 'yellow';
-      text = balance > 0 ? '需补充能量' : '注意控制';
+      text = balance > 0 ? '能量严重不足' : '能量超标警示';
     } else {
       status = 'red';
-      text = balance > 0 ? '能量严重不足' : '能量超标警示';
+      text = balance > 0 ? '需补充能量' : '注意控制';
     }
 
     this.setData({
@@ -654,11 +661,219 @@ Page({
    * 显示日历选择器
    */
   showCalendar() {
-    wx.showToast({
-      title: '日历功能',
-      icon: 'none',
-      duration: 1000
+    const date = new Date(this.data.currentDate);
+    this.setData({
+      showCalendarModal: true,
+      calendarYear: date.getFullYear(),
+      calendarMonth: date.getMonth() + 1
+    }, () => {
+      this.fetchRecordDates();
     });
+  },
+
+  /**
+   * 隐藏日历
+   */
+  hideCalendar() {
+    this.setData({ showCalendarModal: false });
+  },
+
+  /**
+   * 阻止事件冒泡
+   */
+  stopPropagation() {
+    // 空函数，用于阻止冒泡
+  },
+
+  /**
+   * 上个月
+   */
+  prevMonth() {
+    let { calendarYear, calendarMonth } = this.data;
+    if (calendarMonth === 1) {
+      calendarYear--;
+      calendarMonth = 12;
+    } else {
+      calendarMonth--;
+    }
+    this.setData({ calendarYear, calendarMonth }, () => {
+      this.fetchRecordDates();
+    });
+  },
+
+  /**
+   * 下个月
+   */
+  nextMonth() {
+    let { calendarYear, calendarMonth } = this.data;
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth() + 1;
+
+    // 不允许查看未来月份
+    if (calendarYear === currentYear && calendarMonth >= currentMonth) {
+      return;
+    }
+
+    if (calendarMonth === 12) {
+      calendarYear++;
+      calendarMonth = 1;
+    } else {
+      calendarMonth++;
+    }
+    this.setData({ calendarYear, calendarMonth }, () => {
+      this.fetchRecordDates();
+    });
+  },
+
+  /**
+   * 选择日历日期
+   */
+  selectCalendarDay(e) {
+    const date = e.currentTarget.dataset.date;
+    if (!date) return;
+
+    this.setData({ showCalendarModal: false });
+    this.setFormattedDate(new Date(date));
+    this.loadData();
+  },
+
+  /**
+   * 快捷选择：今天
+   */
+  selectToday() {
+    this.setData({ showCalendarModal: false });
+    this.setFormattedDate(new Date());
+    this.loadData();
+  },
+
+  /**
+   * 快捷选择：昨天
+   */
+  selectYesterday() {
+    const d = new Date();
+    d.setDate(d.getDate() - 1);
+    this.setData({ showCalendarModal: false });
+    this.setFormattedDate(d);
+    this.loadData();
+  },
+
+  /**
+   * 快捷选择：本周开始
+   */
+  selectThisWeek() {
+    const d = new Date();
+    const day = d.getDay();
+    const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+    d.setDate(diff);
+    this.setData({ showCalendarModal: false });
+    this.setFormattedDate(d);
+    this.loadData();
+  },
+
+  /**
+   * 获取有记录的日期列表
+   */
+  async fetchRecordDates() {
+    try {
+      // 获取当前月份的记录日期
+      const year = this.data.calendarYear;
+      const month = this.data.calendarMonth;
+      const startDate = `${year}-${String(month).padStart(2, '0')}-01`;
+      const endDate = `${year}-${String(month).padStart(2, '0')}-31`;
+
+      const res = await wx.cloud.callFunction({
+        name: 'dietService',
+        data: {
+          action: 'getDietLogsByRange',
+          payload: { startDate, endDate }
+        }
+      });
+
+      if (res.result?.success) {
+        const logs = res.result.data || [];
+        const recordDates = [...new Set(logs.map(log => log.recordDate))];
+        this.setData({ recordDates }, () => {
+          this.generateCalendarDays();
+        });
+      }
+    } catch (err) {
+      console.log('获取记录日期失败:', err);
+      this.generateCalendarDays();
+    }
+  },
+
+  /**
+   * 生成日历天数
+   */
+  generateCalendarDays() {
+    const year = this.data.calendarYear;
+    const month = this.data.calendarMonth;
+    const today = api.getTodayString();
+    const selectedDate = this.data.currentDate;
+    const recordDates = this.data.recordDates;
+
+    // 本月第一天是周几
+    const firstDay = new Date(year, month - 1, 1);
+    const firstDayWeekday = firstDay.getDay();
+
+    // 本月天数
+    const daysInMonth = new Date(year, month, 0).getDate();
+
+    // 上月天数
+    const daysInPrevMonth = new Date(year, month - 1, 0).getDate();
+
+    const days = [];
+
+    // 填充上月日期
+    for (let i = firstDayWeekday - 1; i >= 0; i--) {
+      const day = daysInPrevMonth - i;
+      const prevMonth = month === 1 ? 12 : month - 1;
+      const prevYear = month === 1 ? year - 1 : year;
+      const date = `${prevYear}-${String(prevMonth).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+      days.push({
+        day,
+        date,
+        isCurrentMonth: false,
+        isToday: date === today,
+        isSelected: date === selectedDate,
+        hasRecord: recordDates.includes(date),
+        isFuture: date > today
+      });
+    }
+
+    // 填充本月日期
+    for (let i = 1; i <= daysInMonth; i++) {
+      const date = `${year}-${String(month).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+      days.push({
+        day: i,
+        date,
+        isCurrentMonth: true,
+        isToday: date === today,
+        isSelected: date === selectedDate,
+        hasRecord: recordDates.includes(date),
+        isFuture: date > today
+      });
+    }
+
+    // 填充下月日期（补满6行）
+    const remainingDays = 42 - days.length;
+    for (let i = 1; i <= remainingDays; i++) {
+      const nextMonth = month === 12 ? 1 : month + 1;
+      const nextYear = month === 12 ? year + 1 : year;
+      const date = `${nextYear}-${String(nextMonth).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+      days.push({
+        day: i,
+        date,
+        isCurrentMonth: false,
+        isToday: date === today,
+        isSelected: date === selectedDate,
+        hasRecord: recordDates.includes(date),
+        isFuture: date > today
+      });
+    }
+
+    this.setData({ calendarDays: days });
   },
 
   /**
@@ -674,7 +889,7 @@ Page({
    * 查看营养素详情
    */
   onViewNutritionDetail() {
-    wx.navigateTo({
+    wx.switchTab({
       url: '/pages/diet/index/index'
     });
   },
@@ -683,7 +898,7 @@ Page({
    * 查看运动详情
    */
   onViewExerciseDetail() {
-    wx.navigateTo({
+    wx.switchTab({
       url: '/pages/exercise/index/index'
     });
   },
