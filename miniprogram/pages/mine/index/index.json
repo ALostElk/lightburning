@@ -1,7 +1,10 @@
 {
-  "navigationBarTitleText": "我的",
-  "navigationBarBackgroundColor": "#7b61ff",
-  "navigationBarTextStyle": "white",
-  "backgroundColor": "#f8f9fa"
+  "navigationStyle": "custom",
+  "navigationBarTextStyle": "black",
+  "usingComponents": {
+    "spotlight-card": "/components/spotlight-card/index",
+    "glow-button": "/components/glow-button/index",
+    "border-beam-button": "/components/border-beam-button/index",
+    "floating-fab": "/components/floating-fab/index"
+  }
 }
-
