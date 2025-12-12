@@ -1,55 +1,75 @@
 /* pages/recipe-detail/index.wxss */
-
 .container {
   min-height: 100vh;
-  background: #F5F5F5;
-  padding-bottom: 140rpx;
+  background: #f3eeee; /* 背景色稍微调整，与卡片形成更好对比 */
+  padding-bottom: 180rpx; /* 增加底部填充，为固定按钮留出更多空间 */
+  /* 增加全局字体抗锯齿，使文本渲染更平滑 */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* 顶部英雄区 */
 .hero-section {
   position: relative;
   width: 100%;
-  height: 500rpx;
+  height: 560rpx; /* 增加图片高度，更具视觉冲击力 */
+  overflow: hidden; /* 确保内容不溢出 */
 }
+
+
 
 .hero-image {
   width: 100%;
   height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease; /* 图片过渡效果 */
 }
+
+
+
+/* 可以考虑给图片加一个视差效果，在滚动时稍微移动 */
+/* .hero-section:hover .hero-image {
+  transform: scale(1.05);
+} */
 
 .hero-overlay {
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
-  background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
-  padding: 40rpx 32rpx;
+  background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.4) 70%, transparent); /* 渐变更强，文字更清晰 */
+  padding: 40rpx 32rpx 60rpx; /* 增加底部填充 */
   color: #fff;
 }
 
 .recipe-title {
   display: block;
-  font-size: 48rpx;
+  font-size: 52rpx; /* 标题更大，更醒目 */
   font-weight: 700;
-  margin-bottom: 12rpx;
+  margin-bottom: 16rpx; /* 增加标题和副标题间距 */
+  text-shadow: 0 2rpx 4rpx rgba(0,0,0,0.3); /* 文字阴影，增强立体感 */
 }
 
 .recipe-subtitle {
   display: block;
-  font-size: 28rpx;
-  opacity: 0.9;
-  line-height: 1.5;
+  font-size: 30rpx; /* 副标题字体稍大 */
+  opacity: 0.95; /* 透明度稍低，更显眼 */
+  line-height: 1.6; /* 增加行高 */
+  text-shadow: 0 1rpx 3rpx rgba(0,0,0,0.2); /* 文字阴影 */
 }
 
 /* 快捷操作栏 */
 .action-bar {
   display: flex;
-  justify-content: space-around;
+  justify-content: center; /* 关键改动：改为居中对齐，不再是 space-around */
+  gap: 0rpx; /* 在这里调整，让它们靠近 */
   background: #fff;
   padding: 24rpx 32rpx;
-  border-bottom: 1rpx solid #F0F0F0;
+  border-bottom: 1rpx solid #ECECEC;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.03);
 }
+
+
 
 .action-btn {
   display: flex;
@@ -58,7 +78,14 @@
   background: transparent;
   border: none;
   padding: 0;
-  font-size: 24rpx;
+  font-size: 26rpx; /* 字体稍大 */
+  transition: transform 0.2s ease; /* 增加点击过渡效果 */
+}
+
+
+
+.action-btn:active {
+  transform: scale(0.95); /* 点击时缩小 */
 }
 
 .action-btn::after {
@@ -66,30 +93,35 @@
 }
 
 .action-icon {
-  font-size: 44rpx;
-  margin-bottom: 8rpx;
+  font-size: 48rpx; /* 图标更大 */
+  margin-bottom: 10rpx; /* 增加图标和文字间距 */
+  color: #FF6B35; /* 统一图标颜色，与品牌色一致 */
 }
-
 .action-text {
   color: #666;
-  font-size: 24rpx;
+  font-size: 26rpx; /* 字体稍大 */
 }
 
 /* 卡片通用样式 */
 .card {
-  margin: 20rpx 32rpx;
+  margin: 28rpx 32rpx; /* 增加卡片外边距 */
+  width:620rpx;
+  background: #fff;
+  border-radius: 20rpx; /* 圆角更大 */
+  padding: 32rpx; /* 增加内边距 */
+  box-shadow: 0 6rpx 20rpx rgba(0, 0, 0, 0.08); /* 更明显的阴影 */
 }
 
 .card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24rpx;
+  margin-bottom: 28rpx; /* 增加标题下方间距 */
 }
 
 .card-title {
-  font-size: 32rpx;
-  font-weight: 600;
+  font-size: 36rpx; /* 标题更大 */
+  font-weight: 700; /* 加粗 */
   color: #333;
 }
 
@@ -97,80 +129,88 @@
 .nutrition-card {
   background: linear-gradient(135deg, #FF6B35 0%, #FF8C42 100%);
   color: #fff;
+  /* 继承 .card 的 margin, border-radius, padding, box-shadow */
+  padding: 40rpx 32rpx; /* 增加内边距 */
+}
+
+.nutrition-card .card-title {
+  color: #fff; /* 确保标题在渐变背景上是白色 */
 }
 
 .toggle-btn {
   display: flex;
   align-items: center;
-  padding: 8rpx 16rpx;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 20rpx;
-  font-size: 24rpx;
+  padding: 10rpx 20rpx; /* 增加内边距 */
+  background: rgba(255, 255, 255, 0.25); /* 背景稍微不那么透明 */
+  border-radius: 24rpx; /* 圆角更大 */
+  font-size: 26rpx; /* 字体稍大 */
+  backdrop-filter: blur(8rpx); /* 模糊效果 */
 }
 
 .toggle-text {
-  margin-right: 4rpx;
+  margin-right: 6rpx;
 }
 
+
 .toggle-icon {
-  font-size: 20rpx;
+  font-size: 22rpx;
 }
 
 .nutrition-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 20rpx;
+  gap: 24rpx; /* 增加网格间距 */
+  margin-top: 20rpx; /* 增加与标题的间距 */
 }
 
 .nutrition-main-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 20rpx;
+  padding: 24rpx 10rpx; /* 增加垂直内边距 */
   background: rgba(255, 255, 255, 0.2);
-  border-radius: 16rpx;
+  border-radius: 18rpx; /* 圆角更大 */
   backdrop-filter: blur(10rpx);
 }
 
 .nutrition-main-icon {
-  font-size: 40rpx;
-  margin-bottom: 8rpx;
+  font-size: 44rpx; /* 图标更大 */
+  margin-bottom: 10rpx;
 }
 
 .nutrition-main-value {
-  font-size: 32rpx;
+  font-size: 34rpx; /* 数值更大 */
   font-weight: 700;
-  margin-bottom: 4rpx;
+  margin-bottom: 6rpx;
 }
-
 .nutrition-main-label {
-  font-size: 22rpx;
-  opacity: 0.9;
+  font-size: 24rpx; /* 标签字体稍大 */
+  opacity: 0.95;
 }
-
 .nutrition-detail {
-  margin-top: 24rpx;
-  padding-top: 24rpx;
-  border-top: 1rpx solid rgba(255, 255, 255, 0.3);
+  margin-top: 34rpx; /* 增加与上方内容的间距 */
+  padding-top: 32rpx;
+  border-top: 1rpx solid rgba(255, 255, 255, 0.35); /* 边框更明显 */
 }
 
 .nutrition-highlight {
   display: flex;
   align-items: flex-start;
   background: rgba(255, 255, 255, 0.2);
-  border-radius: 12rpx;
-  padding: 16rpx;
+  border-radius: 16rpx; /* 圆角更大 */
+  padding:120rpx; /* 增加内边距 */
 }
-
 .highlight-icon {
-  font-size: 32rpx;
-  margin-right: 12rpx;
+  font-size: 36rpx; /* 图标更大 */
+  margin-right: 16rpx;
   flex-shrink: 0;
 }
 
+
+
 .highlight-text {
-  font-size: 26rpx;
-  line-height: 1.6;
+  font-size: 28rpx; /* 字体稍大 */
+  line-height: 1.7; /* 增加行高 */
   flex: 1;
 }
 
@@ -178,190 +218,423 @@
 .cooking-info-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 20rpx;
+  gap: 24rpx; /* 增加网格间距 */
+  margin-top: 20rpx; /* 增加与标题的间距 */
 }
 
 .cooking-info-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 24rpx;
-  background: #FFF5F0;
-  border-radius: 16rpx;
+  padding: 28rpx; /* 增加内边距 */
+  background: #FFFBF9; /* 背景色更浅，更柔和 */
+  border-radius: 18rpx; /* 圆角更大 */
+  box-shadow: 0 4rpx 12rpx rgba(255, 107, 53, 0.05); /* 轻微阴影 */
 }
 
 .cooking-info-icon {
-  font-size: 44rpx;
-  margin-bottom: 12rpx;
+  font-size: 48rpx; /* 图标更大 */
+  margin-bottom: 16rpx; /* 增加图标和文字间距 */
+  color: #FF6B35;
 }
 
 .cooking-info-label {
-  font-size: 24rpx;
-  color: #999;
-  margin-bottom: 8rpx;
+  font-size: 28rpx; /* 字体稍大 */
+  color: rgb(122, 120, 120); /* 颜色稍深 */
+  margin-bottom: 10rpx;
+
 }
+
+
 
 .cooking-info-value {
-  font-size: 28rpx;
-  font-weight: 600;
+
+  font-size: 30rpx; /* 字体稍大 */
+
+  font-weight: 700; /* 加粗 */
+
   color: #FF6B35;
+
 }
+
+
 
 /* 标签 */
+
 .tags-list {
+
   display: flex;
+
   flex-wrap: wrap;
-  margin-top: 16rpx;
+
+  margin-top: 20rpx; /* 增加与标题的间距 */
+
+  gap: 16rpx; /* 增加标签间距 */
+
 }
+
+
+
+/* 标签样式 (假设这里需要定义) */
+
+/* 如果 .tag 样式来自其他页面，请确保它的美化也一致 */
+
+.tag {
+
+  padding: 8rpx 20rpx;
+
+  background: #F0F0F0; /* 标签背景色 */
+
+  border-radius: 20rpx;
+
+  font-size: 24rpx;
+
+  color: #666;
+
+  font-weight: 500;
+
+}
+
+
 
 /* 食材清单 */
+
 .copy-btn {
+
   display: flex;
+
   align-items: center;
+
   background: #FFF5F0;
+
   color: #FF6B35;
+
   border: none;
-  border-radius: 20rpx;
-  padding: 8rpx 20rpx;
-  font-size: 24rpx;
+
+  border-radius: 24rpx; /* 圆角更大 */
+
+  padding: 10rpx 24rpx; /* 增加内边距 */
+
+  font-size: 26rpx; /* 字体稍大 */
+
+  font-weight: 600; /* 加粗 */
+
+  transition: background 0.2s ease;
+
 }
+
+
+
+.copy-btn:active {
+
+  background: #FFE8E0; /* 点击时背景色变深 */
+
+}
+
+
 
 .copy-btn::after {
+
   border: none;
+
 }
+
+
 
 .copy-icon {
-  margin-right: 4rpx;
+
+  margin-right: 18rpx; /* 增加图标和文字间距 */
+
+  font-size: 28rpx;
+
 }
+
+
 
 .ingredients-list {
-  margin-top: 16rpx;
+
+  margin-top: 20rpx; /* 增加与标题的间距 */
+
 }
+
+
 
 .ingredient-item {
+
   display: flex;
+
   justify-content: space-between;
+
   align-items: center;
-  padding: 20rpx 0;
+
+  padding: 24rpx 0; /* 增加内边距 */
+
   border-bottom: 1rpx solid #F0F0F0;
+
 }
+
+
 
 .ingredient-item:last-child {
+
   border-bottom: none;
+
 }
+
+
 
 .ingredient-info {
+
   display: flex;
+
   align-items: center;
+
   flex: 1;
+
 }
+
+
 
 .ingredient-name {
-  font-size: 28rpx;
-  color: #333;
-  margin-right: 16rpx;
+
+  font-size: 30rpx; /* 字体稍大 */
+
+  color: rgb(26, 25, 25);
+
+  margin-right: 20rpx;
+
 }
+
+
 
 .ingredient-amount {
-  font-size: 26rpx;
-  color: #999;
+
+  font-size: 28rpx; /* 字体稍大 */
+
+  color: rgb(122, 120, 120); /* 颜色稍深 */
+
 }
+
+
 
 .ingredient-calories {
-  font-size: 24rpx;
+
+  font-size: 26rpx; /* 字体稍大 */
+
   color: #FF6B35;
-  font-weight: 500;
+
+  font-weight: 600; /* 加粗 */
+
+  margin-left: 16rpx; /* 增加间距 */
+
 }
+
+
 
 /* 烹饪步骤 */
+
 .steps-list {
-  margin-top: 24rpx;
+
+  margin-top: 28rpx; /* 增加与标题的间距 */
+
 }
+
+
 
 .step-item {
+
   display: flex;
+
   align-items: flex-start;
-  margin-bottom: 32rpx;
+
+  margin-bottom: 40rpx; /* 增加步骤间距 */
+
 }
+
+
 
 .step-item:last-child {
+
   margin-bottom: 0;
+
 }
+
+
 
 .step-number {
+
   flex-shrink: 0;
-  width: 56rpx;
-  height: 56rpx;
+
+  width: 64rpx; /* 数字框更大 */
+
+  height: 64rpx;
+
   background: linear-gradient(135deg, #FF6B35 0%, #FF8C42 100%);
+
   color: #fff;
+
   border-radius: 50%;
+
   display: flex;
+
   align-items: center;
+
   justify-content: center;
-  font-size: 28rpx;
+
+  font-size: 32rpx; /* 数字更大 */
+
   font-weight: 700;
-  margin-right: 20rpx;
+
+  margin-right: 24rpx; /* 增加与内容间距 */
+
+  box-shadow: 0 4rpx 10rpx rgba(255, 107, 53, 0.2); /* 增加阴影 */
+
 }
+
+
 
 .step-content {
+
   flex: 1;
-  font-size: 28rpx;
-  line-height: 1.8;
+
+  font-size: 30rpx; /* 字体稍大 */
+
+  line-height: 1.8; /* 增加行高 */
+
   color: #333;
-  padding-top: 8rpx;
+
+  padding-top: 10rpx; /* 与数字居中对齐 */
+
 }
+
+
 
 /* 底部操作 */
+
 .bottom-actions {
+
   position: fixed;
+
   bottom: 0;
+
   left: 0;
+
   right: 0;
-  padding: 20rpx 32rpx;
+
+  padding: 24rpx 32rpx 40rpx; /* 增加底部和垂直内边距 */
+
   background: #fff;
-  box-shadow: 0 -4rpx 12rpx rgba(0, 0, 0, 0.08);
+
+  box-shadow: 0 -6rpx 20rpx rgba(0, 0, 0, 0.08); /* 更明显的阴影 */
+
   z-index: 100;
+
 }
+
+
 
 .start-cooking-btn {
+
   width: 100%;
+
+  height: 96rpx; /* 按钮更高 */
+
   display: flex;
+
   align-items: center;
+
   justify-content: center;
-  font-size: 32rpx;
-  font-weight: 600;
+
+  background: linear-gradient(135deg, #FF6B35 0%, #FF8C42 100%); /* 使用渐变背景 */
+
+  color: #fff;
+
+  border-radius: 50rpx; /* 圆角更大，胶囊形状 */
+
+  font-size: 34rpx; /* 字体更大 */
+
+  font-weight: 700; /* 加粗 */
+
+  box-shadow: 0 8rpx 20rpx rgba(255, 107, 53, 0.3); /* 强阴影 */
+
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
 }
+
+
+
+.start-cooking-btn:active {
+
+  transform: translateY(2rpx) scale(0.98); /* 点击时下沉并缩小 */
+
+  box-shadow: 0 4rpx 10rpx rgba(255, 107, 53, 0.4);
+
+}
+
+
 
 .btn-icon {
-  margin-right: 12rpx;
-  font-size: 36rpx;
+
+  margin-right: 16rpx; /* 增加图标和文字间距 */
+
+  font-size: 40rpx; /* 图标更大 */
+
 }
+
+
 
 /* 加载状态 */
+
 .loading-container {
+
   display: flex;
+
   flex-direction: column;
+
   align-items: center;
+
   justify-content: center;
-  height: 100vh;
+
+  min-height: calc(100vh - 120rpx); /* 减去顶部导航栏等可能的高度 */
+
+  background: #fff; /* 加载状态背景 */
+
 }
+
+
 
 .loading-spinner {
-  width: 80rpx;
-  height: 80rpx;
-  border: 6rpx solid #FFE8E0;
+
+  width: 90rpx; /* 旋转器更大 */
+
+  height: 90rpx;
+
+  border: 8rpx solid #FFE8E0; /* 边框更粗 */
+
   border-top-color: #FF6B35;
+
   border-radius: 50%;
+
   animation: spin 1s linear infinite;
+
 }
+
+
 
 @keyframes spin {
+
   to { transform: rotate(360deg); }
+
 }
+
+
 
 .loading-text {
-  margin-top: 24rpx;
-  font-size: 28rpx;
-  color: #999;
-}
 
+  margin-top: 28rpx; /* 增加间距 */
+
+  font-size: 30rpx; /* 字体稍大 */
+
+  color: #777; /* 颜色稍深 */
+
+}

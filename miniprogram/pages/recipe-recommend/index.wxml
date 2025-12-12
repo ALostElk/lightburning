@@ -1,16 +1,16 @@
 <!--pages/recipe-recommend/index.wxml-->
-<view class="container">
+<view class="container" style="width: 750rpx; display: flex; box-sizing: border-box; position: relative; left: 0rpx; top: 0rpx; height: 10810rpx">
   
   <!-- 标签切换 -->
   <view class="tabs-container">
-    <view class="tabs">
+    <view class="tabs" style="height: 91rpx; display: flex; box-sizing: border-box; width: 670rpx">
       <view 
         wx:for="{{tabs}}" 
         wx:key="key"
         class="tab-item {{recommendType === item.key ? 'active' : ''}}"
         data-type="{{item.key}}"
         bindtap="onTabChange"
-      >
+       style="width: 174rpx; display: block; box-sizing: border-box">
         <text class="tab-icon">{{item.icon}}</text>
         <text class="tab-label">{{item.label}}</text>
       </view>
@@ -36,7 +36,7 @@
 
   <!-- 刷新按钮 -->
   <view class="refresh-section">
-    <button class="btn-refresh" bindtap="onRefresh">
+    <button class="btn-refresh" bindtap="onRefresh" style="width: 343rpx; display: block; box-sizing: border-box; left: 0rpx; top: 0rpx">
       <text class="refresh-icon">🔄</text>
       <text>换一批推荐</text>
     </button>
@@ -109,13 +109,13 @@
         </view>
 
         <!-- 标签 -->
-        <view class="recipe-tags">
+        <view class="recipe-tags" style="height: 0rpx; display: block; box-sizing: border-box">
           <view 
             wx:for="{{item.tags}}" 
             wx:key="*this"
             wx:for-item="tag"
             class="tag {{tag === '高蛋白' ? 'tag-protein' : tag === '低卡' || tag === '低脂' ? 'tag-lowcal' : tag === '素食' ? 'tag-veg' : ''}}"
-          >
+           style="width: 156rpx; display: block; box-sizing: border-box; position: relative; left: 325rpx; top: -222rpx">
             {{tag}}
           </view>
         </view>

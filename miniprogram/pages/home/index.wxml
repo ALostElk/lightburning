@@ -22,11 +22,11 @@
 
       <!-- 右侧：目标状态 -->
       <view class="goal-status" wx:if="{{profile && profile.goal}}">
-        <view class="status-badge" wx:if="{{calorieProgress >= 80}}">
+        <view class="status-badge" wx:if="{{progressMetrics.overallProgress >= 80}}">
           <text class="status-icon">🎯</text>
           <text class="status-text">目标达成</text>
         </view>
-        <view class="status-badge progress" wx:elif="{{calorieProgress >= 50}}">
+        <view class="status-badge progress" wx:elif="{{progressMetrics.overallProgress >= 50}}">
           <text class="status-icon">📈</text>
           <text class="status-text">进度良好</text>
         </view>
@@ -50,25 +50,6 @@
       </view>
       <view class="date-nav-arrow" bindtap="goToNextDay">
         <text class="arrow-icon">›</text>
-      </view>
-    </view>
-
-    <!-- AI 分析横幅（条件渲染） -->
-    <view class="ai-banner animate-fade-in-up" wx:if="{{aiInsight.message}}" data-priority="{{aiInsight.priority}}">
-      <view class="ai-banner-content">
-        <view class="ai-icon-wrapper">
-          <text class="ai-icon">{{aiInsight.type === 'diet' ? '🍽️' : aiInsight.type === 'exercise' ? '💪' : aiInsight.type === 'balance' ? '⚖️' : '🧠'}}</text>
-        </view>
-        <view class="ai-text">
-          <text class="ai-title">AI 健康助手</text>
-          <text class="ai-message">{{aiInsight.message}}</text>
-        </view>
-        <view class="ai-priority" wx:if="{{aiInsight.priority === 'high'}}">
-          <text class="priority-dot"></text>
-        </view>
-      </view>
-      <view class="ai-close" bindtap="closeAIBanner">
-        <text>×</text>
       </view>
     </view>
 
@@ -253,6 +234,25 @@
       </view>
     </view>
 
+    <!-- AI 分析横幅（条件渲染） -->
+    <view class="ai-banner animate-fade-in-up" wx:if="{{aiInsight.message}}" data-priority="{{aiInsight.priority}}">
+      <view class="ai-banner-content">
+        <view class="ai-icon-wrapper">
+          <text class="ai-icon">{{aiInsight.type === 'diet' ? '🍽️' : aiInsight.type === 'exercise' ? '💪' : aiInsight.type === 'balance' ? '⚖️' : '🧠'}}</text>
+        </view>
+        <view class="ai-text">
+          <text class="ai-title">AI 健康助手</text>
+          <text class="ai-message">{{aiInsight.message}}</text>
+        </view>
+        <view class="ai-priority" wx:if="{{aiInsight.priority === 'high'}}">
+          <text class="priority-dot"></text>
+        </view>
+      </view>
+      <view class="ai-close" bindtap="closeAIBanner">
+        <text>×</text>
+      </view>
+    </view>
+
     <!-- 快捷操作网格 -->
     <view class="quick-actions">
       <view class="actions-grid">
@@ -267,22 +267,6 @@
             <text class="icon-text">{{item.icon}}</text>
           </view>
           <text class="action-title">{{item.title}}</text>
-        </view>
-      </view>
-    </view>
-
-    <!-- AI 智能助手 -->
-    <view class="ai-assistant" bindtap="onAISuggestion">
-      <view class="assistant-content">
-        <view class="assistant-icon">
-          <text class="icon-emoji">🤖</text>
-        </view>
-        <view class="assistant-info">
-          <text class="assistant-title">AI 健康助手</text>
-          <text class="assistant-desc">获取个性化饮食和运动建议</text>
-        </view>
-        <view class="assistant-arrow">
-          <text class="arrow-icon">→</text>
         </view>
       </view>
     </view>
