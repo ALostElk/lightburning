@@ -165,6 +165,31 @@
   font-weight: 500;
 }
 
+/* ========== 数值选择器样式 ========== */
+.picker {
+  margin: 20rpx 0;
+}
+
+.picker-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 80rpx;
+  background: linear-gradient(135deg, rgba(255, 107, 107, 0.1) 0%, rgba(255, 142, 83, 0.1) 100%);
+  border: 2rpx solid rgba(255, 107, 107, 0.3);
+  border-radius: 16rpx;
+  font-size: 28rpx;
+  color: #FF6B6B;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.picker-display:active {
+  background: linear-gradient(135deg, rgba(255, 107, 107, 0.15) 0%, rgba(255, 142, 83, 0.15) 100%);
+  border-color: #FF6B6B;
+  transform: scale(0.98);
+}
+
 /* ========== 计划预览样式 ========== */
 .preview-item {
   display: flex;

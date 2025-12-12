@@ -28,7 +28,7 @@
   <view class="card" style="width: 568rpx; display: block; box-sizing: border-box; position: relative; left: 6rpx; top: -41rpx">
     <view class="card-title">计划参数</view>
     
-    <!-- 目标减重参数 -->
+    <!-- 目标体重变化参数 -->
     <view class="param-item">
       <view class="param-header">
         <text class="param-label">目标体重变化</text>
@@ -37,11 +37,9 @@
           <text class="param-unit">kg</text>
         </view>
       </view>
-      <slider class="slider" min="-20" max="10" step="0.5" value="{{targetWeightChange}}" bindchange="onWeightChangeSlider" activeColor="#FF6B6B" backgroundColor="#f0f0f0" />
-      <view class="slider-labels">
-        <text>-20kg</text>
-        <text>+10kg</text>
-      </view>
+      <picker mode="selector" range="{{weightChangeOptions}}" value="{{weightChangeIndex}}" bindchange="onWeightChangePicker" class="picker">
+        <view class="picker-display">选择体重变化: {{targetWeightChange}}kg</view>
+      </picker>
     </view>
 
     <!-- 计划周期参数 -->
@@ -53,11 +51,9 @@
           <text class="param-unit">天</text>
         </view>
       </view>
-      <slider class="slider" min="30" max="180" step="1" value="{{totalDays}}" bindchange="onDaysSlider" activeColor="#FF6B6B" backgroundColor="#f0f0f0" />
-      <view class="slider-labels">
-        <text>30天</text>
-        <text>180天</text>
-      </view>
+      <picker mode="selector" range="{{daysOptions}}" value="{{daysIndex}}" bindchange="onDaysChangePicker" class="picker">
+        <view class="picker-display">选择计划周期: {{totalDays}}天</view>
+      </picker>
     </view>
   </view>
 

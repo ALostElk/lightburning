@@ -24,14 +24,50 @@ Page({
     
     // UI状态
     loading: false,
-    generating: false
+    generating: false,
+    
+    // 数值选择器选项
+    weightChangeOptions: [], // 体重变化选项
+    weightChangeIndex: 0,    // 体重变化选择索引
+    daysOptions: [],         // 计划周期选项
+    daysIndex: 0             // 计划周期选择索引
   },
 
   /**
    * 页面加载
    */
   onLoad() {
+    this.initPickerOptions();
     this.loadProfile();
+  },
+  
+  /**
+   * 初始化数值选择器选项
+   * @private
+   */
+  initPickerOptions() {
+    // 初始化体重变化选项 (-20kg 到 +10kg，步长 0.5kg)
+    const weightChangeOptions = [];
+    for (let i = -20; i <= 10; i += 0.5) {
+      weightChangeOptions.push(`${i > 0 ? '+' : ''}${i}kg`);
+    }
+    
+    // 初始化计划周期选项 (7天到180天，步长1天)
+    const daysOptions = [];
+    for (let i = 7; i <= 180; i++) {
+      daysOptions.push(`${i}天`);
+    }
+    
+    // 计算默认值的索引
+    const weightChangeIndex = weightChangeOptions.findIndex(opt => opt.replace('+', '') === `${this.data.targetWeightChange}kg`);
+    const daysIndex = daysOptions.findIndex(opt => opt === `${this.data.totalDays}天`);
+    
+    this.setData({
+      weightChangeOptions,
+      weightChangeIndex: weightChangeIndex !== -1 ? weightChangeIndex : 0,
+      daysOptions,
+      daysIndex: daysIndex !== -1 ? daysIndex : 0
+    });
   },
 
   /**
@@ -111,22 +147,34 @@ Page({
   },
 
   /**
-   * 目标减重滑块变化
+   * 目标体重变化选择器变化
    * @param {Object} e - 事件对象
    */
-  onWeightChangeSlider(e) {
-    const value = e.detail.value;
-    this.setData({ targetWeightChange: value });
+  onWeightChangePicker(e) {
+    const index = e.detail.value;
+    const selectedOption = this.data.weightChangeOptions[index];
+    const value = Number(selectedOption.replace('kg', '').replace('+', ''));
+    
+    this.setData({ 
+      weightChangeIndex: index,
+      targetWeightChange: value 
+    });
     this.calculatePreview();
   },
 
   /**
-   * 计划天数滑块变化
+   * 计划周期选择器变化
    * @param {Object} e - 事件对象
    */
-  onDaysSlider(e) {
-    const value = e.detail.value;
-    this.setData({ totalDays: value });
+  onDaysChangePicker(e) {
+    const index = e.detail.value;
+    const selectedOption = this.data.daysOptions[index];
+    const value = Number(selectedOption.replace('天', ''));
+    
+    this.setData({ 
+      daysIndex: index,
+      totalDays: value 
+    });
     this.calculatePreview();
   },
 
@@ -136,7 +184,9 @@ Page({
    */
   onWeightInput(e) {
     const value = Number(e.detail.value) || -5;
-    this.setData({ targetWeightChange: value });
+    // 限制范围在-20kg到+10kg之间
+    const weightChange = Math.max(-20, Math.min(10, value));
+    this.setData({ targetWeightChange: weightChange });
     this.calculatePreview();
   },
 
@@ -146,8 +196,8 @@ Page({
    */
   onDaysInput(e) {
     const value = Number(e.detail.value) || 90;
-    // 限制范围在30-180天之间
-    const days = Math.max(30, Math.min(180, value));
+    // 限制范围在7-180天之间
+    const days = Math.max(7, Math.min(180, value));
     this.setData({ totalDays: days });
     this.calculatePreview();
   },
