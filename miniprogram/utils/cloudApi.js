@@ -364,6 +364,9 @@ export const analyzeAndRecommend = (userData, dietRecords, nutritionGap) => {
       userData,
       dietRecords,
       nutritionGap
+    },
+    config: {
+      timeout: 20000 // 20秒超时
     }
   });
 };
@@ -382,6 +385,9 @@ export const generateRecipeReason = (recipe, userData, nutritionGap) => {
       recipe,
       userData,
       nutritionGap
+    },
+    config: {
+      timeout: 15000 // 15秒超时
     }
   });
 };
@@ -396,6 +402,9 @@ export const customPrompt = (prompt) => {
     data: {
       action: 'customPrompt',
       prompt
+    },
+    config: {
+      timeout: 20000 // 20秒超时
     }
   });
 };

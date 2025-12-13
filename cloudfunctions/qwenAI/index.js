@@ -13,7 +13,7 @@ exports.main = async (event, context) => {
   const { action, prompt, userData, dietRecords, nutritionGap, recipe } = event;
 
   // API配置 - 从云函数环境变量读取
-  const API_KEY = cloud.env.QWEN_API_KEY || 'sk-cbf4265d902f4721ab7d08d7fedad32f';
+  const API_KEY = process.env.DASHSCOPE_API_KEY || process.env.QWEN_API_KEY || 'sk-cbf4265d902f4721ab7d08d7fedad32f';
   const API_URL = 'https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation';
 
   try {
@@ -45,7 +45,7 @@ exports.main = async (event, context) => {
 /**
  * 调用通义千问API
  */
-async function callQwen(apiKey, apiUrl, prompt) {
+async function callQwen(apiKey, apiUrl, prompt, timeout = 15000) {
   const https = require('https');
   const url = new URL(apiUrl);
 
@@ -65,6 +65,12 @@ async function callQwen(apiKey, apiUrl, prompt) {
   });
 
   return new Promise((resolve, reject) => {
+    // 设置超时定时器
+    const timer = setTimeout(() => {
+      req.destroy();
+      reject(new Error('AI请求超时'));
+    }, timeout);
+
     const req = https.request({
       hostname: url.hostname,
       path: url.pathname,
@@ -78,6 +84,7 @@ async function callQwen(apiKey, apiUrl, prompt) {
       let data = '';
       res.on('data', (chunk) => { data += chunk; });
       res.on('end', () => {
+        clearTimeout(timer);
         try {
           const result = JSON.parse(data);
           if (result.output && result.output.choices && result.output.choices.length > 0) {
@@ -97,7 +104,10 @@ async function callQwen(apiKey, apiUrl, prompt) {
       });
     });
 
-    req.on('error', reject);
+    req.on('error', (err) => {
+      clearTimeout(timer);
+      reject(err);
+    });
     req.write(postData);
     req.end();
   });
@@ -110,68 +120,60 @@ async function analyzeAndRecommend(apiKey, apiUrl, userData, dietRecords, nutrit
   const recentRecords = dietRecords.slice(0, 7);
   const avgNutrition = calculateAverage(recentRecords);
 
+  // 简化提示词，加快响应速度
   const prompt = `
-你是一名专业的营养师和健康顾问，请根据用户的基本信息和近期饮食数据，提供专业的营养分析和建议。
+你是营养师，请简洁分析用户饮食并给出建议。
 
-用户基本信息：
-- 性别：${userData.gender || '未知'}
-- 年龄：${userData.age || '未知'}岁
-- 身高：${userData.height || '未知'}cm
-- 体重：${userData.weight || '未知'}kg
-- 健康目标：${userData.goal || '未知'}
-- 活动水平：${userData.activityLevel || '未知'}
-- 饮食偏好：${(userData.dietaryPreferences || []).join('、') || '无'}
+用户信息：
+- 目标：${userData.goal || '减脂'}
+- 活动水平：${userData.activityLevel || '中等'}
 
 近${recentRecords.length}天平均营养摄入：
 - 热量：${Math.round(avgNutrition.calories)}千卡/天
 - 蛋白质：${Math.round(avgNutrition.protein)}克/天
-- 碳水化合物：${Math.round(avgNutrition.carbs)}克/天
+- 碳水：${Math.round(avgNutrition.carbs)}克/天
 - 脂肪：${Math.round(avgNutrition.fat)}克/天
 
-营养缺口分析：
-- 蛋白质缺口：${Math.round(nutritionGap.proteinDeficit)}克（不足）/ ${Math.round(nutritionGap.proteinExcess)}克（超标）
-- 碳水缺口：${Math.round(nutritionGap.carbsDeficit)}克（不足）/ ${Math.round(nutritionGap.carbsExcess)}克（超标）
-- 脂肪缺口：${Math.round(nutritionGap.fatDeficit)}克（不足）/ ${Math.round(nutritionGap.fatExcess)}克（超标）
-- 热量缺口：${Math.round(nutritionGap.caloriesDeficit)}千卡（不足）/ ${Math.round(nutritionGap.caloriesExcess)}千卡（超标）
+营养缺口：
+- 蛋白质：${nutritionGap.proteinDeficit > 0 ? '不足' + Math.round(nutritionGap.proteinDeficit) + '克' : '超标' + Math.round(nutritionGap.proteinExcess) + '克'}
+- 碳水：${nutritionGap.carbsDeficit > 0 ? '不足' + Math.round(nutritionGap.carbsDeficit) + '克' : '超标' + Math.round(nutritionGap.carbsExcess) + '克'}
+- 脂肪：${nutritionGap.fatDeficit > 0 ? '不足' + Math.round(nutritionGap.fatDeficit) + '克' : '超标' + Math.round(nutritionGap.fatExcess) + '克'}
 
-请提供：
-1. 营养状况综合评价
-2. 3-5条具体的饮食建议
-3. 推荐的食物类型和烹饪方式
-4. 需要注意的营养素补充
-
-输出格式必须为 JSON 对象，包含以下字段：
+输出JSON格式：
 {
-  "overall_assessment": "整体评价（50字内）",
+  "overall_assessment": "整体评价（30字内）",
   "nutrition_score": 85,
   "suggestions": [
     {
       "type": "protein",
       "severity": "warning",
       "icon": "💪",
-      "title": "蛋白质摄入建议",
-      "message": "建议内容",
+      "title": "建议标题",
+      "message": "建议内容（50字内）",
       "priority": 1
     }
   ],
-  "recommended_food_types": ["鸡胸肉", "鱼类", "豆制品"],
-  "cooking_methods": ["清蒸", "水煮", "少油炒"],
-  "food_tags_priority": ["高蛋白", "低卡", "低脂"]
+  "recommended_food_types": ["食物1", "食物2"],
+  "cooking_methods": ["方法1", "方法2"]
 }
 
-注意：输出纯JSON格式，不要添加任何其他文字说明。
-`;
+只输出JSON，不要其他内容。最多3条建议。`;
 
-  const response = await callQwen(apiKey, apiUrl, prompt);
+  const response = await callQwen(apiKey, apiUrl, prompt, 12000); // 12秒超时
   
   if (response.success) {
     try {
-      const analysis = JSON.parse(response.content);
+      // 尝试提取JSON内容
+      let content = response.content.trim();
+      // 移除可能的markdown代码块标记
+      content = content.replace(/```json\n?/g, '').replace(/```\n?/g, '');
+      const analysis = JSON.parse(content);
       return {
         success: true,
         data: analysis
       };
     } catch (e) {
+      console.error('JSON解析失败:', e, '原始内容:', response.content);
       return {
         success: true,
         data: {
@@ -189,25 +191,19 @@ async function analyzeAndRecommend(apiKey, apiUrl, userData, dietRecords, nutrit
  */
 async function generateRecipeReason(apiKey, apiUrl, recipe, userData, nutritionGap) {
   const prompt = `
-你是一名营养师，请为用户推荐这道食谱生成简短的推荐理由。
+简短说明推荐理由（30字内）：
 
-用户信息：
-- 健康目标：${userData.goal || '减脂'}
-- 营养缺口：蛋白质${nutritionGap.proteinDeficit > 0 ? '不足' : '充足'}，碳水${nutritionGap.carbsExcess > 0 ? '超标' : '适中'}
+用户目标：${userData.goal || '减脂'}
+营养缺口：蛋白质${nutritionGap.proteinDeficit > 0 ? '不足' : '充足'}，碳水${nutritionGap.carbsExcess > 0 ? '超标' : '适中'}
 
-食谱信息：
-- 名称：${recipe.name}
-- 热量：${recipe.calories}卡
-- 蛋白质：${recipe.protein}g
-- 碳水：${recipe.carbs}g
-- 脂肪：${recipe.fat}g
-- 特点：${recipe.tags.join('、')}
+食谱：${recipe.name}
+热量：${recipe.calories}卡
+蛋白质：${recipe.protein}g
+特点：${recipe.tags.join('、')}
 
-请用一句话（30字内）说明为什么推荐这道菜，要结合用户的目标和营养缺口。
-直接输出推荐理由，不要其他内容。
-`;
+直接输出推荐理由，不要其他内容。`;
 
-  const response = await callQwen(apiKey, apiUrl, prompt);
+  const response = await callQwen(apiKey, apiUrl, prompt, 8000); // 8秒超时
   if (response.success) {
     return {
       success: true,

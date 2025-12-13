@@ -31,7 +31,7 @@ class RecipeRecommendEngine {
 
     let scoredRecipes = allRecipes.map(recipe => {
       let score = 0;
-      
+
       // 基于目标的评分
       if (type === 'goal' || type === 'ai') {
         score += this.calculateGoalScore(recipe, userInfo);
@@ -105,7 +105,7 @@ class RecipeRecommendEngine {
     }
 
     // 排除过敏源
-    const hasAllergen = recipe.ingredients.some(ing => 
+    const hasAllergen = recipe.ingredients.some(ing =>
       allergens.includes(ing.name)
     );
     if (hasAllergen) {
@@ -176,20 +176,38 @@ class RecipeRecommendEngine {
       return { protein: 0, carbs: 0, fat: 0, calories: 0 };
     }
 
-    const total = records.reduce((acc, record) => {
-      acc.protein += record.protein || 0;
-      acc.carbs += record.carbs || 0;
-      acc.fat += record.fat || 0;
-      acc.calories += record.calories || 0;
+    // 1. 按日期分组聚合
+    const dailyTotals = {};
+    records.forEach(record => {
+      // 假设 record.date 是 YYYY-MM-DD 格式，或者可以转换为该格式
+      const dateKey = record.date.split(' ')[0]; // 只取日期部分
+      if (!dailyTotals[dateKey]) {
+        dailyTotals[dateKey] = { protein: 0, carbs: 0, fat: 0, calories: 0 };
+      }
+
+      dailyTotals[dateKey].protein += record.protein || 0;
+      dailyTotals[dateKey].carbs += record.carbs || 0;
+      dailyTotals[dateKey].fat += record.fat || 0;
+      dailyTotals[dateKey].calories += record.calories || 0;
+    });
+
+    // 2. 计算所有有记录日期的平均值
+    const days = Object.keys(dailyTotals).length;
+    if (days === 0) return { protein: 0, carbs: 0, fat: 0, calories: 0 };
+
+    const total = Object.values(dailyTotals).reduce((acc, day) => {
+      acc.protein += day.protein;
+      acc.carbs += day.carbs;
+      acc.fat += day.fat;
+      acc.calories += day.calories;
       return acc;
     }, { protein: 0, carbs: 0, fat: 0, calories: 0 });
 
-    const count = records.length;
     return {
-      protein: total.protein / count,
-      carbs: total.carbs / count,
-      fat: total.fat / count,
-      calories: total.calories / count
+      protein: Math.round(total.protein / days),
+      carbs: Math.round(total.carbs / days),
+      fat: Math.round(total.fat / days),
+      calories: Math.round(total.calories / days)
     };
   }
 
@@ -235,9 +253,15 @@ class RecipeRecommendEngine {
       try {
         const userData = wx.getStorageSync('userInfo') || {};
         const dietRecords = this.getRecentDietRecords(7);
-        
+
+        console.log('开始调用AI分析...');
+        const startTime = Date.now();
+
         const res = await api.analyzeAndRecommend(userData, dietRecords, nutritionGap);
-        
+
+        const duration = Date.now() - startTime;
+        console.log(`AI分析完成，耗时: ${duration}ms`);
+
         if (res.result && res.result.success && res.result.data.suggestions) {
           return res.result.data.suggestions.map(s => ({
             type: s.type || 'general',
@@ -247,13 +271,21 @@ class RecipeRecommendEngine {
             severity: s.severity || 'info',
             priority: s.priority || 3
           }));
+        } else if (res.result && res.result.data && res.result.data.rawText) {
+          // AI返回了文本但不是JSON格式，使用默认规则
+          console.warn('AI返回非JSON格式，使用默认规则');
         }
       } catch (error) {
         console.warn('AI分析失败，使用默认规则:', error);
+        // 显示具体的错误信息
+        if (error.errMsg && error.errMsg.includes('timeout')) {
+          console.error('AI请求超时，这可能是网络问题或AI服务响应慢');
+        }
       }
     }
 
     // 降级到默认规则生成
+    console.log('使用默认规则生成建议');
     return this.generateDefaultSuggestions(nutritionGap);
   }
 
@@ -335,7 +367,7 @@ class RecipeRecommendEngine {
       const nutritionGap = this.analyzeNutritionGap(7);
 
       const res = await api.generateRecipeReason(recipe, userData, nutritionGap);
-      
+
       if (res.result && res.result.success) {
         return res.result.reason;
       }

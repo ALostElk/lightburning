@@ -1,238 +1,242 @@
-/* General improvements and subtle touches */
+/* pages/recipe-recommend/index.wxss */
+
+/* 全局容器 */
 .container {
-  min-height: 100vh; /* 确保容器覆盖整个视口高度 */
-  background: linear-gradient(180deg, #f6f8f8 0%, #b4cec6 100%); /* 保持背景渐变 */
-  padding: 0 20rpx 40rpx;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #F5FAFF 0%, #FFFFFF 100%);
+  padding-bottom: 40rpx;
   box-sizing: border-box;
-  /* 增加全局字体抗锯齿，使文本渲染更平滑 */
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
-/* 标签切换 (Tabs) */
-.tabs-container {
+/* 顶部标签切换 (Floating Pills) */
+.tabs-wrapper {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: #fff;
-  padding: 30rpx 0;
-  margin: 0 -20rpx;
-  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.05); /* 阴影稍微柔和一点，但范围更大 */
+  background: rgba(245, 250, 255, 0.95); /* 半透明背景防遮挡 */
+  backdrop-filter: blur(10px);
+  padding: 20rpx 0;
+  box-shadow: 0 4rpx 20rpx rgba(148, 163, 184, 0.05);
 }
-.tabs {
+
+.tabs-list {
   display: flex;
-  justify-content: space-around;
-  padding: 0 20rpx;
-  gap: 45rpx; /* 增加标签之间的间距，避免过于拥挤 */
+  justify-content: center;
+  gap: 24rpx;
 }
-.tab-item {
-  flex: 1; /* 让标签平均分配宽度 */
-  text-align: center; /* 确保内容居中 */
-  padding: 18rpx 0; /* 调整垂直内边距，移除水平内边距（宽度由flex处理） */
-  border-radius: 10rpx; /* 稍微增加圆角，更柔和 */
-  transition: all 0.3s ease-in-out; /* 更平滑的过渡动画 */
-  background: #F8F8F8; /* 非选中状态的背景色，比F5F5F5更浅一点，增加层次感 */
-  box-shadow: 0 2rpx 6rpx rgba(0, 0, 0, 0.03); /* 为非选中标签添加非常细微的阴影，增加立体感 */
-  border: 1rpx solid #EEE; /* 添加一个非常浅的边框，提供清晰的边缘 */
+
+.tab-pill {
+  padding: 16rpx 32rpx;
+  background: #F1F5F9;
+  border-radius: 40rpx;
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  transition: all 0.3s ease;
+  color: #64748B;
 }
-.tab-item.active {
-  background: linear-gradient(135deg, #FF6B35 0%, #FF8C42 100%);
-  transform: translateY(-2rpx) scale(1.02); /* 选中时稍微上浮并放大一点，更具动态感 */
-  box-shadow: 0 6rpx 16rpx rgba(255, 107, 53, 0.4); /* 选中状态的阴影更明显 */
-  border: none; /* 选中时移除边框，让阴影更突出 */
+
+.tab-pill.active {
+  background: #334155; /* Slate-700 */
+  color: #FFFFFF;
+  box-shadow: 0 4rpx 12rpx rgba(51, 65, 85, 0.3);
+}
+
+.tab-icon {
+  font-size: 28rpx;
 }
 .tab-label {
-  font-size: 30rpx; /* 字体稍微大一点，提高可读性 */
-  color: rgb(114, 112, 112); /* 未选中标签的颜色稍微深一点 */
+  font-size: 28rpx;
   font-weight: 500;
 }
-.tab-item.active .tab-label {
-  color: #fff;
-  font-weight: 600;
+
+/* 内容区域 */
+.content-area {
+  padding: 20rpx 32rpx;
 }
 
-/* AI建议 (AI Suggestions) */
-.ai-suggestions {
-  background: linear-gradient(135deg, #667EEA 0%, #764BA2 100%);
-  border-radius: 24rpx; /* 圆角更大，更显友好 */
-  padding: 28rpx; /* 内边距增加，内容有更多呼吸空间 */
-  color: #fff;
-  margin-top: 30rpx; /* 增加与上方内容的间距 */
-  box-shadow: 0 6rpx 20rpx rgba(102, 126, 234, 0.4); /* 更强的阴影，突出卡片 */
+/* 通用玻璃卡片 */
+.glass-card {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1rpx solid rgba(255, 255, 255, 0.8);
+  border-radius: 32rpx;
+  box-shadow: 0 4rpx 20rpx rgba(148, 163, 184, 0.05);
+  overflow: hidden;
+}
+
+/* AI 建议区块 */
+.ai-section {
+  padding: 30rpx;
+  margin-bottom: 30rpx;
+}
+.ai-header {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  margin-bottom: 20rpx;
 }
 .ai-title {
-  font-size: 36rpx; /* 标题字体更大 */
-  margin-bottom: 20rpx; /* 标题下方间距增加 */
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #334155;
 }
-.suggestion-item {
-  background: rgba(255, 255, 255, 0.25); /* 背景稍微不那么透明 */
-  border-radius: 16rpx; /* 更多圆角 */
-  padding: 20rpx; /* 更多内边距 */
-  margin-top: 16rpx; /* 增加项目间的间距 */
-  backdrop-filter: blur(12rpx); /* 稍微增强背景模糊效果 */
-  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1); /* 为每个建议项添加细微阴影 */
+.ai-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
 }
-.suggestion-message {
-  font-size: 28rpx; /* 建议消息字体稍微大一点，更易读 */
+.ai-item {
+  padding: 20rpx;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 20rpx;
+  font-size: 26rpx;
+  color: #475569;
+  border-left: 6rpx solid #CBD5E1;
 }
-/* 警告/错误/成功边框保持不变，它们已经很清晰 */
+.ai-item.success { border-left-color: #10B981; }
+.ai-item.warning { border-left-color: #F59E0B; }
+.ai-item.error { border-left-color: #EF4444; }
 
-/* 刷新按钮 (Refresh Button) */
-.refresh-section {
-  margin-top: 40rpx; /* 增加按钮上方间距 */
-  margin-bottom: 20rpx; /* 增加按钮下方间距 */
-}
-.btn-refresh {
-  border: 2rpx solid #FF6B35;
-  border-radius: 60rpx; /* 更多圆角，使其看起来像一个胶囊按钮 */
-  padding: 18rpx 50rpx; /* 增加内边距，使按钮更大气 */
-  font-size: 30rpx; /* 字体稍微大一点 */
-  box-shadow: 0 6rpx 16rpx rgba(255, 107, 53, 0.2); /* 更强的阴影 */
-}
-.btn-refresh:active {
-  transform: translateY(1rpx) scale(0.98); /* 点击时稍微下沉并缩小，更自然的反馈 */
-  box-shadow: 0 2rpx 8rpx rgba(255, 107, 53, 0.25);
-}
-.refresh-icon {
-  font-size: 30rpx; /* 图标稍微大一点 */
+/* 食谱卡片 */
+.recipe-card {
+  margin-bottom: 32rpx;
+  display: flex;
+  flex-direction: column;
 }
 
-/* 加载状态 (Loading State) */
-.loading-container {
-  padding: 100rpx 0; /* 稍微减少垂直内边距 */
+.card-image-box {
+  width: 100%;
+  height: 360rpx;
+  position: relative;
+  background: #F1F5F9;
+}
+.card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.score-badge {
+  position: absolute;
+  top: 20rpx;
+  left: 20rpx;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  padding: 8rpx 16rpx;
+  border-radius: 20rpx;
+  color: #FFD700;
+  font-size: 24rpx;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4rpx;
+}
+.fav-btn {
+  position: absolute;
+  top: 20rpx;
+  right: 20rpx;
+  width: 64rpx;
+  height: 64rpx;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0,0,0,0.1);
+}
+
+.card-content {
+  padding: 30rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.card-title {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #334155;
+  line-height: 1.3;
+}
+
+.card-desc {
+  font-size: 26rpx;
+  color: #64748B;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.5;
+}
+
+/* 标签行 (Flex fix for bug) */
+.tags-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+  align-items: center;
+}
+
+.tag-pill {
+  font-size: 22rpx;
+  padding: 6rpx 20rpx;
+  background: #F1F5F9;
+  border-radius: 30rpx;
+  color: #475569;
+}
+.meta-item {
+  font-size: 22rpx;
+  color: #94A3B8;
+  display: flex;
+  align-items: center;
+  gap: 4rpx;
+}
+
+/* 换一批按钮 */
+.refresh-footer {
+  margin-top: 40rpx;
+  margin-bottom: 60rpx;
+}
+.glass-btn {
+  background: #334155;
+  color: #FFF;
+  font-size: 30rpx;
+  font-weight: 600;
+  border-radius: 50rpx;
+  padding: 24rpx 0;
+  width: 100%;
+  box-shadow: 0 8rpx 20rpx rgba(51, 65, 85, 0.2);
+}
+.glass-btn:active {
+  transform: scale(0.98);
+}
+
+/* 加载与空状态 */
+.loading-state, .empty-state {
+  height: 60vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24rpx;
 }
 .loading-spinner {
-  width: 90rpx; /* 旋转器稍微大一点 */
-  height: 90rpx;
-  border-width: 8rpx; /* 边框更粗 */
-  border-top-color: #FF6B35;
-}
-.loading-text {
-  font-size: 30rpx; /* 字体稍微大一点 */
-  color: #777; /* 颜色稍微深一点 */
-}
-
-/* 食谱列表 (Recipe List) */
-.recipe-list {
-  margin-top: 30rpx; /* 增加与上方内容的间距 */
-}
-.recipe-card {
-  border-radius: 24rpx; /* 更多圆角，与AI建议卡片保持风格一致 */
-  margin-bottom: 32rpx; /* 增加卡片间的垂直间距 */
-  box-shadow: 0 8rpx 24rpx rgba(14, 13, 13, 0.1); /* 更明显、更立体的阴影效果 */
-}
-.recipe-card:active {
-  transform: translateY(1rpx) scale(0.99); /* 点击时轻微下沉和缩小 */
-  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.15);
-}
-.recipe-image-container {
-  height: 480rpx; /* 增加图片高度，更具视觉冲击力 */
-}
-.recipe-score {
-  top: 20rpx; /* 分数标签稍微向下、向左移动一点 */
-  right: 20rpx;
-  border-radius: 28rpx; /* 更多圆角 */
-  padding: 10rpx 18rpx; /* 增加内边距 */
-}
-.score-icon {
-  font-size: 26rpx;
-}
-.score-value {
-  font-size: 26rpx;
-}
-.recipe-info {
-  padding: 30rpx; /* 增加卡片信息区域的内边距 */
-}
-.recipe-header {
-  margin-bottom: 16rpx; /* 增加标题下方间距 */
-}
-.recipe-name {
-  font-size: 40rpx; /* 食谱名称字体更大，更醒目 */
-  font-weight: 700; /* 加粗 */
-  color: #222; /* 更深的字体颜色，对比度更高 */
-}
-.action-btn {
-  width: 64rpx; /* 动作按钮稍微大一点 */
-  height: 64rpx;
-  background: #F0F0F0; /* 按钮背景色稍微深一点 */
-  box-shadow: 0 2rpx 6rpx rgba(0, 0, 0, 0.05); /* 为按钮添加细微阴影 */
-}
-.action-btn:active {
-  background: #E5E5E5;
-  transform: scale(0.95);
-}
-.action-icon {
-  font-size: 36rpx; /* 图标字体更大 */
-  color: #555; /* 图标颜色稍微深一点 */
-}
-.recipe-description {
-  font-size: 30rpx; /* 描述文字字体稍微大一点 */
-  color: #555; /* 颜色稍微深一点 */
-  margin-bottom: 20rpx; /* 增加下方间距 */
-}
-
-/* 营养信息 (Nutrition Info) */
-.nutrition-info {
-  padding: 20rpx 0; /* 增加垂直内边距 */
-  margin-bottom: 20rpx; /* 增加下方间距 */
-  border-top: 1rpx solid #EAEAEA; /* 边框颜色更浅一点 */
-  border-bottom: 1rpx solid #EAEAEA;
-}
-.nutrition-icon {
-  font-size: 30rpx; /* 图标稍微大一点 */
-  color: #555;
-}
-.nutrition-value {
-  font-size: 40rpx; /* 数值字体稍微大一点 */
-  font-weight: 700; /* 加粗 */
-  color: #222;
-}
-.nutrition-unit {
-  font-size: 25rpx; /* 单位字体稍微大一点 */
-  color: #888;
-}
-
-/* 标签 (Tags) */
-.recipe-tags {
-  margin-bottom: 20rpx; /* 增加下方间距 */
-  gap: 12rpx; /* 增加标签之间的间距 */
-}
-.tag {
-  padding: 8rpx 18rpx; /* 增加内边距 */
-  background: #e9e8e8; /* 标签背景色稍微深一点 */
-  border-radius: 24rpx; /* 更多圆角，像胶囊 */
-  font-size: 24rpx; /* 字体稍微大一点 */
-  color: rgb(44, 43, 43); /* 字体颜色稍微深一点 */
-  font-weight: 500;
-}
-
-/* 烹饪信息 (Cooking Info) */
-.cooking-info {
-  font-size: 26rpx; /* 字体稍微大一点 */
-  color: rgb(70, 68, 68); /* 颜色稍微深一点 */
-  padding-top: 16rpx; /* 增加上方内边距 */
-  border-top: 1rpx solid #EAEAEA;
-}
-.cooking-time::before,
-.cooking-difficulty::before {
-  font-size: 28rpx; /* 图标字体大小与文字匹配 */
-}
-
-/* 空状态 (Empty State) */
-.empty-state {
-  padding: 160rpx 0; /* 增加垂直内边距，使空状态居中更舒适 */
+  width: 60rpx;
+  height: 60rpx;
+  border: 4rpx solid #E2E8F0;
+  border-top-color: #334155;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
 }
 .empty-icon {
-  font-size: 150rpx; /* 图标更大，更显眼 */
-  margin-bottom: 30rpx;
-  color: #D0D0D0; /* 颜色稍微深一点 */
+  font-size: 80rpx;
+  opacity: 0.5;
 }
 .empty-text {
-  font-size: 36rpx; /* 字体更大 */
-  color: #555; /* 字体颜色稍微深一点 */
-  margin-bottom: 16rpx;
+  font-size: 28rpx;
+  color: #94A3B8;
 }
-.empty-hint {
-  font-size: 28rpx; /* 字体更大 */
-  color: #888;
-}
+@keyframes spin { to { transform: rotate(360deg); } }

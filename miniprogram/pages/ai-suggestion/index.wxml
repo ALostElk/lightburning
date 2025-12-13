@@ -1,193 +1,109 @@
 <!--pages/ai-suggestion/index.wxml-->
-<view class="container">
-
-  <!-- 加载中 -->
-  <view wx:if="{{loading}}" class="loading-container">
-    <view class="loading-spinner"></view>
-    <text class="loading-text">AI正在分析您的饮食数据...</text>
+<view class="page-container">
+  
+  <!-- 极简头部: 纯文字排版 -->
+  <view class="header-section">
+    <text class="page-title">AI 智能分析</text>
+    <text class="page-desc">基于您最近 {{weeklyStats.days}} 天的饮食记录</text>
   </view>
 
-  <view wx:else>
+  <!-- 加载状态 -->
+  <view wx:if="{{loading}}" class="loading-wrapper">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">正在生成分析报告...</text>
+  </view>
+
+  <block wx:else>
     
-    <!-- AI分析头部 -->
-    <view class="ai-header">
-      <view class="ai-avatar">🤖</view>
-      <view class="ai-intro">
-        <text class="ai-title">AI营养师</text>
-        <text class="ai-subtitle">基于您近{{weeklyStats ? weeklyStats.days : 7}}天的饮食数据分析</text>
+    <!-- 智能建议 (无图标，色条指示) -->
+    <view class="section-container">
+      <view class="section-header">
+        <text class="section-title">核心建议</text>
       </view>
-    </view>
-
-    <!-- AI建议卡片 -->
-    <view class="suggestions-section">
-      <view class="section-title">
-        <text class="title-icon">💡</text>
-        <text class="title-text">智能建议</text>
-      </view>
-
+      
       <view class="suggestions-list">
-        <view 
-          wx:for="{{suggestions}}" 
-          wx:key="type"
-          class="suggestion-card severity-{{item.severity}}"
-        >
-          <view class="suggestion-header">
-            <text class="suggestion-icon">{{item.icon}}</text>
-            <view class="severity-badge severity-{{item.severity}}">
-              <text>{{item.severity === 'success' ? '良好' : item.severity === 'warning' ? '注意' : item.severity === 'error' ? '警告' : '提示'}}</text>
+        <block wx:for="{{suggestions}}" wx:key="index">
+          <view class="glass-card suggestion-item">
+            <!-- 顶部极简指示条 (Organic Pill) -->
+            <view class="note-indicator {{item.severity}}"></view>
+            
+            <view class="note-content">
+               <text class="suggestion-title">{{item.title}}</text>
+               <text class="suggestion-body">{{item.message}}</text>
             </view>
           </view>
-          <text class="suggestion-message">{{item.message}}</text>
+        </block>
+      </view>
+    </view>
+
+    <!-- 营养数据 (极简仪表盘) -->
+    <view class="section-container">
+      <view class="section-header">
+        <text class="section-title">营养摄入概览</text>
+      </view>
+
+      <view class="glass-card dashboard-card">
+        <!-- 核心数据行 -->
+        <view class="data-row">
+           <view class="data-col">
+             <text class="label">蛋白质</text>
+             <text class="value">{{weeklyStats.avg.protein}} <text class="unit">g</text></text>
+             <view class="status-dot {{nutritionGap.proteinDeficit > 0 ? 'warn' : 'good'}}"></view>
+           </view>
+           <view class="divider"></view>
+           <view class="data-col">
+             <text class="label">碳水</text>
+             <text class="value">{{weeklyStats.avg.carbs}} <text class="unit">g</text></text>
+             <view class="status-dot {{nutritionGap.carbsExcess > 0 ? 'warn' : 'good'}}"></view>
+           </view>
+           <view class="divider"></view>
+           <view class="data-col">
+             <text class="label">脂肪</text>
+             <text class="value">{{weeklyStats.avg.fat}} <text class="unit">g</text></text>
+             <view class="status-dot {{nutritionGap.fatExcess > 0 ? 'warn' : 'good'}}"></view>
+           </view>
+        </view>
+        
+        <!-- 热量进度 -->
+        <view class="progress-section">
+           <view class="progress-info">
+             <text class="label">热量摄入</text>
+             <text class="value-small">{{weeklyStats.avg.calories}} / {{weeklyStats.goals.calories}} kcal</text>
+           </view>
+           <view class="progress-bar-bg">
+             <view class="progress-bar-fill" style="width: {{weeklyStats.completion.calories}}%"></view>
+           </view>
         </view>
       </view>
     </view>
 
-    <!-- 每周统计 -->
-    <view wx:if="{{weeklyStats}}" class="stats-section">
-      <view class="section-title">
-        <text class="title-icon">📊</text>
-        <text class="title-text">近{{weeklyStats.days}}天平均摄入</text>
+    <!-- 推荐食谱 (无图标) -->
+    <view class="section-container">
+      <view class="section-header row-between">
+         <text class="section-title">推荐食谱</text>
+         <text class="link-text" bindtap="onRefresh">换一批</text>
       </view>
 
-      <view class="stats-grid">
-        <view class="stat-item">
-          <text class="stat-label">热量</text>
-          <text class="stat-value">{{weeklyStats.avg.calories}}</text>
-          <text class="stat-unit">/ {{weeklyStats.goals.calories}}卡</text>
-          <view class="progress-bar">
-            <view 
-              class="progress-fill" 
-              style="width: {{weeklyStats.completion.calories > 100 ? 100 : weeklyStats.completion.calories}}%; background: {{weeklyStats.completion.calories >= 80 && weeklyStats.completion.calories <= 120 ? '#51CF66' : '#FFB84D'}};"
-            ></view>
-          </view>
-          <text class="stat-percentage">{{weeklyStats.completion.calories}}%</text>
-        </view>
-
-        <view class="stat-item">
-          <text class="stat-label">蛋白质</text>
-          <text class="stat-value">{{weeklyStats.avg.protein}}g</text>
-          <text class="stat-unit">/ {{weeklyStats.goals.protein}}g</text>
-          <view class="progress-bar">
-            <view 
-              class="progress-fill" 
-              style="width: {{weeklyStats.completion.protein > 100 ? 100 : weeklyStats.completion.protein}}%; background: {{weeklyStats.completion.protein >= 80 && weeklyStats.completion.protein <= 120 ? '#51CF66' : '#FFB84D'}};"
-            ></view>
-          </view>
-          <text class="stat-percentage">{{weeklyStats.completion.protein}}%</text>
-        </view>
-
-        <view class="stat-item">
-          <text class="stat-label">碳水</text>
-          <text class="stat-value">{{weeklyStats.avg.carbs}}g</text>
-          <text class="stat-unit">/ {{weeklyStats.goals.carbs}}g</text>
-          <view class="progress-bar">
-            <view 
-              class="progress-fill" 
-              style="width: {{weeklyStats.completion.carbs > 100 ? 100 : weeklyStats.completion.carbs}}%; background: {{weeklyStats.completion.carbs >= 80 && weeklyStats.completion.carbs <= 120 ? '#51CF66' : '#FFB84D'}};"
-            ></view>
-          </view>
-          <text class="stat-percentage">{{weeklyStats.completion.carbs}}%</text>
-        </view>
-
-        <view class="stat-item">
-          <text class="stat-label">脂肪</text>
-          <text class="stat-value">{{weeklyStats.avg.fat}}g</text>
-          <text class="stat-unit">/ {{weeklyStats.goals.fat}}g</text>
-          <view class="progress-bar">
-            <view 
-              class="progress-fill" 
-              style="width: {{weeklyStats.completion.fat > 100 ? 100 : weeklyStats.completion.fat}}%; background: {{weeklyStats.completion.fat >= 80 && weeklyStats.completion.fat <= 120 ? '#51CF66' : '#FFB84D'}};"
-            ></view>
-          </view>
-          <text class="stat-percentage">{{weeklyStats.completion.fat}}%</text>
-        </view>
-      </view>
-    </view>
-
-    <!-- 推荐食谱 -->
-    <view class="recipes-section">
-      <view class="section-title">
-        <text class="title-icon">🍽️</text>
-        <text class="title-text">为您推荐的食谱</text>
-      </view>
-
-      <view class="recipes-grid">
+      <scroll-view scroll-x class="recipes-scroll" enable-flex>
         <view 
           wx:for="{{recommendedRecipes}}" 
-          wx:key="id"
-          class="recipe-mini-card"
-          data-id="{{item.id}}"
+          wx:key="id" 
+          class="glass-card recipe-card"
           bindtap="onRecipeClick"
+          data-id="{{item.id}}"
         >
-          <image class="recipe-mini-image" src="{{item.image}}" mode="aspectFill" />
-          <view class="recipe-mini-info">
-            <text class="recipe-mini-name">{{item.name}}</text>
-            <!-- AI推荐理由 -->
-            <text wx:if="{{item.aiReason}}" class="ai-reason">🤖 {{item.aiReason}}</text>
-            <view class="recipe-mini-nutrition">
-              <text class="mini-nutrition-item">🔥{{item.calories}}</text>
-              <text class="mini-nutrition-item">💪{{item.protein}}g</text>
-            </view>
+          <image class="recipe-img" src="{{item.image}}" mode="aspectFill" />
+          <view class="recipe-content">
+             <text class="recipe-name">{{item.name}}</text>
+             <view class="recipe-meta">
+               <text class="meta-text">{{item.calories}} kcal</text>
+               <text class="meta-dot">·</text>
+               <text class="meta-text">蛋白质 {{item.protein}}g</text>
+             </view>
           </view>
         </view>
-      </view>
-
-      <button class="btn-view-more" bindtap="onViewMoreRecipes">
-        查看更多推荐
-      </button>
+      </scroll-view>
     </view>
 
-    <!-- 详细营养分析（可展开） -->
-    <view class="detail-analysis-section">
-      <view 
-        class="detail-analysis-header"
-        bindtap="onToggleDetailAnalysis"
-      >
-        <text class="title-icon">📋</text>
-        <text class="title-text">详细营养分析</text>
-        <text class="toggle-icon">{{showDetailAnalysis ? '▲' : '▼'}}</text>
-      </view>
-
-      <view wx:if="{{showDetailAnalysis}}" class="detail-analysis-content">
-        <view class="analysis-item">
-          <text class="analysis-label">蛋白质缺口</text>
-          <text class="analysis-value {{nutritionGap.proteinDeficit > 0 ? 'deficit' : 'surplus'}}">
-            {{nutritionGapDisplay.protein.sign}}{{nutritionGapDisplay.protein.value}}g
-          </text>
-        </view>
-
-        <view class="analysis-item">
-          <text class="analysis-label">碳水缺口</text>
-          <text class="analysis-value {{nutritionGap.carbsDeficit > 0 ? 'deficit' : 'surplus'}}">
-            {{nutritionGapDisplay.carbs.sign}}{{nutritionGapDisplay.carbs.value}}g
-          </text>
-        </view>
-
-        <view class="analysis-item">
-          <text class="analysis-label">脂肪缺口</text>
-          <text class="analysis-value {{nutritionGap.fatDeficit > 0 ? 'deficit' : 'surplus'}}">
-            {{nutritionGapDisplay.fat.sign}}{{nutritionGapDisplay.fat.value}}g
-          </text>
-        </view>
-
-        <view class="analysis-item">
-          <text class="analysis-label">热量缺口</text>
-          <text class="analysis-value {{nutritionGap.caloriesDeficit > 0 ? 'deficit' : 'surplus'}}">
-            {{nutritionGapDisplay.calories.sign}}{{nutritionGapDisplay.calories.value}}卡
-          </text>
-        </view>
-      </view>
-    </view>
-
-    <!-- 刷新按钮 -->
-    <view class="refresh-section">
-      <button class="btn-refresh" bindtap="onRefresh">
-        <text class="refresh-icon">🔄</text>
-        <text>重新分析</text>
-      </button>
-    </view>
-
-  </view>
-
+  </block>
 </view>
-

@@ -43,51 +43,59 @@ Page({
   async loadAnalysis() {
     this.setData({ loading: true });
 
-    wx.showLoading({ title: 'AI正在分析中...' });
+    wx.showLoading({
+      title: 'AI正在分析中...',
+      mask: true
+    });
 
     try {
       // 分析营养缺口
       const nutritionGap = this.engine.analyzeNutritionGap(7);
-      
-      // 使用AI生成建议（异步）
-      const suggestions = await this.engine.generateAISuggestion(nutritionGap);
-      
-      // 获取推荐食谱
+
+      // 先获取推荐食谱（不依赖AI）
       const recommendedRecipes = this.engine.getRecommendedRecipes({
         type: 'ai',
         limit: 6
       });
 
-      // 为每个食谱生成AI推荐理由（可选）
-      // 注意：这会增加请求次数，建议只为前3个食谱生成
-      for (let i = 0; i < Math.min(3, recommendedRecipes.length); i++) {
-        const reason = await this.engine.generateRecipeReason(recommendedRecipes[i]);
-        if (reason) {
-          recommendedRecipes[i].aiReason = reason;
-        }
-      }
-
       // 计算每周统计
       const weeklyStats = this.calculateWeeklyStats();
-      
+
       // 格式化营养缺口显示数据
       const nutritionGapDisplay = this.formatNutritionGap(nutritionGap);
 
+      // 先显示基础数据
       this.setData({
         nutritionGap,
         nutritionGapDisplay,
-        suggestions,
         recommendedRecipes,
         weeklyStats,
         loading: false
       });
 
+      // 使用AI生成建议（异步）
+      wx.showLoading({
+        title: 'AI生成建议中...',
+        mask: true
+      });
+
+      try {
+        const suggestions = await this.engine.generateAISuggestion(nutritionGap);
+        this.setData({ suggestions });
+      } catch (aiError) {
+        console.warn('AI生成建议失败:', aiError);
+        // 使用默认建议
+        const suggestions = this.engine.generateDefaultSuggestions(nutritionGap);
+        this.setData({ suggestions });
+      }
+
       wx.hideLoading();
+
     } catch (error) {
       console.error('分析失败:', error);
       wx.hideLoading();
       wx.showToast({
-        title: 'AI分析失败，使用默认分析',
+        title: '加载失败，使用默认分析',
         icon: 'none'
       });
 
@@ -99,7 +107,7 @@ Page({
         limit: 6
       });
       const weeklyStats = this.calculateWeeklyStats();
-      
+
       // 格式化营养缺口显示数据
       const nutritionGapDisplay = this.formatNutritionGap(nutritionGap);
 
@@ -119,7 +127,7 @@ Page({
    */
   formatNutritionGap(gap) {
     if (!gap) return this.data.nutritionGapDisplay;
-    
+
     return {
       protein: {
         sign: gap.proteinDeficit > 0 ? '-' : '+',
@@ -145,25 +153,16 @@ Page({
    */
   calculateWeeklyStats() {
     const records = this.engine.getRecentDietRecords(7);
-    
+
     if (records.length === 0) {
       return null;
     }
 
-    const total = records.reduce((acc, record) => {
-      acc.calories += record.calories || 0;
-      acc.protein += record.protein || 0;
-      acc.carbs += record.carbs || 0;
-      acc.fat += record.fat || 0;
-      return acc;
-    }, { calories: 0, protein: 0, carbs: 0, fat: 0 });
+    // 使用与 engine 一致的按日期分组逻辑
+    const avg = this.engine.calculateAverageNutrition(records);
 
-    const avg = {
-      calories: Math.round(total.calories / records.length),
-      protein: Math.round(total.protein / records.length),
-      carbs: Math.round(total.carbs / records.length),
-      fat: Math.round(total.fat / records.length)
-    };
+    // 计算实际有记录的天数
+    const uniqueDays = new Set(records.map(r => r.date.split(' ')[0])).size;
 
     const app = getApp();
     const goals = {
@@ -174,7 +173,7 @@ Page({
     };
 
     return {
-      days: records.length,
+      days: uniqueDays, // 显示实际天数
       avg,
       goals,
       completion: {
