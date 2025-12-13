@@ -1,11 +1,5 @@
 // pages/stats/index.js
-
-import {
-  getProfile,
-  evaluateDaily,
-  getDietLogsByRange
-} from '../../../utils/cloudApi.js';
-
+import * as api from '../../../utils/cloudApi.js';
 
 // ======================== 工具函数 ========================
 
@@ -22,39 +16,82 @@ function calcDateRange(days) {
     return `${y}-${m}-${dd}`;
   };
 
-  return {
-    startDate: f(start),
-    endDate: f(end)
-  };
+  return { startDate: f(start), endDate: f(end) };
 }
 
 // 将 YYYY-MM-DD 转 Date
 function parseDate(str) {
-  const [y, m, d] = str.split('-');
+  const [y, m, d] = String(str).split('-');
   return new Date(Number(y), Number(m) - 1, Number(d));
 }
 
-// 饮食统计封装（你原来的逻辑保持不变）
-function buildStatsFromLogs(logs, rangeDays) {
+function formatDate(d) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${dd}`;
+}
+
+// 生成日期数组（包含 end）
+function makeDateList(startDate, endDate) {
+  const start = parseDate(startDate);
+  const end = parseDate(endDate);
+  const dates = [];
+  const cur = new Date(start);
+
+  while (cur <= end) {
+    dates.push(formatDate(cur));
+    cur.setDate(cur.getDate() + 1);
+  }
+  return dates;
+}
+
+// 并发限制执行（避免 Promise.all 一口气打爆云函数）
+async function mapLimit(list, limit, worker) {
+  const ret = [];
+  let i = 0;
+
+  async function runOne() {
+    while (i < list.length) {
+      const idx = i++;
+      try {
+        ret[idx] = await worker(list[idx], idx);
+      } catch (e) {
+        ret[idx] = null;
+      }
+    }
+  }
+
+  const runners = Array.from({ length: Math.max(1, limit) }, runOne);
+  await Promise.all(runners);
+  return ret;
+}
+
+// 从 range 接口 data 里取 records（兼容多种实现）
+function pickDietRecords(data) {
+  if (!data) return [];
+  if (Array.isArray(data)) return data;
+  if (Array.isArray(data.records)) return data.records;
+  if (Array.isArray(data.logs)) return data.logs;
+  if (Array.isArray(data.list)) return data.list;
+  return [];
+}
+
+// ======================== 饮食统计 ========================
+
+function buildStatsFromDietRecords(records, rangeDays) {
   const dayMap = {};
   let totalCalories = 0, totalProtein = 0, totalFat = 0, totalCarbs = 0;
 
-  let totalEx = 0;
-  const exSet = {};
-
-  const weightLogs = [];
-  let firstW = null, lastW = null;
-  let firstDate = null, lastDate = null;
-
-  logs.forEach(log => {
-    const date = log.recordDate;
+  records.forEach((log) => {
+    const date = log.recordDate || log.date;
     if (!date) return;
 
     if (!dayMap[date]) {
       dayMap[date] = { date, calories: 0, protein: 0, fat: 0, carbs: 0 };
     }
 
-    const c = Number(log.calories) || 0;
+    const c = Number(log.calories || log.totalCalories || 0) || 0;
     const p = Number(log.protein) || 0;
     const f = Number(log.fat) || 0;
     const cb = Number(log.carbs) || 0;
@@ -68,25 +105,6 @@ function buildStatsFromLogs(logs, rangeDays) {
     totalProtein += p;
     totalFat += f;
     totalCarbs += cb;
-
-    const ex = Number(log.exerciseMinutes) || Number(log.exercise) || 0;
-    if (ex > 0) {
-      totalEx += ex;
-      exSet[date] = true;
-    }
-
-    const w = Number(log.weight) || 0;
-    if (w > 0) {
-      weightLogs.push({ date, weight: w });
-      if (firstW === null || date < firstDate) {
-        firstW = w;
-        firstDate = date;
-      }
-      if (lastW === null || date > lastDate) {
-        lastW = w;
-        lastDate = date;
-      }
-    }
   });
 
   const dailyList = Object.keys(dayMap).sort().map(k => dayMap[k]);
@@ -109,30 +127,6 @@ function buildStatsFromLogs(logs, rangeDays) {
     fp = 100 - cp - pp;
   }
 
-  const exDays = Object.keys(exSet).length;
-  const exAvg = exDays > 0 ? Math.round(totalEx / exDays) : 0;
-  const exGoal = 30;
-
-  let exText = '暂无运动记录';
-  if (exDays > 0) {
-    if (exAvg >= exGoal) exText = '整体达标（≥30min/天）';
-    else if (exAvg >= exGoal * 0.5) exText = '接近达标，建议增加时长';
-    else exText = '未达标，可以多安排运动时间';
-  }
-
-  let weightChange = 0;
-  let weightText = '暂无体重记录';
-  let trend = [];
-
-  if (weightLogs.length > 0) {
-    weightLogs.sort((a, b) => (a.date > b.date ? 1 : -1));
-    trend = weightLogs;
-    weightChange = Number((lastW - firstW).toFixed(1));
-    if (weightChange > 0) weightText = `+${weightChange} kg`;
-    else if (weightChange < 0) weightText = `${weightChange} kg`;
-    else weightText = '0 kg';
-  }
-
   return {
     totalCaloriesIn: totalCalories,
     avgCaloriesIn: avgCalories,
@@ -142,18 +136,6 @@ function buildStatsFromLogs(logs, rangeDays) {
     totalDays: rangeDays,
     recordDays: activeDays,
     recordRate: rangeDays > 0 ? Math.round((activeDays * 100) / rangeDays) : 0,
-
-    exerciseMinutesTotal: totalEx,
-    exerciseDays: exDays,
-    exerciseAvgMinutes: exAvg,
-    exerciseGoalPerDay: exGoal,
-    exerciseStatusText: exText,
-
-    weightStart: firstW,
-    weightEnd: lastW,
-    weightChange,
-    weightChangeText: weightText,
-    weightTrendList: trend,
 
     minCalories,
     maxCalories,
@@ -166,7 +148,7 @@ function buildStatsFromLogs(logs, rangeDays) {
   };
 }
 
-// ===============================================================
+// ======================== Page ========================
 
 Page({
   data: {
@@ -193,14 +175,7 @@ Page({
     exerciseGoalPerDay: 30,
     exerciseStatusText: '',
 
-    // 体重
-    weightStart: null,
-    weightEnd: null,
-    weightChange: 0,
-    weightChangeText: '',
-    weightTrendList: [],
-
-    // 体重目标进度
+    // ✅ 体重：只展示目标差距
     currentWeight: null,
     targetWeight: null,
     weightGoalText: '暂无目标体重',
@@ -251,23 +226,42 @@ Page({
     wx.showLoading({ title: '加载中...', mask: true });
 
     try {
-      const res = await getDietLogsByRange(startDate, endDate);
-      const result = res.result || {};
-
-      if (!result.success) {
+      // 1) 饮食范围记录
+      const dietRes = await api.getDietLogsByRange(startDate, endDate);
+      const dietResult = dietRes?.result || {};
+      if (!dietResult.success) {
         wx.showToast({ title: '加载数据失败', icon: 'none' });
         return;
       }
 
-      const logs = result.data || [];
-      const stats = buildStatsFromLogs(logs, rangeDays);
+      const dietRecords = pickDietRecords(dietResult.data);
+      const dietStats = buildStatsFromDietRecords(dietRecords, rangeDays);
 
-      this.setData(stats);
+      // ✅ 只写饮食相关字段，不会覆盖运动/计划
+      this.setData(dietStats);
 
-      wx.nextTick(() => this.drawWeightChart());
+      // 2) 日期列表
+      const dates = makeDateList(startDate, endDate);
 
-      await this.updateProfileAndProgress(stats);
-      await this.loadPlanProgress();
+      // 3) 并行：运动 + 计划完成度 + profile（用于体重目标差距）
+      const [exerciseAgg, planAgg, profileRes] = await Promise.all([
+        this.loadExerciseByDates(dates),
+        this.loadPlanProgressByDates(dates),
+        api.getProfile()
+      ]);
+
+      // ✅ 运动
+      this.setData(exerciseAgg);
+
+      // ✅ 计划：只 set 展示字段（别把 _dailyEvalList 塞进 data）
+      this.setData({
+        planProgressPercent: planAgg.planProgressPercent,
+        planSummaryText: planAgg.planSummaryText
+      });
+
+      // ✅ 体重目标差距：只基于 profile（不做折线图）
+      const profile = profileRes?.result?.success ? (profileRes.result.data || {}) : {};
+      await this.updateGoalDistanceFromProfile(profile);
 
     } catch (err) {
       console.error(err);
@@ -278,138 +272,143 @@ Page({
     }
   },
 
-  // ===================== 体重档案 & 目标进度 =====================
+  // ===================== 运动：逐日 getExerciseLogs（保留能显示的版本） =====================
 
-  async updateProfileAndProgress(stats) {
-    try {
-      const res = await getProfile();
-      const result = res.result || {};
-      if (!result.success) return;
+  async loadExerciseByDates(dates) {
+    let totalMin = 0;
+    const daySet = new Set();
 
-      const profile = result.data;
-      const targetWeight = Number(profile.targetWeight) || null;
-      const currentWeight = Number(profile.weight) || stats.weightEnd;
+    // 并发限制 3，稳一点
+    const results = await mapLimit(dates, 3, async (d) => {
+      const res = await api.getExerciseLogs(d);
+      const ok = res?.result?.success;
+      const data = res?.result?.data;
+      return ok ? data : null;
+    });
 
-      const weightStart = stats.weightStart ?? currentWeight;
-      const goal = profile.goal || '减脂';
+    results.forEach((logs, idx) => {
+      if (!logs) return;
 
-      let totalChange = 0, finished = 0;
-
-      if (goal === '增肌' || currentWeight < targetWeight) {
-        totalChange = targetWeight - weightStart;
-        finished = currentWeight - weightStart;
-      } else {
-        totalChange = weightStart - targetWeight;
-        finished = weightStart - currentWeight;
+      // 你们首页里 exerciseRes.result.data 是数组，这里保持一致
+      if (Array.isArray(logs)) {
+        logs.forEach(log => {
+          // duration(分钟) 常见；也兼容 minutes/exerciseMinutes
+          const minutes = Number(log.duration || log.minutes || log.exerciseMinutes || 0) || 0;
+          if (minutes > 0) {
+            totalMin += minutes;
+            daySet.add(dates[idx]);
+          }
+        });
       }
+    });
 
-      let percent = 0;
-      let text = '暂无目标体重';
+    const exDays = daySet.size;
+    const exAvg = exDays > 0 ? Math.round(totalMin / exDays) : 0;
+    const exGoal = 30;
 
-      if (totalChange > 0) {
-        finished = Math.max(0, Math.min(finished, totalChange));
-        percent = Math.round((finished * 100) / totalChange);
-        text = `已完成 ${finished.toFixed(1)} / ${totalChange.toFixed(1)} kg`;
-      }
-
-      this.setData({
-        currentWeight,
-        targetWeight,
-        weightGoalText: text,
-        weightProgressPercent: percent
-      });
-
-    } catch (e) {
-      console.error(e);
+    let exText = '暂无运动记录';
+    if (exDays > 0) {
+      if (exAvg >= exGoal) exText = '整体达标（≥30min/天）';
+      else if (exAvg >= exGoal * 0.5) exText = '接近达标，建议增加时长';
+      else exText = '未达标，可以多安排运动时间';
     }
+
+    return {
+      exerciseMinutesTotal: totalMin,
+      exerciseDays: exDays,
+      exerciseAvgMinutes: exAvg,
+      exerciseGoalPerDay: exGoal,
+      exerciseStatusText: exText
+    };
   },
 
-  // ===================== 计划完成度（日评） =====================
+  // ===================== 计划完成度：逐日 evaluateDaily（稳 + 兼容） =====================
 
-  async loadPlanProgress() {
-    const { startDate, endDate } = this.data;
-
-    const start = parseDate(startDate);
-    const end = parseDate(endDate);
-    const dates = [];
-
-    const cur = new Date(start);
-    while (cur <= end) {
-      const y = cur.getFullYear();
-      const m = String(cur.getMonth() + 1).padStart(2, '0');
-      const d = String(cur.getDate()).padStart(2, '0');
-      dates.push(`${y}-${m}-${d}`);
-      cur.setDate(cur.getDate() + 1);
-    }
-
+  async loadPlanProgressByDates(dates) {
     let successDays = 0;
     let evaluatedDays = 0;
 
-    await Promise.all(
-      dates.map(async d => {
+    function isDaySuccess(data) {
+      if (!data) return false;
+      if (data.status === 'success' || data.status === true) return true;
+
+      const s = String(data.status || data.result || data.state || '').toLowerCase();
+      if (['pass', 'passed', 'ok', 'success', 'achieved', 'done', '达标', '完成'].includes(s)) return true;
+
+      const nested =
+        data.evaluation?.status ??
+        data.report?.status ??
+        data.dailyReport?.status ??
+        data.data?.status;
+      if (nested === 'success' || nested === true) return true;
+
+      if (data.goalMet === true || data.isSuccess === true || data.achieved === true) return true;
+
+      return false;
+    }
+
+    // ✅ 串行：最稳（不吃运动，不影响别的模块）
+    for (const d of dates) {
+      try {
+        let res;
         try {
-          const res = await evaluateDaily(d);
-          const result = res.result;
-          if (result?.success) {
-            evaluatedDays++;
-            if (result.data?.status === 'success') successDays++;
-          }
-        } catch {}
-      })
-    );
+          res = await api.evaluateDaily(d);
+        } catch (e1) {
+          res = await api.evaluateDaily({ date: d });
+        }
 
-    const percent = Math.round((successDays * 100) / dates.length);
+        const ok = res?.result?.success;
+        const data = ok ? (res.result.data || null) : null;
+        if (data) {
+          evaluatedDays++;
+          if (isDaySuccess(data)) successDays++;
+        }
+      } catch (e) {}
+    }
 
-    this.setData({
+    const percent = dates.length > 0 ? Math.round((successDays * 100) / dates.length) : 0;
+
+    return {
       planProgressPercent: percent,
-      planSummaryText:
-        `${successDays}/${dates.length} 天达标，${evaluatedDays} 天已生成日评`
-    });
+      planSummaryText: `${successDays}/${dates.length} 天达标，${evaluatedDays} 天已生成日评`
+    };
   },
 
-  // ===================== 体重折线图 =====================
+  // ===================== 体重：显示距离目标还有多远（不做历史） =====================
 
-  drawWeightChart() {
-    const list = this.data.weightTrendList;
-    const ctx = wx.createCanvasContext('weightChart', this);
+  async updateGoalDistanceFromProfile(profile) {
+    const currentWeight = Number(profile.weight) || null;
+    const targetWeight = Number(profile.targetWeight) || null;
 
-    const width = 300, height = 120, p = 10;
-    ctx.clearRect(0, 0, width, height);
-
-    if (!list || !list.length) {
-      ctx.draw();
+    if (!currentWeight || !targetWeight) {
+      this.setData({
+        currentWeight,
+        targetWeight,
+        weightGoalText: '暂无目标体重',
+        weightProgressPercent: 0
+      });
       return;
     }
 
-    const weights = list.map(i => i.weight);
-    const min = Math.min(...weights);
-    const max = Math.max(...weights);
-    const diff = max - min || 1;
+    const diff = Number((targetWeight - currentWeight).toFixed(1));
+    const absDiff = Math.abs(diff);
 
-    const stepX = (width - p * 2) / (list.length - 1);
+    const direction = diff < 0 ? '还需减重' : diff > 0 ? '还需增重' : '已达成目标';
+    const text = diff === 0 ? '已达成目标 🎉' : `${direction} ${absDiff} kg`;
 
-    ctx.setStrokeStyle('#1f8cff');
-    ctx.setLineWidth(2);
-    ctx.beginPath();
+    // 没有历史时，用“接近度”做进度：<=0.5kg 视作100%，>=10kg 视作0%
+    const maxGap = 10;
+    let percent = 0;
+    if (absDiff <= 0.5) percent = 100;
+    else if (absDiff >= maxGap) percent = 0;
+    else percent = Math.round((1 - (absDiff - 0.5) / (maxGap - 0.5)) * 100);
 
-    list.forEach((item, idx) => {
-      const x = p + idx * stepX;
-      const y = height - p - ((item.weight - min) / diff) * (height - p * 2);
-      idx === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    this.setData({
+      currentWeight,
+      targetWeight,
+      weightGoalText: text,
+      weightProgressPercent: percent
     });
-
-    ctx.stroke();
-
-    ctx.setFillStyle('#1f8cff');
-    list.forEach((item, idx) => {
-      const x = p + idx * stepX;
-      const y = height - p - ((item.weight - min) / diff) * (height - p * 2);
-      ctx.beginPath();
-      ctx.arc(x, y, 3, 0, Math.PI * 2);
-      ctx.fill();
-    });
-
-    ctx.draw();
   },
 
   goWeeklyReport() {
