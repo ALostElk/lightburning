@@ -16,13 +16,13 @@ Page({
   data: {
     // 时间状态
     currentTime: '16:00',
-    
+
     // 导航
     currentTab: 3, // 默认选中"我的"页面
-    
+
     // 问候语
     greeting: '下午好',
-    
+
     // 用户信息
     userInfo: {
       avatarUrl: '/images/default-avatar.png',
@@ -33,29 +33,29 @@ Page({
       age: 0,
       gender: 'male'
     },
-    
+
     // 用户统计数据
     userStats: {
       bmi: 0,
       bmr: 0,
       tdee: 0
     },
-    
+
     // 今日数据
     todayIntake: 0,
     todayConsume: 0,
     recordCount: 0,
-    
+
     // 热量结余数据
     calorieBalance: 0,
     ringColor: '#FF6B35', // 默认橙色（盈余）
     ringDegrees: 0,
     balanceLabel: '热量盈余',
-    
+
     // 加载状态
     isLoading: false,
     loadError: false, // 新增：数据加载错误状态
-    
+
     // UI状态
     isNicknameModalShow: false,
     newNickname: '',
@@ -132,14 +132,14 @@ Page({
   switchTab(e) {
     const tab = parseInt(e.currentTarget.dataset.tab);
     this.setData({ currentTab: tab });
-    
+
     const tabUrls = [
       '/pages/index/index',
       '/pages/diet/index',
       '/pages/exercise/index',
       '/pages/mine/index/index'
     ];
-    
+
     if (tab !== 3) { // 如果不是"我的"页面
       wx.switchTab({ url: tabUrls[tab] });
     }
@@ -148,8 +148,8 @@ Page({
   // 加载所有数据
   async loadAllData() {
     if (this.data.isLoading) return;
-    
-    this.setData({ 
+
+    this.setData({
       isLoading: true,
       loadError: false // 重置错误状态
     });
@@ -157,10 +157,10 @@ Page({
 
     try {
       // 增加超时控制
-      const timeoutPromise = new Promise((_, reject) => 
+      const timeoutPromise = new Promise((_, reject) =>
         setTimeout(() => reject(new Error('请求超时')), 15000)
       );
-      
+
       // 使用Promise.race确保请求不会无限等待
       await Promise.race([
         Promise.all([
@@ -169,14 +169,14 @@ Page({
         ]),
         timeoutPromise
       ]);
-      
+
       this.calculateCalorieBalance();
-      
+
     } catch (error) {
       console.error('加载数据失败:', error);
       this.setData({ loadError: true });
       api.handleError(error, '加载失败，请稍后重试');
-      
+
       // 确保有默认数据显示
       if (!this.data.userInfo.nickName) {
         this.setData({
@@ -199,7 +199,7 @@ Page({
           recordCount: 0
         });
       }
-      
+
       this.calculateCalorieBalance();
     } finally {
       this.setData({ isLoading: false });
@@ -215,20 +215,20 @@ Page({
       console.log('开始调用用户信息接口');
       const res = await api.getProfile();
       console.log('用户信息接口返回完整数据:', res);
-      
+
       if (res.result?.success) {
         const userData = res.result.data || {};
-        
+
         // 确保关键数据有默认值
         const height = userData.height || 170;
         const weight = userData.weight || 60;
         const age = userData.age || 25;
         const gender = userData.gender || 'male';
-        
+
         // 计算BMI和BMR
         const bmi = userData.bmi || this.calculateBMI(height, weight);
         const bmr = userData.bmr || this.calculateBMR(gender, age, weight, height);
-        
+
         const userInfo = {
           avatarUrl: userData.avatarUrl || '/images/default-avatar.png',
           nickName: userData.nickName || '微信用户',
@@ -238,11 +238,12 @@ Page({
           age,
           gender
         };
-        
+
         const userStats = {
           bmi,
           bmr,
-          tdee: userData.tdee || this.calculateTDEE(bmr, userData.activityLevel)
+          tdee: userData.tdee || this.calculateTDEE(bmr, userData.activityLevel),
+          bmiStatus: this.getBMIStatus(bmi) // 新增：BMI状态
         };
 
         this.setData({ userInfo, userStats });
@@ -250,7 +251,7 @@ Page({
         wx.setStorageSync('userInfo', userInfo);
         wx.setStorageSync('userStats', userStats);
         wx.setStorageSync('userInfoUpdateTime', new Date().getTime());
-        
+
       } else {
         console.log('用户信息接口返回失败，错误信息:', res.result?.error);
         throw new Error(res.result?.error || '获取个人信息失败');
@@ -270,33 +271,33 @@ Page({
     try {
       const today = api.getTodayString ? api.getTodayString() : this.getTodayString();
       console.log('开始调用今日数据接口，请求日期:', today);
-      
+
       // 并行调用饮食接口和运动接口
       const [dietRes, exerciseRes] = await Promise.all([
         api.getDietLogs(today),
         getExerciseRecords(today)
       ]);
-      
+
       console.log('饮食接口返回:', dietRes);
       console.log('运动接口返回:', exerciseRes);
-      
+
       // 处理饮食摄入数据
-      const todayIntake = dietRes.result?.success 
-        ? (dietRes.result.data.summary?.totalCalories || 0) 
+      const todayIntake = dietRes.result?.success
+        ? (dietRes.result.data.summary?.totalCalories || 0)
         : 0;
-        
+
       // 处理运动消耗数据
       const todayConsume = exerciseRes.result?.success
         ? (exerciseRes.result.data.summary?.totalCalories || 0)
         : 0;
-        
+
       // 计算记录总数
       const dietRecords = dietRes.result?.success ? (dietRes.result.data.records?.length || 0) : 0;
       const exerciseRecords = exerciseRes.result?.success ? (exerciseRes.result.data.records?.length || 0) : 0;
       const recordCount = dietRecords + exerciseRecords;
 
       this.setData({ todayIntake, todayConsume, recordCount });
-      
+
       // 缓存今日数据
       wx.setStorageSync('todayData', {
         todayIntake,
@@ -305,7 +306,7 @@ Page({
         date: today,
         updateTime: new Date().getTime()
       });
-      
+
     } catch (error) {
       console.error('加载今日数据失败:', error);
       // 尝试加载缓存数据
@@ -317,10 +318,10 @@ Page({
   // 计算热量结余
   calculateCalorieBalance() {
     const { userStats, todayConsume, todayIntake, userInfo } = this.data;
-    
+
     // 热量结余 = 基础代谢 + 运动消耗 - 今日摄入
     const balance = userStats.bmr + todayConsume - todayIntake;
-    
+
     // 根据目标调整显示逻辑（减脂需要热量赤字，增肌需要热量盈余）
     let ringColor, balanceLabel;
     if (userInfo.goal === '减脂') {
@@ -332,12 +333,12 @@ Page({
       ringColor = balance >= 0 ? '#52C41A' : '#FF6B35';
       balanceLabel = balance >= 0 ? '热量盈余' : '热量赤字';
     }
-    
+
     // 计算环形图角度（最大360度）
     const maxDisplayValue = userStats.bmr * 0.5; // 最大显示值为基础代谢的50%
     const displayValue = Math.min(Math.abs(balance), maxDisplayValue);
     const ringDegrees = (displayValue / maxDisplayValue) * 360;
-    
+
     this.setData({
       calorieBalance: balance,
       ringColor,
@@ -384,7 +385,7 @@ Page({
       'active': 1.725,        // 高度活动
       'veryActive': 1.9       // 极度活动
     };
-    
+
     const factor = activityFactors[activityLevel] || activityFactors.moderate;
     return Math.round(bmr * factor);
   },
@@ -394,7 +395,7 @@ Page({
     const userInfo = wx.getStorageSync('userInfo');
     const userStats = wx.getStorageSync('userStats');
     const updateTime = wx.getStorageSync('userInfoUpdateTime');
-    
+
     // 检查缓存是否存在且在24小时内
     if (userInfo && userStats && updateTime && (new Date().getTime() - updateTime < 86400000)) {
       this.setData({ userInfo, userStats });
@@ -405,7 +406,7 @@ Page({
   loadCachedTodayData() {
     const todayData = wx.getStorageSync('todayData');
     const today = this.getTodayString();
-    
+
     // 检查缓存是否存在且是今日数据
     if (todayData && todayData.date === today) {
       this.setData({
@@ -446,7 +447,7 @@ Page({
       wx.showToast({ title: '昵称不能为空', icon: 'none' });
       return;
     }
-    
+
     try {
       const res = await api.updateProfile({ nickName: newNickname });
       if (res.result?.success) {
@@ -486,7 +487,7 @@ Page({
       }
     });
   },
- 
+
   // 页面跳转事件
   goToEdit() {
     wx.navigateTo({ url: '/pages/profile/index' }); // 个人信息编辑页
@@ -510,5 +511,13 @@ Page({
 
   goToHelp() {
     wx.navigateTo({ url: '/pages/help/index' }); // 使用帮助页
+  },
+
+  // 计算BMI状态颜色
+  getBMIStatus(bmi) {
+    if (bmi < 18.5) return 'yellow'; // 偏瘦
+    if (bmi < 24) return 'green';    // 正常
+    if (bmi < 28) return 'yellow';   // 超重
+    return 'red';                    // 肥胖
   }
 });

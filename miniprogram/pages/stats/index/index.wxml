@@ -57,30 +57,20 @@
   </view>
 </view>
 
-<!-- 体重卡片：折线图 + 体重进度条 -->
+<!-- 体重卡片：目标进度（不使用折线图） -->
 <view class="card card--pink">
   <view class="card-header">
-    <text class="card-title">体重变化</text>
-    <text class="card-sub">{{weightChangeText}}</text>
+    <text class="card-title">目标体重进度</text>
+    <text class="card-sub">{{weightGoalText}}</text>
   </view>
-
-  <view class="chart-wrapper">
-    <canvas
-      canvas-id="weightChart"
-      class="weight-chart"
-      style="width: 300px; height: 120px;"
-    ></canvas>
-  </view>
-
-  <view class="divider"></view>
 
   <view class="progress-section">
     <view class="progress-row">
       <text class="progress-label">
-        当前体重：{{currentWeight || '--'}} kg
+        当前体重：{{currentWeight != null ? currentWeight : '--'}} kg
       </text>
       <text class="progress-label">
-        目标体重：{{targetWeight || '--'}} kg
+        目标体重：{{targetWeight != null ? targetWeight : '--'}} kg
       </text>
     </view>
 
@@ -90,12 +80,14 @@
         style="width: {{weightProgressPercent}};"
       ></view>
     </view>
+
     <view class="progress-row progress-row--bottom">
       <text class="progress-desc">{{weightGoalText}}</text>
       <text class="progress-percent">{{weightProgressPercent}}%</text>
     </view>
   </view>
 </view>
+
 
 <!-- 计划完成度卡片：使用 evaluateDaily -->
 <view class="card card--green">
