@@ -2,29 +2,9 @@
   运动记录主页 - exercise/index
   设计语言: Daylight Futurism (日光未来主义)
   功能: 折叠运动类型 + 日历选择
+  完全复用饮食页面的UI设计
 -->
 <view class="page-container">
-  <!-- ============ 粘性头部 ============ -->
-  <view class="sticky-header" style="padding-top: {{statusBarHeight}}px;">
-    <view class="header-content">
-      <!-- 左侧：用户信息 -->
-      <view class="user-info">
-        <view class="avatar-wrapper">
-          <image
-            class="user-avatar"
-            src="{{userInfo.avatarUrl || '/images/default-avatar.png'}}"
-            mode="aspectFill"
-          />
-          <view class="status-dot"></view>
-        </view>
-        <view class="user-text">
-          <text class="greeting">{{greeting}}</text>
-          <text class="user-name">{{userInfo.nickName || '运动达人'}}</text>
-        </view>
-      </view>
-    </view>
-  </view>
-
   <!-- ============ 主内容区 ============ -->
   <view class="main-content">
     <!-- ============ 日期切换导航栏 ============ -->
@@ -57,7 +37,9 @@
     </view>
 
     <!-- ============ 仪表盘卡片 ============ -->
-    <spotlight-card customClass="dashboard-card" holo="{{true}}" customStyle="background: linear-gradient(135deg, #FFF7ED 0%, #FFEDD5 100%)">
+    <spotlight-card customClass="dashboard-card {{dashboardStatus}}" holo="{{true}}">
+      <!-- 动态光晕层 - 状态感知型呼吸光晕 -->
+      <view class="dashboard-glow"></view>
       <view class="dashboard-content">
         <!-- 热量环形图 + 核心数据 -->
         <view class="calories-dashboard">
@@ -99,7 +81,7 @@
           <!-- 右侧：详细数据 -->
           <view class="calories-details">
             <view class="calorie-row">
-              <view class="calorie-indicator consumed"></view>
+              <view class="calorie-indicator out"></view>
               <text class="calorie-label">已消耗</text>
               <view class="calorie-value-wrapper">
                 <text class="calorie-value">{{stats.totalCalories}}</text>
@@ -125,7 +107,7 @@
           </view>
         </view>
 
-        <!-- 运动时长进度条 -->
+        <!-- 运动时长进度条（替代宏量营养素） -->
         <view class="macros-section">
           <view class="macro-bar">
             <view class="macro-info">
@@ -169,30 +151,30 @@
             </view>
 
             <!-- 运动类型卡片 -->
-            <view class="type-card-wrapper">
+            <view class="meal-card-wrapper">
               <spotlight-card
-                customClass="type-card {{item.type}} {{item.totalCalories > 0 ? 'has-data' : ''}}"
+                customClass="meal-card {{item.type}} {{item.totalCalories > 0 ? 'has-data' : ''}}"
                 customStyle="{{item.bgStyle}}"
               >
                 <!-- 点击卡片空白区域切换折叠状态 -->
-                <view class="type-card-content" bindtap="onTypeCardTap" data-type="{{item.type}}">
+                <view class="meal-card-content" bindtap="onTypeCardTap" data-type="{{item.type}}">
                   <!-- 卡片头部 -->
-                  <view class="type-header">
-                    <view class="type-title-group">
-                      <text class="type-title">{{item.title}}</text>
-                      <text class="type-time">{{item.suggestMin}}-{{item.suggestMax}} 分钟</text>
+                  <view class="meal-header">
+                    <view class="meal-title-group">
+                      <text class="meal-title">{{item.title}}</text>
+                      <text class="meal-time">{{item.suggestMin}}-{{item.suggestMax}} 分钟</text>
                     </view>
-                    <view class="type-right-section">
+                    <view class="meal-right-section">
                       <!-- 单类型编辑按钮 -->
                       <view
-                        class="type-edit-btn {{item.isEditing ? 'active' : ''}}"
+                        class="meal-edit-btn {{item.isEditing ? 'active' : ''}}"
                         catchtap="toggleTypeEdit"
                         data-type="{{item.type}}"
                         wx:if="{{item.items.length > 0}}"
                       >
                         <text>{{item.isEditing ? '完成' : '编辑'}}</text>
                       </view>
-                      <view class="type-calories" wx:if="{{item.totalCalories > 0}}">
+                      <view class="meal-calories" wx:if="{{item.totalCalories > 0}}">
                         <text class="cal-number">{{item.totalCalories}}</text>
                         <text class="cal-unit">kcal</text>
                       </view>
@@ -204,25 +186,25 @@
                   </view>
 
                   <!-- 进度条 -->
-                  <view class="type-progress-wrapper">
-                    <view class="type-progress-bar">
+                  <view class="meal-progress-wrapper">
+                    <view class="meal-progress-bar">
                       <view
-                        class="type-progress-fill {{item.percentage > 100 ? 'over' : ''}}"
+                        class="meal-progress-fill {{item.percentage > 100 ? 'over' : ''}}"
                         style="width: {{item.percentage > 100 ? 100 : item.percentage}}%"
                       ></view>
                     </view>
-                    <text class="type-progress-text">{{item.percentage}}%</text>
+                    <text class="meal-progress-text">{{item.percentage}}%</text>
                   </view>
 
                   <!-- 可折叠的运动列表 -->
                   <view class="collapsible-content {{item.collapsed ? 'collapsed' : ''}}">
                     <!-- 运动列表 -->
-                    <view class="exercise-items" wx:if="{{item.items.length > 0}}">
+                    <view class="food-items" wx:if="{{item.items.length > 0}}">
                       <block wx:for="{{item.items}}" wx:for-item="exercise" wx:key="uniqueId">
                         <!-- 左滑删除容器 -->
-                        <view class="exercise-item-wrapper">
+                        <view class="food-item-wrapper">
                           <view
-                            class="exercise-item {{exercise.swiped ? 'swiped' : ''}}"
+                            class="food-item {{exercise.swiped ? 'swiped' : ''}}"
                             bindtouchstart="onExerciseTouchStart"
                             bindtouchmove="onExerciseTouchMove"
                             bindtouchend="onExerciseTouchEnd"
@@ -230,21 +212,21 @@
                             data-type="{{item.type}}"
                           >
                             <!-- 编辑模式选择框（全局或单类型） -->
-                            <view class="exercise-checkbox {{isEditMode || item.isEditing ? 'show' : ''}}" catchtap="toggleExerciseSelect" data-id="{{exercise.id}}" data-type="{{item.type}}">
+                            <view class="food-checkbox {{isEditMode || item.isEditing ? 'show' : ''}}" catchtap="toggleExerciseSelect" data-id="{{exercise.id}}" data-type="{{item.type}}">
                               <view class="checkbox-inner {{exercise.selected ? 'checked' : ''}}">
                                 <text wx:if="{{exercise.selected}}">✓</text>
                               </view>
                             </view>
-                            <view class="exercise-left" catchtap="{{isEditMode || item.isEditing ? 'stopPropagation' : 'openExerciseEdit'}}" data-exercise="{{exercise}}" data-type="{{item.type}}">
-                              <text class="exercise-emoji">{{exercise.emoji}}</text>
-                              <view class="exercise-info">
-                                <text class="exercise-name">{{exercise.name}}</text>
-                                <text class="exercise-duration">{{exercise.duration}}分钟</text>
+                            <view class="food-left" catchtap="{{isEditMode || item.isEditing ? 'stopPropagation' : 'openExerciseEdit'}}" data-exercise="{{exercise}}" data-type="{{item.type}}">
+                              <text class="food-emoji">{{exercise.emoji}}</text>
+                              <view class="food-info">
+                                <text class="food-name">{{exercise.name}}</text>
+                                <text class="food-portion">{{exercise.duration}}分钟</text>
                               </view>
                             </view>
-                            <view class="exercise-right" catchtap="{{isEditMode || item.isEditing ? 'stopPropagation' : 'openExerciseEdit'}}" data-exercise="{{exercise}}" data-type="{{item.type}}">
-                              <text class="exercise-cal">{{exercise.calories}}</text>
-                              <text class="exercise-cal-unit">kcal</text>
+                            <view class="food-right" catchtap="{{isEditMode || item.isEditing ? 'stopPropagation' : 'openExerciseEdit'}}" data-exercise="{{exercise}}" data-type="{{item.type}}">
+                              <text class="food-cal">{{exercise.calories}}</text>
+                              <text class="food-cal-unit">kcal</text>
                             </view>
                           </view>
                           <!-- 左滑删除按钮 -->
@@ -256,7 +238,7 @@
 
                       <!-- 添加更多 -->
                       <view
-                        class="add-type-btn-large"
+                        class="add-meal-btn-large"
                         catchtap="addExercise"
                         data-type="{{item.type}}"
                         wx:if="{{!isEditMode && !item.isEditing}}"
@@ -270,7 +252,7 @@
                     <view class="empty-state" wx:if="{{item.items.length === 0}}">
                       <text class="empty-hint">{{item.emptyText}}</text>
                       <view
-                        class="add-type-btn-large"
+                        class="add-meal-btn-large"
                         catchtap="addExercise"
                         data-type="{{item.type}}"
                       >
@@ -371,27 +353,27 @@
     </view>
   </view>
 
-  <!-- ============ 运动编辑弹窗 ============ -->
-  <view class="exercise-edit-modal {{showExerciseEditModal ? 'show' : ''}}" catchtap="closeExerciseEdit">
-    <view class="exercise-edit-content" catchtap="stopPropagation">
+  <!-- ============ 运动编辑弹窗（复用食物编辑弹窗样式） ============ -->
+  <view class="food-edit-modal {{showExerciseEditModal ? 'show' : ''}}" catchtap="closeExerciseEdit">
+    <view class="food-edit-content" catchtap="stopPropagation">
       <!-- 弹窗头部 -->
-      <view class="exercise-edit-header">
-        <text class="exercise-edit-title">编辑运动</text>
-        <view class="exercise-edit-close" bindtap="closeExerciseEdit">
+      <view class="food-edit-header">
+        <text class="food-edit-title">编辑运动</text>
+        <view class="food-edit-close" bindtap="closeExerciseEdit">
           <text>×</text>
         </view>
       </view>
 
       <!-- 运动信息 -->
-      <view class="exercise-edit-info">
-        <view class="exercise-edit-avatar">
-          <text class="exercise-edit-emoji">{{editingExercise.emoji || '🏃'}}</text>
+      <view class="food-edit-info">
+        <view class="food-edit-avatar">
+          <text class="food-edit-emoji">{{editingExercise.emoji || '🏃'}}</text>
         </view>
-        <view class="exercise-edit-name">{{editingExercise.name}}</view>
+        <view class="food-edit-name">{{editingExercise.name}}</view>
       </view>
 
       <!-- 时长输入 -->
-      <view class="exercise-edit-form">
+      <view class="food-edit-form">
         <!-- 时长显示 -->
         <view class="amount-header">
           <text class="form-label">运动时长</text>
@@ -431,15 +413,15 @@
         </view>
 
         <!-- 快捷时长选择 -->
-        <view class="quick-durations">
-          <view class="quick-durations-label">快捷选择</view>
-          <view class="quick-durations-btns">
-            <view class="quick-duration-btn" bindtap="setQuickDuration" data-duration="15">15分</view>
-            <view class="quick-duration-btn" bindtap="setQuickDuration" data-duration="30">30分</view>
-            <view class="quick-duration-btn" bindtap="setQuickDuration" data-duration="45">45分</view>
-            <view class="quick-duration-btn" bindtap="setQuickDuration" data-duration="60">60分</view>
-            <view class="quick-duration-btn" bindtap="setQuickDuration" data-duration="90">90分</view>
-            <view class="quick-duration-btn" bindtap="setQuickDuration" data-duration="120">120分</view>
+        <view class="quick-grams">
+          <view class="quick-grams-label">快捷选择</view>
+          <view class="quick-grams-btns">
+            <view class="quick-gram-btn" bindtap="setQuickDuration" data-duration="15">15分</view>
+            <view class="quick-gram-btn" bindtap="setQuickDuration" data-duration="30">30分</view>
+            <view class="quick-gram-btn" bindtap="setQuickDuration" data-duration="45">45分</view>
+            <view class="quick-gram-btn" bindtap="setQuickDuration" data-duration="60">60分</view>
+            <view class="quick-gram-btn" bindtap="setQuickDuration" data-duration="90">90分</view>
+            <view class="quick-gram-btn" bindtap="setQuickDuration" data-duration="120">120分</view>
           </view>
         </view>
 
@@ -453,7 +435,7 @@
       </view>
 
       <!-- 操作按钮 -->
-      <view class="exercise-edit-actions">
+      <view class="food-edit-actions">
         <view class="edit-btn-cancel" bindtap="closeExerciseEdit">取消</view>
         <view class="edit-btn-save" bindtap="saveExerciseEdit">保存修改</view>
       </view>

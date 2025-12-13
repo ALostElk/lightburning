@@ -143,6 +143,8 @@
 .search-body {
   flex: 1;
   padding: 0 32rpx;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .result-list {
@@ -265,6 +267,7 @@
   flex-direction: column;
   align-items: center;
   width: 100%;
+  box-sizing: border-box;
 }
 
 .empty-header {
@@ -280,7 +283,7 @@
 
 /* === 餐次切换器 (Glass Pills) === */
 .meal-tabs {
-  display: flex;
+  display: inline-flex;
   gap: 16rpx;
   margin-bottom: 40rpx;
   background: rgba(255, 255, 255, 0.4);
@@ -308,12 +311,18 @@
 }
 
 /* === 常用网格 (Favorites Grid) === */
+.favorites-grid-wrapper {
+  width: 100%;
+  box-sizing: border-box;
+}
+
 .favorites-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr); /* 双列布局 */
   gap: 24rpx;
   width: 100%;
   padding-bottom: 60rpx;
+  box-sizing: border-box;
 }
 
 /* 动画：淡入 */
@@ -338,7 +347,7 @@
   align-items: center;
   padding: 24rpx;
   gap: 16rpx;
-  
+
   /* 玻璃质感 */
   background: rgba(255, 255, 255, 0.6);
   backdrop-filter: blur(12rpx);
@@ -346,10 +355,12 @@
   border: 1rpx solid rgba(255, 255, 255, 0.8);
   border-radius: 28rpx;
   box-shadow: 0 4rpx 16rpx rgba(148, 163, 184, 0.05);
-  
+
   transition: all 0.2s;
   position: relative;
   overflow: hidden;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .fav-card:active {
@@ -447,12 +458,18 @@
 
 .food-edit-content {
   width: 100%;
-  background: #fff;
+  /* 强磨砂玻璃 + 微渐变背景 (薄荷玻璃质感) */
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(236, 253, 245, 0.95) 100%);
+  backdrop-filter: blur(40rpx);
+  -webkit-backdrop-filter: blur(40rpx);
   border-radius: 40rpx 40rpx 0 0;
   padding: 40rpx 32rpx calc(40rpx + env(safe-area-inset-bottom));
   box-sizing: border-box;
   max-height: 80vh;
   overflow-y: auto;
+  /* 增加边框和阴影，提升质感 */
+  border: 1rpx solid rgba(16, 185, 129, 0.1);
+  box-shadow: 0 -16rpx 48rpx rgba(16, 185, 129, 0.08);
 }
 
 .food-edit-header {
@@ -481,7 +498,8 @@
 }
 
 .food-edit-close:active {
-  background: rgba(148, 163, 184, 0.1);
+  background: rgba(16, 185, 129, 0.1);
+  color: #10B981;
 }
 
 .food-edit-info {
@@ -511,10 +529,13 @@
   color: #64748B;
 }
 
+/* === 核心数字 (Slider Value) - 加深颜色 === */
 .slider-value {
-  color: #FF6B35;
-  font-weight: 600;
-  font-size: 36rpx;
+  color: #059669; /* Emerald-600: 深邃的翡翠绿，对比度极高 */
+  font-weight: 800; /* 加粗 */
+  font-size: 56rpx; /* 加大字号 */
+  font-family: 'SF Pro Display', sans-serif;
+  text-shadow: 0 2rpx 10rpx rgba(5, 150, 105, 0.1); /* 微投影增加立体感 */
 }
 
 .amount-slider {
@@ -524,10 +545,15 @@
 .calories-preview {
   display: flex;
   justify-content: space-between;
-  background: #F1F5F9;
+  /* 极淡的绿色半透背景 */
+  background: rgba(236, 253, 245, 0.6);
+  backdrop-filter: blur(10rpx);
+  -webkit-backdrop-filter: blur(10rpx);
+  border: 1rpx solid rgba(16, 185, 129, 0.15);
   padding: 20rpx;
   border-radius: 20rpx;
   margin-bottom: 40rpx;
+  box-shadow: 0 4rpx 12rpx rgba(16, 185, 129, 0.05);
 }
 
 .preview-item {
@@ -543,41 +569,50 @@
   color: #94A3B8;
 }
 
+/* === 营养数值 (Nutrient Values) - 清晰化 === */
 .p-val {
-  font-size: 28rpx;
-  font-weight: 600;
-  color: #334155;
+  font-size: 36rpx; /* 稍微加大 */
+  font-weight: 700;
+  color: #1E293B; /* Slate-800: 近乎黑色的深灰，保证阅读清晰 */
 }
 
-.p-val.protein {
-  color: #6EE7B7;
+/* 针对特定营养素，使用深色版 (Darker variants) */
+.p-val.protein { 
+  color: #047857; /* Deep Green */
 }
 
-.p-val.carbs {
-  color: #FDE047;
+.p-val.carbs { 
+  color: #B45309; /* Deep Amber */
 }
 
-.p-val.fat {
-  color: #FCA5A5;
+.p-val.fat { 
+  color: #B91C1C; /* Deep Red */
 }
 
 .food-edit-actions {
   margin-top: 20rpx;
 }
 
+/* === 确认按钮 (Confirm Button) - 深色高亮 === */
 .edit-btn-save {
-  background: linear-gradient(135deg, #FF6B35 0%, #FF8E53 100%);
-  color: white;
+  /* 背景：从 翡翠绿(500) 到 森林绿(700) 的深色渐变 */
+  background: linear-gradient(135deg, #10B981 0%, #047857 100%);
+  color: #FFFFFF;
+  
   text-align: center;
-  padding: 24rpx;
-  border-radius: 50rpx;
-  font-weight: 600;
-  font-size: 28rpx;
-  box-shadow: 0 8rpx 20rpx rgba(255, 107, 53, 0.3);
-  transition: all 0.2s ease;
+  padding: 32rpx;
+  border-radius: 60rpx;
+  
+  font-size: 32rpx;
+  font-weight: 700; /* 最粗字重 */
+  letter-spacing: 4rpx;
+  
+  /* 强烈的深绿色投影，让按钮浮起来 */
+  box-shadow: 0 12rpx 30rpx rgba(4, 120, 87, 0.4);
+  transition: all 0.2s;
 }
 
 .edit-btn-save:active {
   transform: scale(0.98);
-  box-shadow: 0 4rpx 12rpx rgba(255, 107, 53, 0.4);
+  box-shadow: 0 6rpx 16rpx rgba(4, 120, 87, 0.5); /* 按压时投影收缩 */
 }

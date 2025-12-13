@@ -1,256 +1,151 @@
-<!--运动搜索页面-->
-<view class="container">
-  <!-- 自定义导航栏 -->
-  <view class="custom-navbar">
-    <view class="navbar-back" bindtap="goBack">
-      <text class="back-icon">‹</text>
+<view class="page-container" style="padding-top: {{statusBarHeight + 44}}px">
+  
+  <view class="search-header" style="top: {{statusBarHeight}}px">
+    <view class="nav-back-btn" bindtap="goBack">
+      <text class="back-arrow">‹</text>
     </view>
-    <view class="navbar-title">添加运动</view>
-    <view class="navbar-placeholder"></view>
-  </view>
-
-  <!-- 搜索框 -->
-  <view class="search-container">
-    <view class="search-box">
-      <text class="search-icon">🔍</text>
-      <input
+    
+    <view class="search-capsule">
+      <view class="search-icon-css"></view>
+      <input 
         class="search-input"
         type="text"
-        placeholder="搜索运动项目"
+        placeholder="搜索运动 (如: 跑步)"
+        placeholder-class="input-placeholder"
         value="{{keyword}}"
         bindinput="onSearchInput"
         bindfocus="onSearchFocus"
         confirm-type="search"
       />
-      <view class="search-clear" wx:if="{{keyword}}" bindtap="clearSearch">
-        <text>×</text>
-      </view>
+      <view class="clear-btn" wx:if="{{keyword}}" bindtap="clearSearch">×</view>
     </view>
   </view>
 
-  <!-- 标签切换 -->
-  <view class="tabs-container">
-    <view class="tabs">
-      <view
-        class="tab-item {{activeTab === 'search' ? 'active' : ''}}"
-        data-tab="search"
-        bindtap="switchTab"
-      >
-        <text>搜索</text>
+  <scroll-view scroll-y class="search-body">
+    
+    <view class="results-section" wx:if="{{keyword}}">
+      <view class="section-title-sm">搜索结果</view>
+      
+      <view class="exercise-list" wx:if="{{results.length > 0}}">
+        <block wx:for="{{results}}" wx:key="id">
+          <view class="exercise-card" bindtap="addExercise" data-exercise="{{item}}">
+            <view class="ex-icon-box">{{item.emoji}}</view>
+            <view class="ex-info">
+              <text class="ex-name">{{item.name}}</text>
+              <text class="ex-meta">消耗约 {{item.caloriesPerMin}} kcal/分</text>
+            </view>
+            <view class="add-btn-circle">
+              <view class="plus-icon"></view>
+            </view>
+          </view>
+        </block>
       </view>
-      <view
-        class="tab-item {{activeTab === 'favorites' ? 'active' : ''}}"
-        data-tab="favorites"
-        bindtap="switchTab"
-      >
-        <text>常用</text>
+
+      <view class="empty-state" wx:elif="{{!isSearching}}">
+        <text class="empty-text">未找到相关运动</text>
       </view>
     </view>
-  </view>
 
-  <!-- 主内容区 -->
-  <scroll-view class="content-scroll" scroll-y>
-    <!-- ============ 搜索标签内容 ============ -->
-    <view class="tab-content" wx:if="{{activeTab === 'search'}}">
-      <!-- 最近搜索 -->
-      <view class="recent-section" wx:if="{{recentSearches.length > 0 && !keyword}}">
-        <view class="section-header">
-          <text class="section-title">最近搜索</text>
-          <text class="section-action" bindtap="clearRecentSearches">清除</text>
+    <view class="recommend-section" wx:else>
+      
+      <view class="history-group" wx:if="{{recentSearches.length > 0}}">
+        <view class="group-header">
+          <text class="group-title">最近搜索</text>
+          <view class="clear-icon" bindtap="clearRecentSearches">🗑️</view>
         </view>
-        <view class="recent-tags">
-          <view
-            class="recent-tag"
-            wx:for="{{recentSearches}}"
-            wx:key="index"
-            data-keyword="{{item}}"
-            bindtap="onRecentSearchTap"
-          >
-            <text>{{item}}</text>
+        <view class="tag-cloud">
+          <view class="glass-tag" wx:for="{{recentSearches}}" wx:key="*this" bindtap="onRecentSearchTap" data-keyword="{{item}}">
+            {{item}}
           </view>
         </view>
       </view>
 
-      <!-- 搜索结果 -->
-      <view class="results-section" wx:if="{{keyword}}">
-        <!-- 加载中 -->
-        <view class="loading-state" wx:if="{{isSearching}}">
-          <view class="loading-spinner"></view>
-          <text class="loading-text">搜索中...</text>
-        </view>
+      <view class="filter-scroll">
+        <view 
+          class="filter-chip {{selectedExerciseType === 'aerobic' ? 'active' : ''}}" 
+          bindtap="switchExerciseType" data-type="aerobic">🏃 有氧</view>
+        <view 
+          class="filter-chip {{selectedExerciseType === 'strength' ? 'active' : ''}}" 
+          bindtap="switchExerciseType" data-type="strength">💪 力量</view>
+        <view 
+          class="filter-chip {{selectedExerciseType === 'flexibility' ? 'active' : ''}}" 
+          bindtap="switchExerciseType" data-type="flexibility">🧘 拉伸</view>
+        <view 
+          class="filter-chip {{selectedExerciseType === 'sports' ? 'active' : ''}}" 
+          bindtap="switchExerciseType" data-type="sports">⚽ 球类</view>
+      </view>
 
-        <!-- 搜索结果列表 -->
-        <view class="exercise-list" wx:elif="{{results.length > 0}}">
-          <view
-            class="exercise-card"
-            wx:for="{{results}}"
-            wx:key="id"
+      <view class="exercise-list animate-fade-in">
+        <block wx:for="{{presetExercises}}" wx:key="id">
+          <view 
+            class="exercise-card" 
+            wx:if="{{item.type === selectedExerciseType}}"
+            bindtap="addExercise" 
             data-exercise="{{item}}"
-            bindtap="addExercise"
           >
-            <view class="exercise-icon">
-              <text>{{item.emoji}}</text>
+            <view class="ex-icon-box">{{item.emoji}}</view>
+            <view class="ex-info">
+              <text class="ex-name">{{item.name}}</text>
+              <text class="ex-meta">消耗约 {{item.caloriesPerMin}} kcal/分</text>
             </view>
-            <view class="exercise-info">
-              <text class="exercise-name">{{item.name}}</text>
-              <text class="exercise-meta">建议 {{item.duration}} 分钟 · {{item.calories}} kcal</text>
-            </view>
-            <view class="exercise-action">
-              <text class="add-icon">+</text>
+            <view class="add-btn-circle">
+              <view class="plus-icon"></view>
             </view>
           </view>
-        </view>
-
-        <!-- 无结果 -->
-        <view class="empty-state" wx:elif="{{error}}">
-          <text class="empty-icon">🔍</text>
-          <text class="empty-text">{{error}}</text>
-        </view>
+        </block>
       </view>
-
-      <!-- 推荐运动（未搜索时） -->
-      <view class="recommend-section" wx:if="{{!keyword && !isSearching}}">
-        <view class="section-header">
-          <text class="section-title">推荐运动</text>
-        </view>
-
-        <!-- 类型筛选 -->
-        <view class="type-filters">
-          <view
-            class="type-filter {{selectedExerciseType === 'aerobic' ? 'active' : ''}}"
-            data-type="aerobic"
-            bindtap="switchExerciseType"
-          >
-            <text>🏃 有氧</text>
-          </view>
-          <view
-            class="type-filter {{selectedExerciseType === 'strength' ? 'active' : ''}}"
-            data-type="strength"
-            bindtap="switchExerciseType"
-          >
-            <text>💪 力量</text>
-          </view>
-          <view
-            class="type-filter {{selectedExerciseType === 'flexibility' ? 'active' : ''}}"
-            data-type="flexibility"
-            bindtap="switchExerciseType"
-          >
-            <text>🧘 拉伸</text>
-          </view>
-          <view
-            class="type-filter {{selectedExerciseType === 'sports' ? 'active' : ''}}"
-            data-type="sports"
-            bindtap="switchExerciseType"
-          >
-            <text>⚽ 球类</text>
-          </view>
-        </view>
-
-        <!-- 推荐列表 -->
-        <view class="exercise-list">
-          <block wx:for="{{presetExercises}}" wx:key="id">
-            <view
-              class="exercise-card"
-              wx:if="{{item.type === selectedExerciseType}}"
-              data-exercise="{{item}}"
-              bindtap="addExercise"
-            >
-              <view class="exercise-icon">
-                <text>{{item.emoji}}</text>
-              </view>
-              <view class="exercise-info">
-                <text class="exercise-name">{{item.name}}</text>
-                <text class="exercise-meta">建议 {{item.duration}} 分钟 · {{Math.round(item.duration * item.caloriesPerMin)}} kcal</text>
-              </view>
-              <view class="exercise-action">
-                <text class="add-icon">+</text>
-              </view>
-            </view>
-          </block>
-        </view>
-      </view>
+      
+      <view style="height: 100rpx;"></view>
     </view>
 
-    <!-- ============ 常用标签内容 ============ -->
-    <view class="tab-content" wx:if="{{activeTab === 'favorites'}}">
-      <!-- 类型筛选 -->
-      <view class="type-filters">
-        <view
-          class="type-filter {{favoriteTypeFilter === 'all' ? 'active' : ''}}"
-          data-type="all"
-          bindtap="switchFavoriteType"
-        >
-          <text>全部</text>
-        </view>
-        <view
-          class="type-filter {{favoriteTypeFilter === 'aerobic' ? 'active' : ''}}"
-          data-type="aerobic"
-          bindtap="switchFavoriteType"
-        >
-          <text>🏃 有氧</text>
-        </view>
-        <view
-          class="type-filter {{favoriteTypeFilter === 'strength' ? 'active' : ''}}"
-          data-type="strength"
-          bindtap="switchFavoriteType"
-        >
-          <text>💪 力量</text>
-        </view>
-        <view
-          class="type-filter {{favoriteTypeFilter === 'flexibility' ? 'active' : ''}}"
-          data-type="flexibility"
-          bindtap="switchFavoriteType"
-        >
-          <text>🧘 拉伸</text>
-        </view>
-        <view
-          class="type-filter {{favoriteTypeFilter === 'sports' ? 'active' : ''}}"
-          data-type="sports"
-          bindtap="switchFavoriteType"
-        >
-          <text>⚽ 球类</text>
-        </view>
-      </view>
-
-      <!-- 常用运动列表 -->
-      <view class="frequent-section">
-        <!-- 加载中 -->
-        <view class="loading-state" wx:if="{{isLoadingFavorites}}">
-          <view class="loading-spinner"></view>
-          <text class="loading-text">加载中...</text>
-        </view>
-
-        <!-- 常用列表 -->
-        <view class="exercise-list" wx:elif="{{frequentExercises.length > 0}}">
-          <view
-            class="exercise-card frequent"
-            wx:for="{{frequentExercises}}"
-            wx:key="name"
-            data-exercise="{{item}}"
-            bindtap="addFromFavorite"
-          >
-            <view class="exercise-icon">
-              <text>{{item.emoji}}</text>
-            </view>
-            <view class="exercise-info">
-              <text class="exercise-name">{{item.name}}</text>
-              <text class="exercise-meta">平均 {{item.duration}} 分钟 · {{item.calories}} kcal</text>
-              <text class="exercise-count">记录 {{item.count}} 次</text>
-            </view>
-            <view class="exercise-action">
-              <text class="add-icon">+</text>
-            </view>
-          </view>
-        </view>
-
-        <!-- 空状态 -->
-        <view class="empty-state" wx:else>
-          <text class="empty-icon">📝</text>
-          <text class="empty-text">暂无常用运动</text>
-          <text class="empty-hint">添加运动记录后会自动生成</text>
-        </view>
-      </view>
-    </view>
   </scroll-view>
-</view>
 
+  <view class="duration-modal {{showDurationModal ? 'show' : ''}}" catchtap="closeDurationModal">
+    <view class="modal-content" catchtap="stopPropagation">
+      <view class="modal-header">
+        <text class="modal-title">本次运动时长</text>
+        <view class="modal-close" bindtap="closeDurationModal">×</view>
+      </view>
+
+      <view class="modal-info">
+        <view class="modal-emoji">{{currentExercise.emoji}}</view>
+        <view class="modal-name">{{currentExercise.name}}</view>
+      </view>
+
+      <view class="slider-box">
+        <view class="slider-header">
+          <text>持续时间</text>
+          <text class="slider-value">{{durationInput}} <text class="unit">分钟</text></text>
+        </view>
+        <slider 
+          class="custom-slider" 
+          min="5" max="180" step="5" 
+          value="{{durationInput}}" 
+          activeColor="#FF6B35" 
+          backgroundColor="#FFF1E7"
+          block-size="24"
+          bindchanging="onDurationChange" 
+          bindchange="onDurationChange"
+        />
+        <view class="quick-tags">
+          <view class="quick-tag" bindtap="setDuration" data-val="15">15分</view>
+          <view class="quick-tag" bindtap="setDuration" data-val="30">30分</view>
+          <view class="quick-tag" bindtap="setDuration" data-val="45">45分</view>
+          <view class="quick-tag" bindtap="setDuration" data-val="60">60分</view>
+        </view>
+      </view>
+
+      <view class="burn-preview">
+        <view class="burn-label">预计消耗</view>
+        <view class="burn-value">
+          {{estimatedCalories}} <text class="burn-unit">kcal</text>
+        </view>
+      </view>
+
+      <view class="modal-action">
+        <view class="confirm-btn" bindtap="confirmAddExercise">确认记录</view>
+      </view>
+    </view>
+  </view>
+
+</view>

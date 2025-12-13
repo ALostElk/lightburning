@@ -53,7 +53,7 @@
 
       <view class="meal-tabs">
         <block wx:for="{{mealTabs}}" wx:key="key">
-          <view 
+          <view
             class="meal-tab {{currentMealTab === item.key ? 'active' : ''}}"
             bindtap="switchMealTab"
             data-key="{{item.key}}"
@@ -63,20 +63,22 @@
         </block>
       </view>
 
-      <view class="favorites-grid animate-fade-in">
-        <block wx:for="{{favorites[currentMealTab]}}" wx:key="id">
-          <view class="fav-card" bindtap="selectFood" data-item="{{item}}">
-            <view class="fav-emoji">{{item.emoji}}</view>
-            <view class="fav-info">
-              <text class="fav-name">{{item.name}}</text>
-              <text class="fav-cal">{{item.calories}} kcal</text>
+      <view class="favorites-grid-wrapper">
+        <view class="favorites-grid animate-fade-in">
+          <block wx:for="{{favorites[currentMealTab]}}" wx:key="id">
+            <view class="fav-card" bindtap="selectFood" data-item="{{item}}">
+              <view class="fav-emoji">{{item.emoji}}</view>
+              <view class="fav-info">
+                <text class="fav-name">{{item.name}}</text>
+                <text class="fav-cal">{{item.calories}} kcal</text>
+              </view>
+              <view class="fav-add">+</view>
             </view>
-            <view class="fav-add">+</view>
+          </block>
+
+          <view class="no-fav" wx:if="{{!favorites[currentMealTab] || favorites[currentMealTab].length === 0}}">
+            <text>暂无常用记录</text>
           </view>
-        </block>
-        
-        <view class="no-fav" wx:if="{{!favorites[currentMealTab] || favorites[currentMealTab].length === 0}}">
-          <text>暂无常用记录</text>
         </view>
       </view>
     </view>
@@ -106,7 +108,9 @@
           max="500" 
           step="5" 
           value="{{editingFood.grams || 100}}" 
-          activeColor="#FF6B35" 
+          activeColor="#059669" 
+          backgroundColor="#E2E8F0"
+          block-size="24"
           bindchanging="onSliderChange" 
           bindchange="onSliderChange"
         />

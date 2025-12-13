@@ -275,12 +275,15 @@
 .radar-scan {
   width: 120rpx;
   height: 120rpx;
-  border: 4rpx solid #FF6B35;
+  /* 新浅绿色 (Mint Green) */
+  border: 4rpx solid #6EE7B7;
   border-radius: 50%;
-  border-top-color: transparent;
+  border-top-color: transparent; /* 保持顶部透明以形成缺口 */
   animation: spin 1s linear infinite;
   margin-bottom: 24rpx;
   z-index: 1;
+  /* 增加绿色光晕，提升质感 */
+  box-shadow: 0 0 16rpx rgba(110, 231, 183, 0.4);
 }
 
 @keyframes spin {
@@ -1198,7 +1201,10 @@
 .amount-value {
   font-size: 36rpx;
   font-weight: 800;
-  color: #1F2937;
+  /* 使用绿色渐变，提升质感 */
+  background: linear-gradient(135deg, #10B981, #34D399);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
   font-family: 'SF Mono', 'Menlo', monospace;
 }
 
@@ -1499,12 +1505,18 @@
 
 .food-edit-content {
   width: 100%;
-  background: #fff;
+  /* 强磨砂玻璃 + 微渐变背景 (薄荷玻璃质感) */
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(236, 253, 245, 0.95) 100%);
+  backdrop-filter: blur(40rpx);
+  -webkit-backdrop-filter: blur(40rpx);
   border-radius: 40rpx 40rpx 0 0;
   padding: 40rpx 32rpx calc(40rpx + env(safe-area-inset-bottom));
   box-sizing: border-box;
   max-height: 80vh;
   overflow-y: auto;
+  /* 增加边框和阴影，提升质感 */
+  border: 1rpx solid rgba(16, 185, 129, 0.1);
+  box-shadow: 0 -16rpx 48rpx rgba(16, 185, 129, 0.08);
 }
 
 .food-edit-header {
@@ -1533,7 +1545,8 @@
 }
 
 .food-edit-close:active {
-  background: rgba(148, 163, 184, 0.1);
+  background: rgba(16, 185, 129, 0.1);
+  color: #10B981;
 }
 
 .food-edit-info {
@@ -1563,10 +1576,13 @@
   color: #64748B;
 }
 
+/* === 核心数字 (Slider Value) - 加深颜色 === */
 .slider-value {
-  color: #FF6B35;
-  font-weight: 600;
-  font-size: 36rpx;
+  color: #059669; /* Emerald-600: 深邃的翡翠绿，对比度极高 */
+  font-weight: 800; /* 加粗 */
+  font-size: 56rpx; /* 加大字号 */
+  font-family: 'SF Pro Display', sans-serif;
+  text-shadow: 0 2rpx 10rpx rgba(5, 150, 105, 0.1); /* 微投影增加立体感 */
 }
 
 .amount-slider {
@@ -1576,10 +1592,15 @@
 .calories-preview {
   display: flex;
   justify-content: space-between;
-  background: #F1F5F9;
+  /* 极淡的绿色半透背景 */
+  background: rgba(236, 253, 245, 0.6);
+  backdrop-filter: blur(10rpx);
+  -webkit-backdrop-filter: blur(10rpx);
+  border: 1rpx solid rgba(16, 185, 129, 0.15);
   padding: 20rpx;
   border-radius: 20rpx;
   margin-bottom: 40rpx;
+  box-shadow: 0 4rpx 12rpx rgba(16, 185, 129, 0.05);
 }
 
 .preview-item {
@@ -1595,43 +1616,52 @@
   color: #94A3B8;
 }
 
+/* === 营养数值 (Nutrient Values) - 清晰化 === */
 .p-val {
-  font-size: 28rpx;
-  font-weight: 600;
-  color: #334155;
+  font-size: 36rpx; /* 稍微加大 */
+  font-weight: 700;
+  color: #1E293B; /* Slate-800: 近乎黑色的深灰，保证阅读清晰 */
 }
 
-.p-val.protein {
-  color: #6EE7B7;
+/* 针对特定营养素，使用深色版 (Darker variants) */
+.p-val.protein { 
+  color: #047857; /* Deep Green */
 }
 
-.p-val.carbs {
-  color: #FDE047;
+.p-val.carbs { 
+  color: #B45309; /* Deep Amber */
 }
 
-.p-val.fat {
-  color: #FCA5A5;
+.p-val.fat { 
+  color: #B91C1C; /* Deep Red */
 }
 
 .food-edit-actions {
   margin-top: 20rpx;
 }
 
+/* === 确认按钮 (Confirm Button) - 深色高亮 === */
 .edit-btn-save {
-  background: linear-gradient(135deg, #FF6B35 0%, #FF8E53 100%);
-  color: white;
+  /* 背景：从 翡翠绿(500) 到 森林绿(700) 的深色渐变 */
+  background: linear-gradient(135deg, #10B981 0%, #047857 100%);
+  color: #FFFFFF;
+  
   text-align: center;
-  padding: 24rpx;
-  border-radius: 50rpx;
-  font-weight: 600;
-  font-size: 28rpx;
-  box-shadow: 0 8rpx 20rpx rgba(255, 107, 53, 0.3);
-  transition: all 0.2s ease;
+  padding: 32rpx;
+  border-radius: 60rpx;
+  
+  font-size: 32rpx;
+  font-weight: 700; /* 最粗字重 */
+  letter-spacing: 4rpx;
+  
+  /* 强烈的深绿色投影，让按钮浮起来 */
+  box-shadow: 0 12rpx 30rpx rgba(4, 120, 87, 0.4);
+  transition: all 0.2s;
 }
 
 .edit-btn-save:active {
   transform: scale(0.98);
-  box-shadow: 0 4rpx 12rpx rgba(255, 107, 53, 0.4);
+  box-shadow: 0 6rpx 16rpx rgba(4, 120, 87, 0.5); /* 按压时投影收缩 */
 }
 
 /* CSS 图标样式已移除，统一使用纯文字按钮 */

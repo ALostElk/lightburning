@@ -2408,13 +2408,127 @@
 }
 
 
-/* ============ 相机浮动按钮位置覆盖 ============ */
-.fab-container.bottom-center {
-  bottom: 60rpx !important;
+/* ============ 相机玻璃按钮 (Mint Ice Crystal Button) ============ */
+/* === 1. 薄荷冰晶底座 (Mint Ice Base) === */
+.camera-glass-btn {
+  position: fixed;
+  bottom: calc(60rpx + env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  
+  width: 120rpx;  /* 保持放大后的尺寸 */
+  height: 120rpx;
+  border-radius: 50%;
+  
+  /* 调整底座以适配深色图标：更浅更亮，形成"白纸黑字"般的清晰感 */
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(167, 243, 208, 0.6) 100%);
+  
+  /* 强磨砂 */
+  backdrop-filter: blur(16rpx);
+  -webkit-backdrop-filter: blur(16rpx);
+  
+  /* 边缘高光：更亮的白色 */
+  border: 2rpx solid rgba(255, 255, 255, 0.9);
+  
+  /* 复合光影：增加一点绿色光晕，呼应主题 */
+  box-shadow: 
+    0 8rpx 20rpx rgba(16, 185, 129, 0.15),
+    inset 0 0 12rpx rgba(255, 255, 255, 0.5);
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  
+  /* 保持呼吸动画 */
+  animation: camera-breathe 3s ease-in-out infinite;
 }
 
-.fab-container.safe-area {
-  bottom: calc(60rpx + env(safe-area-inset-bottom)) !important;
+/* 点击反馈 */
+.camera-glass-btn:active {
+  transform: translateX(-50%) scale(0.92);
+  /* 按压时颜色加深一点，反馈更明显 */
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.7) 0%, rgba(52, 211, 153, 0.5) 100%);
+  animation: none; /* 点击时暂停动画 */
+}
+
+/* === 2. 银色相机主体 (Silver Body) === */
+.crystal-camera-body {
+  width: 65rpx;  /* 按比例放大以适配120rpx按钮 */
+  height: 48rpx;  /* 按比例放大 */
+  border-radius: 6rpx;
+  position: relative;
+  
+  /* 核心修改：颜色变浅，改为冷银灰 */
+  border: 4rpx solid #64748B; 
+  
+  /* 填充：保持通透 */
+  background: rgba(255, 255, 255, 0.5);
+  
+  /* 关键：利用投影模拟金属厚度感 (底部深影 + 顶部高光) */
+  box-shadow: 
+    0 4rpx 8rpx rgba(100, 116, 139, 0.2), /* 银色投影 */
+    inset 0 1rpx 0 rgba(255, 255, 255, 0.8); /* 顶部金属高光 */
+}
+
+/* 顶部快门 */
+.crystal-camera-body::before {
+  content: '';
+  position: absolute;
+  top: -8rpx;
+  left: 6rpx;
+  width: 22rpx;  /* 按比例调整 */
+  height: 8rpx;  /* 按比例调整 */
+  /* 银色实心 */
+  background: #64748B;
+  border-radius: 4rpx 4rpx 0 0;
+}
+
+/* === 3. 银色镜头 (Silver Lens) === */
+.crystal-camera-lens {
+  width: 26rpx;  /* 按比例放大 */
+  height: 26rpx;  /* 按比例放大 */
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  
+  /* 镜头圈：银色描边 */
+  border: 3rpx solid #64748B;
+  
+  /* 镜头反光：冷白渐变 */
+  background: radial-gradient(circle at 30% 30%, #FFFFFF 0%, #E2E8F0 100%);
+}
+
+/* === 4. 闪光点 (The Flash) === */
+.crystal-camera-flash {
+  width: 8rpx;  /* 按比例放大 */
+  height: 8rpx;  /* 按比例放大 */
+  /* 保持亮色，形成反差 */
+  background: #38BDF8; /* Sky-400 */
+  border-radius: 50%;
+  position: absolute;
+  top: 8rpx;  /* 按比例调整 */
+  right: 8rpx;  /* 按比例调整 */
+  box-shadow: 0 0 6rpx rgba(56, 189, 248, 0.6);
+}
+
+/* === 5. 动画关键帧适配 === */
+@keyframes camera-breathe {
+  0%, 100% {
+    transform: translateX(-50%) translateY(0) scale(1);
+    box-shadow: 
+      0 8rpx 20rpx rgba(16, 185, 129, 0.15), 
+      inset 0 0 12rpx rgba(255, 255, 255, 0.5);
+  }
+  50% {
+    transform: translateX(-50%) translateY(-6rpx) scale(1.05);
+    box-shadow: 
+      0 16rpx 30rpx rgba(16, 185, 129, 0.1), 
+      inset 0 0 12rpx rgba(255, 255, 255, 0.5);
+  }
 }
 
 /* ============ 全局字体颜色修正 - 日光未来主义风格 ============ */

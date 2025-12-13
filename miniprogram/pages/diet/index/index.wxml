@@ -315,13 +315,12 @@
   </view>
 
   <!-- ============ 浮动相机按钮 ============ -->
-  <floating-fab
-    icon="📷"
-    position="bottom-center"
-    theme="glass"
-    safeArea="{{true}}"
-    bindtap="goToCamera"
-  />
+  <view class="camera-glass-btn" bindtap="goToCamera">
+    <view class="crystal-camera-body">
+      <view class="crystal-camera-lens"></view>
+      <view class="crystal-camera-flash"></view>
+    </view>
+  </view>
 
   <!-- ============ 日历选择器弹窗 ============ -->
   <view class="calendar-modal {{showCalendarModal ? 'show' : ''}}" catchtap="hideCalendar">

@@ -77,8 +77,8 @@
 
   <!-- 4. 行动胶囊 Actions -->
   <view class="actions-grid">
-    <!-- 主操作：拍一拍 -->
-    <view class="action-card primary" bindtap="onQuickAction" data-url="/pages/diet/camera/index">
+    <!-- 主操作：饮食记录 -->
+    <view class="action-card primary" bindtap="onQuickAction" data-url="/pages/diet/index/index">
         <view class="action-glow"></view>
         <view class="action-content">
             <text class="action-label">饮食记录</text>

@@ -19,6 +19,16 @@ Page({
     selectedDate: '',
     dateDisplay: '',
 
+    // 运动列表（扁平化）
+    exercises: [],
+
+    // 统计数据（用于仪表盘）
+    summary: {
+      calories: 0,
+      duration: 0,
+      steps: 0
+    },
+
     // 日历相关
     showCalendarModal: false,
     calendarYear: 2024,
@@ -217,13 +227,20 @@ Page({
     const globalData = app.globalData || {};
     const stats = { ...this.data.stats };
 
-    // 从全局数据加载运动目标
+    // 从全局数据加载运动目标，如果没有则使用默认值
     if (globalData.dailyExerciseCalorieGoal) {
       stats.targetCalories = globalData.dailyExerciseCalorieGoal;
       stats.remainingCalories = globalData.dailyExerciseCalorieGoal;
+    } else {
+      // 确保有默认值
+      stats.targetCalories = stats.targetCalories || 500;
+      stats.remainingCalories = stats.remainingCalories || 500;
     }
     if (globalData.dailyExerciseDurationGoal) {
       stats.targetDuration = globalData.dailyExerciseDurationGoal;
+    } else {
+      // 确保有默认值
+      stats.targetDuration = stats.targetDuration || 60;
     }
 
     this.setData({ stats });
@@ -509,17 +526,26 @@ Page({
 
     try {
       const db = wx.cloud.database();
+      console.log('[Exercise] 正在查询日期:', this.data.selectedDate);
+
       const res = await db.collection('exercise_records')
         .where({
           recordDate: this.data.selectedDate
         })
         .get();
 
+      console.log('[Exercise] 查询结果:', res.data ? res.data.length : 0, '条记录');
+
       if (res.data) {
         this.processLogsData(res.data);
+      } else {
+        // 确保即使没有数据也更新UI
+        this.processLogsData([]);
       }
     } catch (err) {
       console.error('获取运动记录失败:', err);
+      // 出错时也要重置数据
+      this.processLogsData([]);
     } finally {
       this.setData({ isLoading: false });
     }
@@ -530,6 +556,43 @@ Page({
     const typeMap = { aerobic: [], strength: [], flexibility: [], sports: [] };
     const typeCalories = { aerobic: 0, strength: 0, flexibility: 0, sports: 0 };
     const typeDuration = { aerobic: 0, strength: 0, flexibility: 0, sports: 0 };
+
+    // 扁平化运动列表（按时间排序）
+    const exercises = logs.map(log => {
+      const exerciseType = log.exerciseType || 'aerobic';
+      const duration = log.duration || 0;
+      let startTime = '';
+      
+      // 格式化时间显示
+      if (log.startTime) {
+        const time = new Date(log.startTime);
+        const hours = String(time.getHours()).padStart(2, '0');
+        const minutes = String(time.getMinutes()).padStart(2, '0');
+        startTime = `${hours}:${minutes}`;
+      } else if (log.createdAt) {
+        const time = new Date(log.createdAt);
+        const hours = String(time.getHours()).padStart(2, '0');
+        const minutes = String(time.getMinutes()).padStart(2, '0');
+        startTime = `${hours}:${minutes}`;
+      }
+      
+      return {
+        _id: log._id,
+        name: log.name,
+        duration: duration,
+        calories: Math.round(log.calories) || 0,
+        emoji: this.getExerciseEmoji(log.name, exerciseType),
+        startTime: startTime,
+        type: exerciseType,
+        rawTime: log.startTime || log.createdAt || ''
+      };
+    }).sort((a, b) => {
+      // 按时间排序（降序，最新的在前）
+      if (a.rawTime && b.rawTime) {
+        return new Date(b.rawTime) - new Date(a.rawTime);
+      }
+      return 0;
+    });
 
     logs.forEach(log => {
       const exerciseType = log.exerciseType || 'aerobic';
@@ -569,30 +632,54 @@ Page({
     });
 
     // 计算统计数据
-    const targetCal = this.data.stats.targetCalories;
+    const targetCal = this.data.stats.targetCalories || 500; // 默认值防止除零
     const totalCal = Math.round(logs.reduce((sum, log) => sum + (log.calories || 0), 0));
     const totalDur = logs.reduce((sum, log) => sum + (log.duration || 0), 0);
     const remaining = Math.max(0, targetCal - totalCal);
 
-    // 环形图角度计算
-    const consumedPercent = Math.min((totalCal / targetCal) * 100, 100);
+    // 环形图角度计算（添加除零保护）
+    const consumedPercent = targetCal > 0 ? Math.min((totalCal / targetCal) * 100, 100) : 0;
     const consumedDegrees = Math.round((consumedPercent / 100) * 360);
 
-    const targetDur = this.data.stats.targetDuration;
+    const targetDur = this.data.stats.targetDuration || 60; // 默认值防止除零
 
     const stats = {
       totalCalories: totalCal,
       targetCalories: targetCal,
       remainingCalories: remaining,
-      caloriePercentage: Math.round((remaining / targetCal) * 100),
+      caloriePercentage: targetCal > 0 ? Math.round((remaining / targetCal) * 100) : 100,
       consumedCalories: totalCal,
 
       totalDuration: totalDur,
       targetDuration: targetDur,
-      durationPercentage: Math.min(Math.round((totalDur / targetDur) * 100), 100)
+      durationPercentage: targetDur > 0 ? Math.min(Math.round((totalDur / targetDur) * 100), 100) : 0
     };
 
-    this.setData({ exerciseTypes, stats, consumedDegrees, liquidProgress: consumedPercent });
+    // 更新summary用于仪表盘显示
+    const summary = {
+      calories: totalCal,
+      duration: totalDur,
+      steps: 0 // 步数需要从其他数据源获取
+    };
+
+    // 计算液体进度（基于消耗热量占目标的比例，添加除零保护）
+    const liquidProgress = targetCal > 0 ? Math.min(consumedPercent, 100) : 0;
+
+    console.log('[Exercise] 液体进度计算:', {
+      totalCal,
+      targetCal,
+      consumedPercent,
+      liquidProgress
+    });
+
+    this.setData({ 
+      exerciseTypes, 
+      stats, 
+      consumedDegrees, 
+      liquidProgress: liquidProgress,
+      exercises,
+      summary
+    });
   },
 
   // AI 洞察
@@ -1119,8 +1206,31 @@ Page({
   // 跳转到搜索页面
   goToSearch() {
     wx.navigateTo({
-      url: `/pages/exercise/search/index?type=${this.data.exerciseTypes[0].type}&date=${this.data.selectedDate}`
+      url: `/pages/exercise/search/index?type=aerobic&date=${this.data.selectedDate}`
     });
+  },
+
+  // 显示详情（暂时跳转到编辑）
+  showDetail(e) {
+    const id = e.currentTarget.dataset.id;
+    const exercise = this.data.exercises.find(item => item._id === id);
+    if (exercise) {
+      // 可以打开详情或编辑弹窗
+      this.openExerciseEdit({
+        currentTarget: {
+          dataset: {
+            exercise: {
+              id: exercise._id,
+              name: exercise.name,
+              emoji: exercise.emoji,
+              duration: exercise.duration,
+              calories: exercise.calories
+            },
+            type: exercise.type
+          }
+        }
+      });
+    }
   },
 
   // 跳转到运动库
