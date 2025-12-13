@@ -1,0 +1,7 @@
+<canvas
+  id="wave-canvas"
+  type="2d"
+  style="width: {{width}}rpx; height: {{height}}rpx;"
+  canvas-id="wave-canvas"
+></canvas>
+

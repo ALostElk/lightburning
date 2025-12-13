@@ -1,292 +1,753 @@
 /**
  * 拍照识别页面 - diet-camera/index
  * 设计语言: Daylight Futurism (日光未来主义)
- * 1:1 复刻 React 参考项目样式
+ * 全屏沉浸式相机界面 - "日光全息界面"
  */
 
-/* ============ 页面容器 ============ */
-.page-container {
-  min-height: 100vh;
-  /* 继承全局背景，不再单独设置 */
-  background: transparent;
-}
-
-/* ============ 自定义导航栏 ============ */
-.nav-header {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(40rpx);
-  -webkit-backdrop-filter: blur(40rpx);
-  border-bottom: 1rpx solid rgba(255, 255, 255, 0.6);
-}
-
-.nav-content {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20rpx 24rpx;
-}
-
-.nav-back {
-  width: 72rpx;
-  height: 72rpx;
-  background: rgba(255, 255, 255, 0.8);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
-  transition: all 0.2s ease;
-}
-
-.nav-back:active {
-  transform: scale(0.92);
-  background: rgba(255, 107, 53, 0.1);
-}
-
-.back-icon {
-  font-size: 48rpx;
-  color: #374151;
-  font-weight: 300;
-  line-height: 1;
-  margin-top: -4rpx;
-}
-
-.nav-title {
-  font-size: 34rpx;
-  font-weight: 700;
-  color: #1F2937;
-  letter-spacing: 1rpx;
-}
-
-.nav-placeholder {
-  width: 72rpx;
-}
-
-/* ============ 主内容区 ============ */
-.main-content {
-  padding: 24rpx;
-  padding-bottom: 120rpx;
-}
-
-/* ============ 上传区域 ============ */
-.upload-section {
-  display: flex;
-  flex-direction: column;
-  gap: 32rpx;
-}
-
-.upload-card-content {
-  padding: 48rpx 32rpx;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 32rpx;
-  background: linear-gradient(135deg, #F5F3FF 0%, #EDE9FE 100%);
-  border-radius: 28rpx;
-  box-shadow: 0 8rpx 32rpx rgba(139, 92, 246, 0.08);
-}
-
-/* 上传图标 */
-.upload-icon-wrapper {
+/* ============ 全局容器 ============ */
+.camera-page {
+  width: 100vw;
+  height: 100vh;
   position: relative;
-  width: 160rpx;
-  height: 160rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.upload-icon-bg {
-  width: 120rpx;
-  height: 120rpx;
-  background: linear-gradient(135deg, rgba(255, 107, 53, 0.15) 0%, rgba(255, 142, 83, 0.15) 100%);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1;
-}
-
-.upload-icon {
-  font-size: 56rpx;
-}
-
-/* 脉冲光环动画 */
-.pulse-ring {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 120rpx;
-  height: 120rpx;
-  border: 4rpx solid rgba(255, 107, 53, 0.3);
-  border-radius: 50%;
-  animation: pulse-expand 2s ease-out infinite;
-}
-
-.pulse-ring-2 {
-  animation-delay: 1s;
-}
-
-@keyframes pulse-expand {
-  0% {
-    width: 120rpx;
-    height: 120rpx;
-    opacity: 1;
-  }
-  100% {
-    width: 200rpx;
-    height: 200rpx;
-    opacity: 0;
-  }
-}
-
-/* 上传文字 */
-.upload-text {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12rpx;
-  text-align: center;
-}
-
-.upload-title {
-  font-size: 40rpx;
-  font-weight: 800;
-  color: #1F2937;
-  letter-spacing: 2rpx;
-}
-
-.upload-desc {
-  font-size: 28rpx;
-  color: #6B7280;
-  line-height: 1.6;
-  max-width: 500rpx;
-}
-
-/* 操作按钮 */
-.upload-actions {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 20rpx;
-  margin-top: 16rpx;
-}
-
-.action-btn {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 16rpx;
-  padding: 36rpx;
-  border-radius: 24rpx;
-  font-size: 32rpx;
-  font-weight: 600;
-  transition: all 0.3s ease;
+  background: #000; /* 相机加载前的底色 */
   overflow: hidden;
 }
 
-.action-btn.primary {
-  background: linear-gradient(135deg, #FF6B35 0%, #FF8E53 100%);
-  color: #FFFFFF;
-  box-shadow: 0 16rpx 40rpx rgba(255, 107, 53, 0.35);
-}
-
-.action-btn.primary:active {
-  transform: scale(0.97);
-  box-shadow: 0 8rpx 24rpx rgba(255, 107, 53, 0.4);
-}
-
-.action-btn-inner {
+/* ============ 返回按钮 ============ */
+.nav-back-btn {
+  position: fixed;
+  left: 32rpx;
+  z-index: 100;
+  width: 72rpx;
+  height: 72rpx;
   display: flex;
   align-items: center;
-  gap: 16rpx;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10rpx);
+  -webkit-backdrop-filter: blur(10rpx);
+  border-radius: 50%;
+  border: 1rpx solid rgba(255, 255, 255, 0.2);
+  transition: all 0.2s ease;
+}
+
+.nav-back-btn:active {
+  background: rgba(0, 0, 0, 0.6);
+  transform: scale(0.95);
+}
+
+.back-arrow {
+  font-size: 48rpx;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 300;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+}
+
+.fullscreen-camera {
+  width: 100%;
+  height: 100%;
   z-index: 1;
 }
 
-.btn-glow {
+/* ============ 扫描框 HUD ============ */
+.scan-area {
   position: absolute;
-  top: 0;
-  left: -100%;
+  top: 20%; /* 稍微上移，留出下方空间给提示语 */
+  left: 10%;
+  width: 80%;
+  height: 40%; /* 方形取景框 */
+  z-index: 10;
+}
+
+/* 扫描角标：发光的白色/淡橙色 */
+.scan-corner {
+  position: absolute;
+  width: 40rpx;
+  height: 40rpx;
+  border-color: rgba(255, 255, 255, 0.9);
+  border-style: solid;
+  border-width: 0;
+  box-shadow: 0 0 15rpx rgba(255, 255, 255, 0.5); /* 光晕 */
+}
+
+.top-left { 
+  border-top-width: 6rpx; 
+  border-left-width: 6rpx; 
+  top: 0; 
+  left: 0; 
+  border-radius: 12rpx 0 0 0; 
+}
+
+.top-right { 
+  border-top-width: 6rpx; 
+  border-right-width: 6rpx; 
+  top: 0; 
+  right: 0; 
+  border-radius: 0 12rpx 0 0; 
+}
+
+.bottom-left { 
+  border-bottom-width: 6rpx; 
+  border-left-width: 6rpx; 
+  bottom: 0; 
+  left: 0; 
+  border-radius: 0 0 0 12rpx; 
+}
+
+.bottom-right { 
+  border-bottom-width: 6rpx; 
+  border-right-width: 6rpx; 
+  bottom: 0; 
+  right: 0; 
+  border-radius: 0 0 12rpx 0; 
+}
+
+/* 扫描线动画 */
+.scan-line {
+  position: absolute;
   width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-  animation: shine 3s infinite;
+  height: 4rpx;
+  background: linear-gradient(90deg, transparent 0%, #FF6B35 50%, transparent 100%);
+  animation: scan-move 2.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  box-shadow: 0 0 10rpx rgba(255, 107, 53, 0.6);
 }
 
-@keyframes shine {
-  0% { left: -100%; }
-  50%, 100% { left: 100%; }
+@keyframes scan-move {
+  0% { top: 0; opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
 }
 
-/* 蓝色灯光效果 */
-.btn-glow.blue {
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-  animation: shine-blue 3s infinite;
-}
-
-@keyframes shine-blue {
-  0% { left: -100%; }
-  50%, 100% { left: 100%; }
-}
-
-.action-btn.secondary {
-  background: linear-gradient(135deg, #3B82F6 0%, #60A5FA 100%);
-  color: #FFFFFF;
-  box-shadow: 0 16rpx 40rpx rgba(59, 130, 246, 0.35);
-}
-
-.action-btn.secondary:active {
-  transform: scale(0.97);
-  box-shadow: 0 8rpx 24rpx rgba(59, 130, 246, 0.4);
-}
-
-.action-icon {
-  font-size: 36rpx;
-}
-
-.action-text {
-  font-size: 30rpx;
-}
-
-/* 提示区域 */
-.tips-section {
+/* ============ 引导与搜索区 (新增) ============ */
+.guide-area {
+  position: absolute;
+  top: 62%; /* 紧贴扫描框下方 */
+  left: 0;
+  width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 16rpx;
-  padding: 0 16rpx;
+  align-items: center;
+  z-index: 20;
 }
 
-.tip-item {
+.guide-text {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 28rpx;
+  text-shadow: 0 2rpx 4rpx rgba(0,0,0,0.5);
+  letter-spacing: 2rpx;
+}
+
+/* ============ 底部控制台 (Glass Console) ============ */
+.bottom-console {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 260rpx; /* 减小高度，避免遮挡 */
+  padding-bottom: env(safe-area-inset-bottom);
+  z-index: 30;
+  
+  /* 渐变遮罩，不再用实体背景 */
+  background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.8) 100%);
+  
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+/* 次要按钮 (相册/取消) - 纯文字样式 */
+.control-btn.text-btn {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2); /* 磨砂玻璃 */
+  backdrop-filter: blur(10rpx);
+  -webkit-backdrop-filter: blur(10rpx);
   display: flex;
   align-items: center;
-  gap: 16rpx;
-  padding: 20rpx 24rpx;
-  background: transparent;
-  border-radius: 16rpx;
+  justify-content: center;
+  border: 1rpx solid rgba(255, 255, 255, 0.3);
+  transition: all 0.2s;
 }
 
-.tip-icon {
+.control-btn:active {
+  background: rgba(255, 255, 255, 0.4);
+  transform: scale(0.95);
+}
+
+.btn-icon {
+  width: 48rpx;
+  height: 48rpx;
+}
+
+.btn-label,
+.btn-text {
+  font-size: 24rpx;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+}
+
+/* ============ 能量快门 (Core Element) ============ */
+.shutter-btn-wrapper {
+  position: relative;
+  width: 140rpx;
+  height: 140rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20rpx;
+}
+
+/* 外环 - 玻璃质感 */
+.shutter-outer-ring {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 6rpx solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 20rpx rgba(255, 255, 255, 0.2);
+}
+
+/* 内核 - 日光能量球 (呼应主页) */
+.shutter-inner-core {
+  width: 110rpx;
+  height: 110rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #FF9A9E 0%, #FF6B35 100%); /* 品牌渐变 */
+  box-shadow: 
+    inset 0 4rpx 8rpx rgba(255, 255, 255, 0.5), /* 顶部高光 */
+    0 8rpx 20rpx rgba(255, 107, 53, 0.4); /* 弥散光 */
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* 点击时的能量收缩效果 */
+.shutter-btn-wrapper:active .shutter-inner-core {
+  transform: scale(0.85);
+  background: #FF6B35;
+  box-shadow: 0 0 40rpx rgba(255, 107, 53, 0.8); /* 能量爆发 */
+}
+
+/* ============ Loading 层 ============ */
+.analyzing-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.overlay-bg {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: -2;
+}
+
+.overlay-blur {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  background: rgba(0, 0, 0, 0.6); /* 半透黑遮罩 */
+  backdrop-filter: blur(15px);     /* 强高斯模糊 */
+  -webkit-backdrop-filter: blur(15px);
+}
+
+.radar-scan {
+  width: 120rpx;
+  height: 120rpx;
+  border: 4rpx solid #FF6B35;
+  border-radius: 50%;
+  border-top-color: transparent;
+  animation: spin 1s linear infinite;
+  margin-bottom: 24rpx;
+  z-index: 1;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.analyzing-text {
+  color: #fff;
   font-size: 28rpx;
+  letter-spacing: 2rpx;
+  z-index: 1;
+  text-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.5);
 }
 
-.tip-text {
+/* ============ 结果层容器 ============ */
+.result-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 100;
+}
+
+/* 背景模糊处理 */
+.result-bg {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.result-bg-blur {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: rgba(0, 0, 0, 0.4); /* 压暗 */
+  backdrop-filter: blur(20px);     /* 强模糊 */
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* ============ 智能结算卡片 ============ */
+.result-card {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(20rpx);
+  -webkit-backdrop-filter: blur(20rpx);
+  border-radius: 40rpx 40rpx 0 0;
+  padding: 40rpx 32rpx;
+  padding-bottom: calc(40rpx + env(safe-area-inset-bottom));
+  box-sizing: border-box;
+  box-shadow: 0 -10rpx 40rpx rgba(0,0,0,0.2);
+}
+
+.animate-slide-up {
+  animation: slideUp 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+/* 卡片头部 */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24rpx;
+}
+
+.card-title {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #334155;
+}
+
+.card-close {
+  font-size: 28rpx;
+  color: #94A3B8;
+  padding: 8rpx 16rpx;
+  border-radius: 20rpx;
+  transition: all 0.2s ease;
+}
+
+.card-close:active {
+  background: rgba(148, 163, 184, 0.1);
+}
+
+/* ============ 餐次选择器 ============ */
+.meal-selector-row {
+  display: flex;
+  align-items: center;
+  padding: 0 32rpx 24rpx;
+  margin-bottom: 24rpx;
+  border-bottom: 1rpx solid rgba(0, 0, 0, 0.05);
+}
+
+.meal-label {
   font-size: 26rpx;
-  color: #6B7280;
+  color: #94A3B8;
+  margin-right: 16rpx;
+  flex-shrink: 0;
 }
 
-/* ============ 结果区域 ============ */
+.meal-chips {
+  display: flex;
+  gap: 16rpx;
+  flex: 1;
+  overflow-x: auto;
+}
+
+.meal-chip {
+  padding: 8rpx 24rpx;
+  background: #F1F5F9;
+  border-radius: 30rpx;
+  font-size: 24rpx;
+  color: #64748B;
+  transition: all 0.2s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.meal-chip:active {
+  transform: scale(0.95);
+}
+
+.meal-chip.active {
+  background: #FF6B35;
+  color: #fff;
+  box-shadow: 0 4rpx 12rpx rgba(255, 107, 53, 0.3);
+}
+
+/* 食物列表 */
+.food-list {
+  max-height: 50vh;
+}
+
+/* 食物列表项 */
+.food-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24rpx;
+  background: #F8FAFC;
+  border-radius: 20rpx;
+  margin-bottom: 16rpx;
+  border: 1rpx solid rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.food-item:active {
+  background: #F1F5F9;
+  transform: scale(0.98);
+}
+
+.food-left {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  flex: 1;
+  min-width: 0;
+}
+
+/* ============ 空气水晶球 (Ethereal Crystal) ============ */
+.food-emoji {
+  width: 60rpx;
+  height: 60rpx;
+  flex-shrink: 0;
+  border-radius: 50%;
+  position: relative;
+  cursor: pointer;
+  
+  /* 1. 材质：极度通透，几乎没有背景色 */
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(4rpx); /* 微弱的磨砂，保留空气感 */
+  -webkit-backdrop-filter: blur(4rpx);
+  
+  /* 2. 轮廓：极细的、不均匀的白边，模拟玻璃边缘反光 */
+  border: 1rpx solid rgba(255, 255, 255, 0.4);
+  border-bottom-color: rgba(255, 255, 255, 0.1); /* 底部弱化 */
+  
+  /* 3. 体积感：仅靠内阴影塑造 */
+  box-shadow: 
+    inset 0 4rpx 8rpx rgba(255, 255, 255, 0.3), /* 顶部入光 */
+    inset 0 -6rpx 10rpx rgba(255, 255, 255, 0.1), /* 底部反光 */
+    0 4rpx 8rpx rgba(0, 0, 0, 0.03); /* 极淡的悬浮影 */
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* === 关键：高光反射点 (The Glint) === */
+/* 模拟摄影棚灯光在玻璃表面的反射，这是"质感"的灵魂 */
+.food-emoji::before {
+  content: '';
+  position: absolute;
+  top: 10%;
+  left: 12%;
+  width: 30%;
+  height: 18%;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.2) 100%);
+  filter: blur(1rpx); /* 边缘微柔化，但这块光要是实的 */
+  opacity: 0.8;
+  transform: rotate(-45deg);
+  transition: all 0.4s ease;
+  z-index: 1;
+}
+
+/* 内部内容 - 食物点（使用 ::after 作为内容） */
+.food-emoji::after {
+  content: '';
+  position: absolute;
+  width: 28rpx;
+  height: 28rpx;
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  /* 未选中：像封在冰块里，半透明、去色 */
+  background: radial-gradient(
+    circle at 30% 30%,
+    rgba(148, 163, 184, 0.3) 0%,
+    rgba(100, 116, 139, 0.2) 100%
+  );
+  filter: grayscale(100%) opacity(0.4);
+  transform: translate(-50%, -50%) scale(0.85);
+  transition: all 0.4s ease;
+  z-index: 0;
+}
+
+/* ============ 选中状态：灵能注入 ============ */
+.food-emoji.selected {
+  /* 边框变色 */
+  border-color: rgba(110, 231, 183, 0.8); /* 清晰的薄荷绿边 */
+  background: rgba(110, 231, 183, 0.05); /* 极淡的绿色填充 */
+  
+  /* 光效：内发光 + 外辉光 */
+  box-shadow: 
+    0 0 16rpx rgba(110, 231, 183, 0.4), /* 外发光 (Glow) */
+    inset 0 0 12rpx rgba(110, 231, 183, 0.2), /* 内发光 */
+    inset 0 4rpx 8rpx rgba(255, 255, 255, 0.3), /* 保持顶部入光 */
+    inset 0 -6rpx 10rpx rgba(255, 255, 255, 0.1), /* 保持底部反光 */
+    0 4rpx 8rpx rgba(0, 0, 0, 0.03); /* 保持悬浮影 */
+  
+  transform: scale(1.05);
+}
+
+/* 选中后的高光反射点增强 */
+.food-emoji.selected::before {
+  opacity: 1;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 1) 0%, rgba(110, 231, 183, 0.3) 100%);
+}
+
+/* 选中后的内容 */
+.food-emoji.selected::after {
+  transform: translate(-50%, -50%) scale(1);
+  /* 给内容加一点点发光感 */
+  filter: drop-shadow(0 0 4rpx rgba(110, 231, 183, 0.3)) grayscale(0%) opacity(1);
+  background: radial-gradient(
+    circle at 30% 30%,
+    rgba(110, 231, 183, 0.6) 0%,
+    rgba(16, 185, 129, 0.4) 100%
+  );
+}
+
+/* 点击反馈 */
+.food-emoji:active {
+  transform: scale(0.95);
+}
+
+.food-emoji.selected:active {
+  transform: scale(1);
+}
+
+.food-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+  flex: 1;
+  min-width: 0;
+}
+
+.food-name {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #334155;
+}
+
+.food-sub-info {
+  font-size: 26rpx;
+  color: #475569;
+  display: flex;
+  gap: 20rpx;
+  flex-wrap: wrap;
+  margin-top: 8rpx;
+  align-items: center;
+}
+
+.food-grams {
+  font-weight: 600;
+  color: #334155;
+  font-size: 26rpx;
+}
+
+.food-macros {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #334155;
+  letter-spacing: 1rpx;
+}
+
+.food-right {
+  display: flex;
+  align-items: baseline;
+  gap: 4rpx;
+  margin-right: 20rpx;
+  flex-shrink: 0;
+}
+
+.food-cal {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #FF6B35;
+}
+
+.food-unit {
+  font-size: 22rpx;
+  color: #94A3B8;
+}
+
+.edit-icon {
+  font-size: 24rpx;
+  color: #CBD5E1;
+  margin-left: 8rpx;
+}
+
+.food-delete {
+  padding: 10rpx;
+  color: #CBD5E1;
+  font-size: 32rpx;
+  width: 48rpx;
+  height: 48rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.food-delete:active {
+  background: rgba(203, 213, 225, 0.2);
+  color: #94A3B8;
+}
+
+/* ============ 核心：手动添加按钮 ============ */
+.manual-add-row {
+  display: flex;
+  align-items: center;
+  padding: 24rpx;
+  border: 2rpx dashed #CBD5E1; /* 虚线框暗示"补充" */
+  border-radius: 20rpx;
+  margin-bottom: 24rpx;
+  transition: all 0.2s ease;
+}
+
+.manual-add-row.text-only {
+  justify-content: center;
+}
+
+.manual-add-row:active {
+  background: #F1F5F9;
+  border-color: #FF6B35;
+}
+
+.add-text {
+  font-size: 28rpx;
+  color: #64748B;
+  font-weight: 500;
+}
+
+.add-text {
+  flex: 1;
+  font-size: 28rpx;
+  color: #64748B;
+}
+
+.add-arrow {
+  color: #CBD5E1;
+  font-size: 24rpx;
+}
+
+/* 底部保存 */
+.card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 20rpx;
+  padding-top: 20rpx;
+  border-top: 1rpx solid #E2E8F0;
+}
+
+.total-cal {
+  display: flex;
+  align-items: baseline;
+}
+
+.total-label {
+  font-size: 24rpx;
+  color: #94A3B8;
+}
+
+.total-num {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: #334155;
+  margin-left: 8rpx;
+}
+
+.save-btn {
+  background: linear-gradient(135deg, #FF6B35 0%, #FF8E53 100%);
+  color: white;
+  padding: 20rpx 60rpx;
+  border-radius: 40rpx;
+  font-weight: 600;
+  font-size: 28rpx;
+  box-shadow: 0 8rpx 20rpx rgba(255, 107, 53, 0.3);
+  transition: all 0.2s ease;
+}
+
+.save-btn:active {
+  transform: scale(0.95);
+  box-shadow: 0 4rpx 12rpx rgba(255, 107, 53, 0.4);
+}
+
+/* ============ 结果覆盖层（旧版，保留兼容） ============ */
+.result-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 30;
+  background: linear-gradient(180deg, #F5FAFF 0%, #FFFFFF 100%);
+  overflow-y: auto;
+}
+
 .result-section {
+  padding: 24rpx;
+  padding-bottom: 120rpx;
   display: flex;
   flex-direction: column;
   gap: 24rpx;
 }
 
-/* 预览卡片 */
+/* ============ 预览卡片 ============ */
 .preview-wrapper {
   position: relative;
   border-radius: 24rpx;
@@ -338,7 +799,7 @@
   display: block;
 }
 
-/* 分析中遮罩 */
+/* ============ 分析中遮罩 ============ */
 .analyzing-overlay {
   position: absolute;
   top: 0;
@@ -347,6 +808,7 @@
   bottom: 0;
   background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(8rpx);
+  -webkit-backdrop-filter: blur(8rpx);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -415,7 +877,7 @@
   100% { width: 100%; }
 }
 
-/* 重拍按钮 */
+/* ============ 重拍按钮 ============ */
 .retake-btn {
   position: absolute;
   top: 20rpx;
@@ -424,6 +886,7 @@
   height: 64rpx;
   background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(10rpx);
+  -webkit-backdrop-filter: blur(10rpx);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -442,7 +905,7 @@
   font-weight: 300;
 }
 
-/* 图片标签 */
+/* ============ 图片标签 ============ */
 .image-badge {
   position: absolute;
   bottom: 20rpx;
@@ -453,6 +916,7 @@
   padding: 12rpx 20rpx;
   background: rgba(82, 196, 26, 0.9);
   backdrop-filter: blur(10rpx);
+  -webkit-backdrop-filter: blur(10rpx);
   border-radius: 20rpx;
 }
 
@@ -477,6 +941,7 @@
   border: 2rpx solid rgba(252, 165, 165, 0.6);
   border-radius: 20rpx;
   backdrop-filter: blur(10rpx);
+  -webkit-backdrop-filter: blur(10rpx);
 }
 
 .error-content {
@@ -551,7 +1016,7 @@
   color: #9CA3AF;
 }
 
-/* 食物列表 */
+/* ============ 食物列表 ============ */
 .food-list {
   display: flex;
   flex-direction: column;
@@ -985,53 +1450,7 @@
   font-weight: 500;
 }
 
-/* ============ 手动搜索链接 ============ */
-.manual-search {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8rpx;
-  padding: 32rpx;
-  margin-top: 16rpx;
-}
-
-.search-hint {
-  font-size: 26rpx;
-  color: #9CA3AF;
-}
-
-.search-link {
-  font-size: 26rpx;
-  color: #FF6B35;
-  font-weight: 600;
-}
-
-.search-arrow {
-  font-size: 24rpx;
-  color: #FF6B35;
-  transition: transform 0.2s ease;
-}
-
-.manual-search:active .search-arrow {
-  transform: translateX(8rpx);
-}
-
 /* ============ 动画 ============ */
-@keyframes fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(20rpx);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.animate-fade-in {
-  animation: fade-in 0.4s ease-out;
-}
-
 @keyframes slide-up {
   from {
     opacity: 0;
@@ -1056,3 +1475,163 @@
 .animate-shake {
   animation: shake 0.5s ease-in-out;
 }
+
+/* ============ 食物编辑弹窗 ============ */
+.food-edit-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 200;
+  visibility: hidden;
+  opacity: 0;
+  transition: all 0.3s ease;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: flex-end;
+}
+
+.food-edit-modal.show {
+  visibility: visible;
+  opacity: 1;
+}
+
+.food-edit-content {
+  width: 100%;
+  background: #fff;
+  border-radius: 40rpx 40rpx 0 0;
+  padding: 40rpx 32rpx calc(40rpx + env(safe-area-inset-bottom));
+  box-sizing: border-box;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.food-edit-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32rpx;
+}
+
+.food-edit-title {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #334155;
+}
+
+.food-edit-close {
+  width: 48rpx;
+  height: 48rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+  color: #94A3B8;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.food-edit-close:active {
+  background: rgba(148, 163, 184, 0.1);
+}
+
+.food-edit-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 40rpx;
+}
+
+.food-edit-name {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #334155;
+  text-align: center;
+}
+
+.slider-container {
+  margin: 40rpx 0;
+}
+
+.slider-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+  font-size: 28rpx;
+  color: #64748B;
+}
+
+.slider-value {
+  color: #FF6B35;
+  font-weight: 600;
+  font-size: 36rpx;
+}
+
+.amount-slider {
+  width: 100%;
+}
+
+.calories-preview {
+  display: flex;
+  justify-content: space-between;
+  background: #F1F5F9;
+  padding: 20rpx;
+  border-radius: 20rpx;
+  margin-bottom: 40rpx;
+}
+
+.preview-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8rpx;
+  flex: 1;
+}
+
+.p-label {
+  font-size: 22rpx;
+  color: #94A3B8;
+}
+
+.p-val {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #334155;
+}
+
+.p-val.protein {
+  color: #6EE7B7;
+}
+
+.p-val.carbs {
+  color: #FDE047;
+}
+
+.p-val.fat {
+  color: #FCA5A5;
+}
+
+.food-edit-actions {
+  margin-top: 20rpx;
+}
+
+.edit-btn-save {
+  background: linear-gradient(135deg, #FF6B35 0%, #FF8E53 100%);
+  color: white;
+  text-align: center;
+  padding: 24rpx;
+  border-radius: 50rpx;
+  font-weight: 600;
+  font-size: 28rpx;
+  box-shadow: 0 8rpx 20rpx rgba(255, 107, 53, 0.3);
+  transition: all 0.2s ease;
+}
+
+.edit-btn-save:active {
+  transform: scale(0.98);
+  box-shadow: 0 4rpx 12rpx rgba(255, 107, 53, 0.4);
+}
+
+/* CSS 图标样式已移除，统一使用纯文字按钮 */

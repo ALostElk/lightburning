@@ -33,6 +33,9 @@ Page({
     // 环形图/液态球计算值
     consumedDegrees: 0,
     liquidProgress: 0,
+    
+    // 仪表盘状态（用于动态光晕）
+    dashboardStatus: 'status-green', // 默认绿色
 
     // 餐次数据（含折叠状态）
     meals: [
@@ -642,7 +645,19 @@ Page({
       fatPercentage: Math.min(Math.round(((summary.totalFat || 0) / fatTarget) * 100), 100)
     };
 
-    this.setData({ meals, stats, consumedDegrees, liquidProgress: consumedPercent });
+    // 计算仪表盘状态（根据剩余热量百分比）
+    // 绿色（健康）：剩余 >= 50%
+    // 黄色（警告）：剩余 20% - 50%
+    // 红色（超标）：剩余 < 20% 或已超标
+    const remainingPercent = (remaining / targetCal) * 100;
+    let dashboardStatus = 'status-green'; // 默认绿色
+    if (remainingPercent < 20 || remaining < 0) {
+      dashboardStatus = 'status-red'; // 红色：剩余不足或已超标
+    } else if (remainingPercent < 50) {
+      dashboardStatus = 'status-yellow'; // 黄色：警告
+    }
+
+    this.setData({ meals, stats, consumedDegrees, liquidProgress: consumedPercent, dashboardStatus });
   },
 
   // AI 洞察

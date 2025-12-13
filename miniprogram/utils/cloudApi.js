@@ -261,12 +261,15 @@ export const deleteDietLog = (logId) => {
  * 获取用户常用食物
  * @param {number} limit - 返回数量
  */
-export const getFrequentFoods = (limit = 20) => {
+export const getFrequentFoods = (limit = 20, mealType = '') => {
   return wx.cloud.callFunction({
     name: 'dietService',
     data: {
       action: 'getFrequentFoods',
-      payload: { limit }
+      payload: { 
+        limit,
+        mealType: mealType || undefined // 如果为空字符串则不传
+      }
     }
   });
 };

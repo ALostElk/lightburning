@@ -5,6 +5,7 @@ import * as api from '../../../utils/cloudApi.js';
 
 Page({
   data: {
+    statusBarHeight: 44,
     name: '',
     amount: 100,
     baseNutrition: {
@@ -36,8 +37,13 @@ Page({
   },
 
   onLoad(options) {
+    // 获取状态栏高度
+    const systemInfo = wx.getSystemInfoSync();
     const date = options.date || this.getTodayString();
     const mealType = options.mealType || 'snack';
+    this.setData({
+      statusBarHeight: systemInfo.statusBarHeight || 44
+    });
     let food = null;
     let isManualMode = true;
 

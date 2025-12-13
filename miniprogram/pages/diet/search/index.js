@@ -6,6 +6,7 @@ import * as api from '../../../utils/cloudApi.js';
 
 Page({
   data: {
+    statusBarHeight: 44,
     keyword: '',
     isSearching: false,
     isDeepSearching: false,
@@ -30,20 +31,54 @@ Page({
     // 常用食物
     frequentFoods: [],
     isLoadingFavorites: false,
-    favoriteMealFilter: 'all'  // 'all' | 'breakfast' | 'lunch' | 'dinner' | 'snack'
+    favoriteMealFilter: 'all',  // 'all' | 'breakfast' | 'lunch' | 'dinner' | 'snack'
+    
+    // 搜索结果（统一格式）
+    searchResults: [],
+    
+    // 编辑弹窗
+    showFoodEditModal: false,
+    editingFood: {},
+    
+    // 来源标记
+    fromPage: '', // 用于存储来源标记（如 'camera'）
+    
+    // 我的常用 - 餐次切换
+    currentMealTab: 'breakfast', // 当前选中的餐次
+    mealTabs: [
+      { key: 'breakfast', name: '早餐 🌅' },
+      { key: 'lunch', name: '午餐 ☀️' },
+      { key: 'dinner', name: '晚餐 🌙' },
+      { key: 'snack', name: '加餐 🍬' }
+    ],
+    
+    // 重构：移除静态数据，改为动态容器
+    favorites: {
+      breakfast: [],
+      lunch: [],
+      dinner: [],
+      snack: []
+    },
+    isLoadingFavorites: false
   },
 
   debounceTimer: null,
 
   onLoad(options) {
+    // 获取状态栏高度
+    const systemInfo = wx.getSystemInfoSync();
     const mealType = options.mealType || 'snack';
     this.setData({
+      statusBarHeight: systemInfo.statusBarHeight || 44,
       targetDate: options.date || this.getTodayString(),
       selectedMealType: mealType,
-      favoriteMealFilter: mealType  // 默认筛选当前餐次
+      favoriteMealFilter: mealType,  // 默认筛选当前餐次
+      // 捕获来源参数 (例如 ?from=camera)
+      fromPage: options.from || ''
     });
     this.loadRecentSearches();
     this.loadFrequentFoods();
+    this.autoSelectMealTab();
   },
 
   onShow() {
@@ -86,32 +121,76 @@ Page({
   },
 
   // ============ 常用食物 ============
+  // [核心重构] 加载所有餐次的常用食物
   async loadFrequentFoods() {
     this.setData({ isLoadingFavorites: true });
 
     try {
-      // 根据筛选条件决定是否传入 mealType
-      const mealType = this.data.favoriteMealFilter === 'all' ? '' : this.data.favoriteMealFilter;
+      // 定义四个餐次类型
+      const mealTypes = ['breakfast', 'lunch', 'dinner', 'snack'];
+      
+      // 并行发起 4 个请求，每个餐次取前 10 个高频食物
+      const requests = mealTypes.map(type => 
+        api.getFrequentFoods(10, type)
+          .then(res => {
+            const data = res.result?.data || [];
+            // 调试日志：确认 API 返回的数据
+            console.log(`[API ${type}] 返回 ${data.length} 条数据`, data.map(item => item.name));
+            return { 
+              type, 
+              list: data
+            };
+          })
+          .catch(err => {
+            console.error(`加载${type}常用食物失败:`, err);
+            return { type, list: [] }; // 容错处理
+          })
+      );
 
-      const res = await api.getFrequentFoods(20, mealType);
+      const results = await Promise.all(requests);
 
-      if (res.result?.success) {
-        const foods = res.result.data || [];
-        // 转换字段名并添加 emoji
-        const foodsWithEmoji = foods.map(food => ({
-          _id: food.foodId || food.name,
-          name: food.name,
-          calories: food.avgCalories,
-          protein: food.avgProtein,
-          carbs: food.avgCarbs,
-          fat: food.avgFat,
-          grams: food.avgGrams,
-          useCount: food.count,
-          source: food.foodSource,
-          emoji: this.getFoodEmoji(food.name, food.category)
+      // 组装数据
+      const newFavorites = {
+        breakfast: [],
+        lunch: [],
+        dinner: [],
+        snack: []
+      };
+      
+      results.forEach(({ type, list }) => {
+        // 确保 type 是有效的餐次类型
+        if (!['breakfast', 'lunch', 'dinner', 'snack'].includes(type)) {
+          console.warn(`无效的餐次类型: ${type}`);
+          return;
+        }
+        
+        // 数据清洗 & 补充 Emoji (如果没有图片)
+        newFavorites[type] = (list || []).map(item => ({
+          name: item.name,
+          calories: item.avgCalories || item.calories || 0,
+          protein: item.avgProtein || item.protein || 0,
+          carbs: item.avgCarbs || item.carbs || 0,
+          fat: item.avgFat || item.fat || 0,
+          grams: item.avgGrams || item.grams || 100,
+          id: item.foodId || item.name || `${type}-${item.name}`,
+          // 如果后端没存 emoji，前端根据分类补一个
+          emoji: item.emoji || this.getFoodEmoji(item.name, item.category),
+          // 保留完整数据
+          _fullData: item
         }));
-        this.setData({ frequentFoods: foodsWithEmoji });
-      }
+        
+        // 调试日志：确认每个餐次的数据
+        console.log(`[${type}] 加载了 ${newFavorites[type].length} 个常用食物:`, newFavorites[type].map(f => f.name));
+      });
+
+      // 最终确认：打印所有餐次的数据统计
+      console.log('=== 常用食物数据统计 ===');
+      Object.keys(newFavorites).forEach(key => {
+        console.log(`${key}: ${newFavorites[key].length} 个`, newFavorites[key].map(f => f.name));
+      });
+
+      this.setData({ favorites: newFavorites });
+
     } catch (err) {
       console.error('加载常用食物失败:', err);
     } finally {
@@ -292,8 +371,8 @@ Page({
     this.setData({ recentSearches: searches });
   },
 
-  // 输入变化
-  onInput(e) {
+  // 输入变化（新方法名）
+  onSearchInput(e) {
     const keyword = e.detail.value;
     this.setData({ keyword });
 
@@ -304,10 +383,32 @@ Page({
     }, 300);
   },
 
-  // 快速搜索
+  // 兼容旧方法名
+  onInput(e) {
+    this.onSearchInput(e);
+  },
+
+  // 确认搜索（新方法名）
+  onSearchConfirm() {
+    this.fullSearch();
+  },
+
+  // 快速搜索（支持从标签点击）
   async quickSearch(keyword) {
-    if (!keyword.trim()) {
-      this.setData({ results: [], userDishes: [], hasMore: false });
+    // 如果是从标签点击，获取 data-key
+    if (typeof keyword === 'object' && keyword.currentTarget) {
+      const key = keyword.currentTarget.dataset.key;
+      this.setData({ keyword: key });
+      keyword = key;
+    }
+    
+    if (!keyword || !keyword.trim()) {
+      this.setData({ 
+        results: [], 
+        userDishes: [], 
+        hasMore: false,
+        searchResults: []
+      });
       return;
     }
 
@@ -318,15 +419,32 @@ Page({
 
       if (res.result?.success) {
         const data = res.result.data;
+        // 合并结果和用户菜品
+        const allResults = [
+          ...(data.results || []),
+          ...(data.userDishes || [])
+        ].map((item, index) => ({
+          id: item._id || item.foodId || `item-${index}`,
+          name: item.name,
+          calories: item.calories || item.avgCalories || 0,
+          protein: item.protein || item.avgProtein || 0,
+          carbs: item.carbs || item.avgCarbs || 0,
+          fat: item.fat || item.avgFat || 0,
+          grams: item.grams || item.avgGrams || 100,
+          _fullData: item
+        }));
+        
         this.setData({
           results: data.results || [],
           userDishes: data.userDishes || [],
           hasMore: data.hasMore || false,
-          searchSource: 'local'
+          searchSource: 'local',
+          searchResults: allResults
         });
       }
     } catch (err) {
       console.error('搜索失败:', err);
+      this.setData({ searchResults: [] });
     } finally {
       this.setData({ isSearching: false });
     }
@@ -345,14 +463,31 @@ Page({
 
       if (res.result?.success) {
         const data = res.result.data;
+        const merged = data.merged || [];
+        const allResults = merged.map((item, index) => ({
+          id: item._id || item.foodId || `item-${index}`,
+          name: item.name,
+          calories: item.calories || 0,
+          protein: item.protein || 0,
+          carbs: item.carbs || 0,
+          fat: item.fat || 0,
+          grams: item.grams || 100,
+          _fullData: item
+        }));
+        
         this.setData({
-          results: data.merged || [],
+          results: merged,
           hasMore: false,
-          searchSource: data.source || 'full'
+          searchSource: data.source || 'full',
+          searchResults: allResults
         });
       }
     } catch (err) {
-      this.setData({ error: err.message || '搜索失败' });
+      console.error('完整搜索失败:', err);
+      this.setData({ 
+        error: err.message || '搜索失败',
+        searchResults: []
+      });
     } finally {
       this.setData({ isDeepSearching: false });
     }
@@ -371,22 +506,170 @@ Page({
     this.setData({ recentSearches: [] });
   },
 
-  // 清除输入
-  clearInput() {
+  // 清除输入（新方法名）
+  clearSearch() {
     this.setData({
       keyword: '',
       results: [],
       userDishes: [],
-      hasMore: false
+      hasMore: false,
+      searchResults: []
     });
   },
 
-  // 选择食物
+  // 兼容旧方法名
+  clearInput() {
+    this.clearSearch();
+  },
+
+  // 选择食物（打开编辑弹窗）
   selectFood(e) {
-    const food = e.currentTarget.dataset.food;
-    wx.navigateTo({
-      url: `/pages/diet/manual/index?food=${encodeURIComponent(JSON.stringify(food))}&mealType=${this.data.selectedMealType}&date=${this.data.targetDate}`
+    const item = e.currentTarget.dataset.item;
+    // 预处理数据：计算每100g基准值
+    // 常用食物的数据已经是每100g的，直接使用
+    const per100 = {
+      cal: item.calories || 0,
+      pro: item.protein || 0,
+      car: item.carbs || 0,
+      fat: item.fat || 0
+    };
+    
+    this.setData({
+      showFoodEditModal: true,
+      editingFood: {
+        ...item,
+        grams: item.grams || 100, // 使用原有份量或默认100g
+        calories: item.calories || 0,
+        protein: item.protein || 0,
+        carbs: item.carbs || 0,
+        fat: item.fat || 0,
+        // 缓存基准值用于计算
+        _per100: per100,
+        // 保留完整数据
+        _fullData: item
+      }
     });
+  },
+
+  // 直接添加食物（从相机页面调用时使用）
+  addFoodDirect(e) {
+    const item = e.currentTarget.dataset.item;
+    const food = item._fullData || item;
+    
+    // 如果是从相机页面跳转过来的，需要触发事件回调
+    const pages = getCurrentPages();
+    const prevPage = pages[pages.length - 2];
+    
+    if (prevPage && prevPage.route === 'pages/diet/camera/index') {
+      // 触发事件回调
+      const eventChannel = prevPage.getOpenerEventChannel();
+      if (eventChannel) {
+        eventChannel.emit('acceptFoodFromSearch', food);
+      }
+      wx.navigateBack();
+    } else {
+      // 否则打开编辑弹窗
+      this.selectFood({ currentTarget: { dataset: { item } } });
+    }
+  },
+
+  // 实时计算
+  onSliderChange(e) {
+    const grams = parseInt(e.detail.value);
+    const base = this.data.editingFood._per100;
+    const ratio = grams / 100;
+    
+    this.setData({
+      'editingFood.grams': grams,
+      'editingFood.calories': Math.round(base.cal * ratio),
+      'editingFood.protein': (base.pro * ratio).toFixed(1),
+      'editingFood.carbs': (base.car * ratio).toFixed(1),
+      'editingFood.fat': (base.fat * ratio).toFixed(1)
+    });
+  },
+
+  // 确认添加 (核心修复)
+  async confirmAddFood() {
+    const food = this.data.editingFood;
+    
+    // 场景 A: 来自相机页 (需要返回数据)
+    if (this.data.fromPage === 'camera') {
+      try {
+        // 获取 eventChannel（通过 navigateTo 的 events 参数传递）
+        // 在微信小程序中，目标页面通过 this.getOpenerEventChannel() 获取
+        const eventChannel = this.getOpenerEventChannel ? this.getOpenerEventChannel() : null;
+        if (eventChannel && eventChannel.emit) {
+          eventChannel.emit('acceptFoodFromSearch', food);
+          wx.navigateBack();
+          return;
+        } else {
+          // 如果无法获取 eventChannel，直接返回上一页
+          wx.navigateBack();
+        }
+      } catch (err) {
+        console.error('事件通道错误:', err);
+        // 即使出错也返回上一页
+        wx.navigateBack();
+      }
+    } 
+    // 场景 B: 来自主页/日常记录 (直接入库，不返回)
+    else {
+      wx.showLoading({ title: '添加中...' });
+      
+      try {
+        // 调用云函数添加记录
+        const res = await wx.cloud.callFunction({
+          name: 'dietService',
+          data: {
+            action: 'addDietLog',
+            payload: {
+              name: food.name,
+              calories: parseInt(food.calories) || 0,
+              protein: parseFloat(food.protein) || 0,
+              carbs: parseFloat(food.carbs) || 0,
+              fat: parseFloat(food.fat) || 0,
+              grams: parseInt(food.grams) || 100,
+              // 关键：确保 mealType 正确
+              mealType: this.data.keyword ? this.data.selectedMealType : this.data.currentMealTab,
+              recordDate: this.data.targetDate || this.getTodayString(),
+              unit: 'g',
+              foodSource: 'manual_search'
+            }
+          }
+        });
+
+        if (res.result && res.result.success) {
+          wx.showToast({ title: '已添加', icon: 'success' });
+          
+          // [新增] 成功后立即刷新常用列表，体现"动态变化"
+          this.loadFrequentFoods();
+          
+          // 添加成功后返回饮食主页面
+          setTimeout(() => {
+            wx.switchTab({
+              url: '/pages/diet/index/index'
+            });
+          }, 1500);
+        } else {
+          throw new Error(res.result?.error || '添加失败');
+        }
+      } catch (err) {
+        console.error('添加失败:', err);
+        wx.showToast({ title: err.message || '添加失败', icon: 'none' });
+      } finally {
+        wx.hideLoading();
+      }
+    }
+  },
+
+  // 关闭编辑弹窗
+  closeFoodEdit() {
+    this.setData({ showFoodEditModal: false });
+  },
+
+  // 阻止事件冒泡
+  stopPropagation() {
+    // 空函数，用于阻止事件冒泡
   },
 
   // 跳转到手动输入
@@ -394,6 +677,22 @@ Page({
     wx.navigateTo({
       url: `/pages/diet/manual/index?mealType=${this.data.selectedMealType}&date=${this.data.targetDate}`
     });
+  },
+
+  // 根据时间自动选择 Tab
+  autoSelectMealTab() {
+    const hour = new Date().getHours();
+    let tab = 'snack';
+    if (hour >= 5 && hour < 10) tab = 'breakfast';
+    else if (hour >= 10 && hour < 16) tab = 'lunch';
+    else if (hour >= 16 && hour < 21) tab = 'dinner';
+    this.setData({ currentMealTab: tab });
+  },
+
+  // 切换餐次 Tab
+  switchMealTab(e) {
+    const key = e.currentTarget.dataset.key;
+    this.setData({ currentMealTab: key });
   },
 
   // 返回

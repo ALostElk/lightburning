@@ -4,27 +4,6 @@
   功能: 折叠餐次 + 日历选择
 -->
 <view class="page-container">
-  <!-- ============ 粘性头部 ============ -->
-  <view class="sticky-header" style="padding-top: {{statusBarHeight}}px;">
-    <view class="header-content">
-      <!-- 左侧：用户信息 -->
-      <view class="user-info">
-        <view class="avatar-wrapper">
-          <image
-            class="user-avatar"
-            src="{{userInfo.avatarUrl || '/images/default-avatar.png'}}"
-            mode="aspectFill"
-          />
-          <view class="status-dot"></view>
-        </view>
-        <view class="user-text">
-          <text class="greeting">{{greeting}}</text>
-          <text class="user-name">{{userInfo.nickName || '健康达人'}}</text>
-        </view>
-      </view>
-    </view>
-  </view>
-
   <!-- ============ 主内容区 ============ -->
   <view class="main-content">
     <!-- ============ 日期切换导航栏 ============ -->
@@ -57,7 +36,9 @@
     </view>
 
     <!-- ============ 仪表盘卡片 ============ -->
-    <spotlight-card customClass="dashboard-card" holo="{{true}}" customStyle="background: linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%)">
+    <spotlight-card customClass="dashboard-card {{dashboardStatus}}" holo="{{true}}">
+      <!-- 动态光晕层 - 状态感知型呼吸光晕 -->
+      <view class="dashboard-glow"></view>
       <view class="dashboard-content">
         <!-- 热量环形图 + 核心数据 -->
         <view class="calories-dashboard">

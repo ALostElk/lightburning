@@ -1,0 +1,7 @@
+/* 波浪组件样式 */
+#wave-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+

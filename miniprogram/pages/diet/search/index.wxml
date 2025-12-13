@@ -1,267 +1,138 @@
 <!--
   食物搜索页面 - diet-search/index
-  功能：搜索食物 + 我的常用
+  设计语言: Daylight Futurism (日光未来主义)
 -->
-<view class="page">
-  <!-- 背景装饰 -->
-  <view class="page-bg"></view>
-
-  <!-- 搜索头部 -->
-  <view class="search-header">
-    <view class="back-btn" bindtap="goBack">
-      <text>←</text>
+<view class="page-container" style="padding-top: {{statusBarHeight + 44}}px">
+  
+  <view class="search-header" style="top: {{statusBarHeight}}px">
+    <view class="nav-back-btn" bindtap="goBack">
+      <text class="back-arrow">‹</text>
     </view>
-    <view class="search-input-wrapper">
-      <text class="search-icon">🔍</text>
-      <input class="search-input"
-             value="{{keyword}}"
-             placeholder="搜索食物..."
-             bindinput="onInput"
-             confirm-type="search"
-             bindconfirm="fullSearch"
-             bindfocus="onSearchFocus" />
-      <view wx:if="{{keyword}}" class="clear-btn" bindtap="clearInput">
-        <text>✕</text>
-      </view>
+    
+    <view class="search-capsule">
+      <view class="search-icon-css"></view>
+      <input 
+        class="search-input"
+        value="{{keyword}}"
+        placeholder="搜索食物名称..." 
+        placeholder-class="input-placeholder"
+        bindinput="onSearchInput"
+        bindconfirm="onSearchConfirm"
+        focus="{{true}}"
+      />
+      <view class="clear-btn" wx:if="{{keyword}}" bindtap="clearSearch">×</view>
     </view>
   </view>
 
-  <!-- 餐次提示 -->
-  <view class="meal-hint">
-    <text>添加到: </text>
-    <text class="meal-name">{{mealTypeLabels[selectedMealType]}}</text>
-    <text wx:if="{{searchSource}}" class="source-hint">· {{searchSource}}</text>
-  </view>
-
-  <!-- 标签切换 -->
-  <view class="tabs-wrapper">
-    <view class="tabs-container">
-      <view
-        class="tab-item {{activeTab === 'search' ? 'active' : ''}}"
-        bindtap="switchTab"
-        data-tab="search"
-      >
-        <text class="tab-icon">🔍</text>
-        <text>搜索</text>
-      </view>
-      <view
-        class="tab-item {{activeTab === 'favorites' ? 'active' : ''}}"
-        bindtap="switchTab"
-        data-tab="favorites"
-      >
-        <text class="tab-icon">❤️</text>
-        <text>我的常用</text>
-        <view wx:if="{{frequentFoods.length > 0}}" class="tab-badge">{{frequentFoods.length}}</view>
-      </view>
+  <scroll-view scroll-y class="search-body">
+    
+    <view class="result-list" wx:if="{{searchResults.length > 0}}">
+      <block wx:for="{{searchResults}}" wx:key="id">
+        <view class="food-card" bindtap="selectFood" data-item="{{item}}">
+          <view class="food-info">
+            <text class="food-name">{{item.name}}</text>
+            <view class="food-meta">
+              <text class="cal-val">{{item.calories || 0}}</text>
+              <text class="cal-unit">kcal/100g</text>
+            </view>
+          </view>
+          
+          <view class="add-btn-circle" catchtap="addFoodDirect" data-item="{{item}}">
+            <view class="plus-icon"></view>
+          </view>
+        </view>
+      </block>
+      
+      <view class="list-end">- 没有更多结果了 -</view>
     </view>
-  </view>
 
-  <view class="content">
-    <!-- ============ 搜索标签内容 ============ -->
-    <view wx:if="{{activeTab === 'search'}}">
-      <!-- 错误提示 -->
-      <view wx:if="{{error}}" class="error-box">
-        <text class="error-icon">⚠️</text>
-        <text class="error-text">{{error}}</text>
+    <view class="empty-state" wx:else>
+      <view class="empty-header">
+        <text class="empty-title">今天想吃点什么？</text>
       </view>
 
-      <!-- 加载状态 -->
-      <view wx:if="{{isSearching || isDeepSearching}}" class="loading-box">
-        <view class="loading-spinner"></view>
-        <text class="loading-text">{{isDeepSearching ? '深度搜索中...' : '搜索中...'}}</text>
-      </view>
-
-      <!-- 最近搜索 -->
-      <view wx:if="{{!keyword && recentSearches.length > 0}}" class="recent-section">
-        <view class="section-header">
-          <view class="section-title">
-            <text class="section-icon">🕐</text>
-            <text>最近搜索</text>
+      <view class="meal-tabs">
+        <block wx:for="{{mealTabs}}" wx:key="key">
+          <view 
+            class="meal-tab {{currentMealTab === item.key ? 'active' : ''}}"
+            bindtap="switchMealTab"
+            data-key="{{item.key}}"
+          >
+            {{item.name}}
           </view>
-          <view class="clear-link" bindtap="clearRecentSearches">清空</view>
-        </view>
-        <view class="recent-tags">
-          <view wx:for="{{recentSearches}}" wx:key="*this" class="recent-tag" bindtap="useRecentSearch" data-term="{{item}}">
-            {{item}}
+        </block>
+      </view>
+
+      <view class="favorites-grid animate-fade-in">
+        <block wx:for="{{favorites[currentMealTab]}}" wx:key="id">
+          <view class="fav-card" bindtap="selectFood" data-item="{{item}}">
+            <view class="fav-emoji">{{item.emoji}}</view>
+            <view class="fav-info">
+              <text class="fav-name">{{item.name}}</text>
+              <text class="fav-cal">{{item.calories}} kcal</text>
+            </view>
+            <view class="fav-add">+</view>
           </view>
+        </block>
+        
+        <view class="no-fav" wx:if="{{!favorites[currentMealTab] || favorites[currentMealTab].length === 0}}">
+          <text>暂无常用记录</text>
         </view>
-      </view>
-
-      <!-- 用户菜品 -->
-      <view wx:if="{{userDishes.length > 0}}" class="results-section">
-        <view class="section-title-simple">我的菜品</view>
-        <view class="food-list">
-          <view wx:for="{{userDishes}}" wx:key="_id" class="food-card user-dish" bindtap="selectFood" data-food="{{item}}">
-            <view class="food-emoji">🍽️</view>
-            <view class="food-info">
-              <text class="food-name">{{item.name}}</text>
-              <text class="food-meta">{{item.calories}} kcal · 自定义菜品</text>
-            </view>
-          </view>
-        </view>
-      </view>
-
-      <!-- 搜索结果 -->
-      <view wx:if="{{results.length > 0}}" class="results-section">
-        <view class="section-title-simple">搜索结果</view>
-        <view class="food-list">
-          <view wx:for="{{results}}" wx:key="_id" class="food-card" bindtap="selectFood" data-food="{{item}}">
-            <view class="food-emoji">
-              <text wx:if="{{item.category === '主食'}}">🍚</text>
-              <text wx:elif="{{item.category === '肉类'}}">🥩</text>
-              <text wx:elif="{{item.category === '蛋奶'}}">🥚</text>
-              <text wx:elif="{{item.category === '蔬菜'}}">🥗</text>
-              <text wx:elif="{{item.category === '水果'}}">🍎</text>
-              <text wx:else>🍽️</text>
-            </view>
-            <view class="food-info">
-              <view class="food-name-row">
-                <text class="food-name">{{item.name}}</text>
-                <text wx:if="{{item.source === 'builtin'}}" class="source-badge green">内置</text>
-                <text wx:elif="{{item.source === 'ai_estimated'}}" class="source-badge purple">AI</text>
-                <text wx:elif="{{item.source === 'open_food_facts'}}" class="source-badge blue">OFF</text>
-              </view>
-              <text class="food-meta">{{item.category || '未分类'}} · 每100g {{item.calories}} kcal</text>
-              <view class="food-macros">
-                <text class="macro protein">蛋白 {{item.protein}}g</text>
-                <text class="macro carbs">碳水 {{item.carbs}}g</text>
-                <text class="macro fat">脂肪 {{item.fat}}g</text>
-              </view>
-            </view>
-            <view class="food-calories">
-              <text class="cal-value">{{item.calories}}</text>
-              <text class="cal-unit">kcal</text>
-            </view>
-          </view>
-        </view>
-      </view>
-
-      <!-- 深度搜索按钮 -->
-      <view wx:if="{{hasMore && keyword && !isDeepSearching}}" class="deep-search-btn" bindtap="fullSearch">
-        <text class="btn-icon">✨</text>
-        <text>AI 深度搜索</text>
-      </view>
-
-      <!-- 空状态 -->
-      <view wx:if="{{keyword && !isSearching && !isDeepSearching && results.length === 0 && userDishes.length === 0}}" class="empty-state">
-        <view class="empty-icon">🔍</view>
-        <view class="empty-title">未找到相关食物</view>
-        <view class="empty-desc">尝试换个关键词，或使用 AI 深度搜索</view>
-        <view class="deep-search-btn" bindtap="fullSearch">
-          <text>AI 深度搜索</text>
-        </view>
-      </view>
-
-      <!-- 手动输入链接 -->
-      <view class="manual-link" bindtap="goToManual">
-        <text>找不到？</text>
-        <text class="link-text">手动输入</text>
       </view>
     </view>
 
-    <!-- ============ 我的常用标签内容 ============ -->
-    <view wx:if="{{activeTab === 'favorites'}}" class="favorites-content">
-      <!-- 餐次子标签 -->
-      <view class="meal-filter">
-        <view
-          class="meal-filter-item {{favoriteMealFilter === 'all' ? 'active' : ''}}"
-          bindtap="switchFavoriteMeal"
-          data-meal="all"
-        >全部</view>
-        <view
-          class="meal-filter-item {{favoriteMealFilter === 'breakfast' ? 'active' : ''}}"
-          bindtap="switchFavoriteMeal"
-          data-meal="breakfast"
-        >早餐</view>
-        <view
-          class="meal-filter-item {{favoriteMealFilter === 'lunch' ? 'active' : ''}}"
-          bindtap="switchFavoriteMeal"
-          data-meal="lunch"
-        >午餐</view>
-        <view
-          class="meal-filter-item {{favoriteMealFilter === 'dinner' ? 'active' : ''}}"
-          bindtap="switchFavoriteMeal"
-          data-meal="dinner"
-        >晚餐</view>
-        <view
-          class="meal-filter-item {{favoriteMealFilter === 'snack' ? 'active' : ''}}"
-          bindtap="switchFavoriteMeal"
-          data-meal="snack"
-        >加餐</view>
+  </scroll-view>
+
+  <!-- ============ 食物编辑弹窗 ============ -->
+  <view class="food-edit-modal {{showFoodEditModal ? 'show' : ''}}" catchtap="closeFoodEdit">
+    <view class="food-edit-content" catchtap="stopPropagation">
+      <view class="food-edit-header">
+        <text class="food-edit-title">调整份量</text>
+        <view class="food-edit-close" bindtap="closeFoodEdit">×</view>
       </view>
 
-      <!-- 加载状态 -->
-      <view wx:if="{{isLoadingFavorites}}" class="loading-box">
-        <view class="loading-spinner"></view>
-        <text class="loading-text">加载中...</text>
+      <view class="food-edit-info">
+        <view class="food-edit-name">{{editingFood.name}}</view>
       </view>
 
-      <!-- 常用食物网格 -->
-      <view wx:elif="{{frequentFoods.length > 0}}" class="favorites-grid">
-        <view
-          wx:for="{{frequentFoods}}"
-          wx:key="_id"
-          class="favorite-card"
-          bindtap="selectFavorite"
-          data-food="{{item}}"
-        >
-          <!-- 食物图片/图标 -->
-          <view class="favorite-avatar">
-            <text class="favorite-emoji">{{item.emoji || '🍽️'}}</text>
-          </view>
-
-          <!-- 食物信息 -->
-          <view class="favorite-info">
-            <text class="favorite-name">{{item.name}}</text>
-            <text class="favorite-calories">{{item.calories}} Kcal</text>
-          </view>
-
-          <!-- 使用次数标记 -->
-          <view class="favorite-count" wx:if="{{item.useCount > 1}}">
-            <text>×{{item.useCount}}</text>
-          </view>
-
-          <!-- 添加图标 -->
-          <view class="favorite-add-icon">
-            <text>+</text>
-          </view>
+      <view class="slider-container">
+        <view class="slider-header">
+          <text>摄入量</text>
+          <text class="slider-value">{{editingFood.grams || 100}}g</text>
         </view>
+        <slider 
+          class="amount-slider" 
+          min="10" 
+          max="500" 
+          step="5" 
+          value="{{editingFood.grams || 100}}" 
+          activeColor="#FF6B35" 
+          bindchanging="onSliderChange" 
+          bindchange="onSliderChange"
+        />
+      </view>
 
-        <!-- 手动添加卡片 -->
-        <view class="favorite-card add-card" bindtap="goToManual">
-          <view class="add-card-icon">
-            <text>✏️</text>
-          </view>
-          <view class="favorite-info">
-            <text class="favorite-name">手动添加</text>
-            <text class="favorite-calories">添加到{{mealTypeLabels[selectedMealType]}}</text>
-          </view>
+      <view class="calories-preview">
+        <view class="preview-item">
+          <text class="p-label">热量</text>
+          <text class="p-val">{{editingFood.calories || 0}}</text>
+        </view>
+        <view class="preview-item">
+          <text class="p-label">蛋白质</text>
+          <text class="p-val protein">{{editingFood.protein || 0}}g</text>
+        </view>
+        <view class="preview-item">
+          <text class="p-label">碳水</text>
+          <text class="p-val carbs">{{editingFood.carbs || 0}}g</text>
+        </view>
+        <view class="preview-item">
+          <text class="p-label">脂肪</text>
+          <text class="p-val fat">{{editingFood.fat || 0}}g</text>
         </view>
       </view>
 
-      <!-- 空状态 -->
-      <view wx:else class="favorites-empty">
-        <view class="empty-heart">❤️</view>
-        <view class="empty-title">还没有常用食物</view>
-        <view class="empty-desc">记录的食物会自动添加到这里</view>
-        <view class="empty-tips">
-          <view class="tip-item">
-            <text class="tip-icon">💡</text>
-            <text>常吃的食物会自动排在前面</text>
-          </view>
-          <view class="tip-item">
-            <text class="tip-icon">⚡</text>
-            <text>点击即可快速添加</text>
-          </view>
-        </view>
-        <view class="start-search-btn" bindtap="switchToSearch">
-          <text>去搜索食物</text>
-        </view>
-      </view>
-
-      <!-- 底部提示 -->
-      <view wx:if="{{frequentFoods.length > 0}}" class="favorites-footer">
-        <text class="footer-hint">点击卡片快速添加到 {{mealTypeLabels[selectedMealType]}}</text>
+      <view class="food-edit-actions">
+        <view class="edit-btn-save" bindtap="confirmAddFood">确认添加</view>
       </view>
     </view>
   </view>

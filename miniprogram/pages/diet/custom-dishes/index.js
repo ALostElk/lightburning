@@ -4,6 +4,7 @@
 
 Page({
   data: {
+    statusBarHeight: 44,
     isEdit: false,
     dishId: null,
     name: '',
@@ -21,7 +22,10 @@ Page({
   },
 
   onLoad(options) {
+    // 获取状态栏高度
+    const systemInfo = wx.getSystemInfoSync();
     this.setData({
+      statusBarHeight: systemInfo.statusBarHeight || 44,
       targetDate: options.date || this.getTodayString(),
       selectedMealType: options.mealType || 'snack'
     });
