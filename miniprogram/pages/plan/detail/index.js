@@ -259,7 +259,11 @@ Page({
             
             wx.hideLoading();
             api.showSuccess('计划已完成');
-            setTimeout(() => wx.navigateBack(), 1500);
+            setTimeout(() => {
+              wx.switchTab({
+                url: '/pages/home/index'
+              });
+            }, 1500);
           } catch (error) {
             wx.hideLoading();
             console.error('完成计划失败:', error);

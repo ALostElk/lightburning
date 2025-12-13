@@ -121,10 +121,21 @@ Page({
     
     if (!profile) return;
     
+    // 计算动态目标体重
+    const dynamicTargetWeight = Number((profile.weight + targetWeightChange).toFixed(1));
+    
+    // 基于动态目标体重重新计算TDEE
+    let dynamicTdee = profile.tdee;
+    if (profile.height && profile.age && profile.gender && profile.activityLevel) {
+      // 先计算BMR，再计算TDEE
+      const bmr = calc.calculateBMR(dynamicTargetWeight, profile.height, profile.age, profile.gender);
+      dynamicTdee = calc.calculateTDEE(bmr, profile.activityLevel);
+    }
+    
     // 1kg脂肪 ≈ 7700kcal
     const totalDeficit = targetWeightChange * 7700;
     const dailyDeficit = Math.round(totalDeficit / totalDays);
-    const dailyCalorieGoal = profile.tdee + dailyDeficit;
+    const dailyCalorieGoal = dynamicTdee + dailyDeficit;
     
     // 计算完成日期
     const today = new Date();
@@ -142,7 +153,9 @@ Page({
       dailyCalorieGoal,
       endDate: endDateStr,
       weeklyChange,
-      planHealth
+      planHealth,
+      dynamicTargetWeight,
+      dynamicTdee
     });
   },
 
@@ -257,7 +270,7 @@ Page({
         
         // 跳转到计划详情页，传递 planId
         setTimeout(() => {
-          wx.redirectTo({
+          wx.navigateTo({
             url: `/pages/plan/detail/index?planId=${planId}`
           });
         }, 1000);
