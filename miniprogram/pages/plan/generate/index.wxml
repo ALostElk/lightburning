@@ -1,64 +1,62 @@
 <!--pages/plan/generate/index.wxml-->
-<view class="container">
+<view class="container" style="height: 2161rpx; display: flex; box-sizing: border-box">
   <!-- 页面标题 -->
   <view class="header">
-    <text class="title">生成健康计划</text>
-    <text class="subtitle" style="position: relative; left: 29rpx; top: -12rpx">定制您的专属减重计划</text>
+    <text class="title" style="width: 282rpx; height: 62rpx; display: block; box-sizing: border-box; position: relative; left: 0rpx; top: 0rpx">生成健康计划</text>
+    <text class="subtitle" style="position: relative; left: 0rpx; top: -12rpx">定制您的专属减重计划</text>
   </view>
 
   <!-- 当前用户状态卡片 -->
-  <view class="card" wx:if="{{profile}}" style="width: 572rpx; display: block; box-sizing: border-box; position: relative; left: 1rpx; top: -49rpx">
+  <view class="card" wx:if="{{profile}}" style="width: 625rpx; display: block; box-sizing: border-box; position: relative; left: 2rpx; top: -48rpx">
     <view class="current-status">
-      <view class="status-item">
+      <view class="status-item" style="width: 128rpx; display: flex; box-sizing: border-box">
         <text class="status-label">当前体重</text>
         <text class="status-value">{{profile.weight}}kg</text>
       </view>
       <view class="status-item">
         <text class="status-label">目标体重</text>
-        <text class="status-value">{{profile.targetWeight}}kg</text>
+        <text class="status-value">{{dynamicTargetWeight || profile.targetWeight}}kg</text>
       </view>
       <view class="status-item">
         <text class="status-label">每日消耗</text>
-        <text class="status-value">{{profile.tdee}}kcal</text>
+        <text class="status-value">{{dynamicTdee || profile.tdee}}kcal</text>
       </view>
     </view>
   </view>
 
   <!-- 计划参数卡片 -->
-  <view class="card" style="width: 568rpx; display: block; box-sizing: border-box; position: relative; left: 6rpx; top: -41rpx">
+  <view class="card" style="width: 621rpx; display: block; box-sizing: border-box; position: relative; left: 6rpx; top: -40rpx; height: 379rpx">
     <view class="card-title">计划参数</view>
     
     <!-- 目标体重变化参数 -->
-    <view class="param-item">
+    <view class="param-item" style="position: relative; left: 4rpx; top: -22rpx; height: 128rpx; display: block; box-sizing: border-box">
       <view class="param-header">
         <text class="param-label">目标体重变化</text>
         <view class="param-input">
-          <input type="digit" value="{{targetWeightChange}}" bindinput="onWeightInput" />
+          <picker mode="selector" range="{{weightChangeOptions}}" value="{{weightChangeIndex}}" bindchange="onWeightChangePicker" class="clickable-number">
+            <text class="number-value">{{targetWeightChange}}</text>
+          </picker>
           <text class="param-unit">kg</text>
         </view>
       </view>
-      <picker mode="selector" range="{{weightChangeOptions}}" value="{{weightChangeIndex}}" bindchange="onWeightChangePicker" class="picker">
-        <view class="picker-display">选择体重变化: {{targetWeightChange}}kg</view>
-      </picker>
     </view>
 
     <!-- 计划周期参数 -->
-    <view class="param-item">
-      <view class="param-header">
-        <text class="param-label">计划周期</text>
+    <view class="param-item" style="position: relative; left: 5rpx; top: -43rpx; height: 124rpx; display: block; box-sizing: border-box">
+      <view class="param-header" style="height: 100rpx; display: flex; box-sizing: border-box">
+        <text class="param-label" style="position: relative; left: -1rpx; top: -18rpx">计划周期</text>
         <view class="param-input">
-          <input type="number" value="{{totalDays}}" bindinput="onDaysInput" />
-          <text class="param-unit">天</text>
+          <picker mode="selector" range="{{daysOptions}}" value="{{daysIndex}}" bindchange="onDaysChangePicker" class="clickable-number" style="position: relative; left: -6rpx; top: -10rpx">
+            <text class="number-value">{{totalDays}}</text>
+          </picker>
+          <text class="param-unit" style="position: relative; left: 1rpx; top: -10rpx">天</text>
         </view>
       </view>
-      <picker mode="selector" range="{{daysOptions}}" value="{{daysIndex}}" bindchange="onDaysChangePicker" class="picker">
-        <view class="picker-display">选择计划周期: {{totalDays}}天</view>
-      </picker>
     </view>
   </view>
 
   <!-- 计划预览卡片 -->
-  <view class="card" style="width: 564rpx; display: block; box-sizing: border-box; position: relative; left: 8rpx; top: -48rpx">
+  <view class="card" style="width: 617rpx; display: block; box-sizing: border-box; position: relative; left: 8rpx; top: -48rpx">
     <view class="card-title">计划预览</view>
     
     <view class="preview-item">
@@ -82,16 +80,16 @@
     </view>
     
     <!-- 健康性评估 -->
-    <view class="health-assessment" style="background-color: {{planHealth.color}}15; border-color: {{planHealth.color}}">
-      <text class="assessment-icon" wx:if="{{planHealth.status === 'good'}}">✅</text>
-      <text class="assessment-icon" wx:if="{{planHealth.status === 'danger'}}">⚠️</text>
-      <text class="assessment-icon" wx:if="{{planHealth.status === 'slow'}}">🐢</text>
-      <text class="assessment-text" style="color: {{planHealth.color}}">{{planHealth.message}}</text>
+    <view class="health-assessment" style="background-color: {{planHealth.color}}15; border-color: {{planHealth.color}}; width: 573rpx; height: 92rpx; display: block; box-sizing: border-box">
+      <text class="assessment-icon" wx:if="{{planHealth.status === 'good'}}"></text>
+      <text class="assessment-icon" wx:if="{{planHealth.status === 'danger'}}"></text>
+      <text class="assessment-icon" wx:if="{{planHealth.status === 'slow'}}"></text>
+      <text class="assessment-text" style="color: {{planHealth.color}}; position: relative; left: 32rpx; top: -48rpx">{{planHealth.message}}</text>
     </view>
   </view>
 
   <!-- 温馨提示卡片 -->
-  <view class="card tips-card" style="width: 560rpx; display: block; box-sizing: border-box; position: relative; left: 11rpx; top: -62rpx">
+  <view class="card tips-card" style="width: 535rpx; display: block; box-sizing: border-box; position: relative; left: 10rpx; top: -74rpx; height: 352rpx">
     <view class="card-title">温馨提示</view>
     <view class="tips">
       <text class="tip-item">• 健康减重速度：每周0.5-1kg</text>
@@ -102,7 +100,7 @@
   </view>
 
   <!-- 生成计划按钮 -->
-  <button class="generate-btn" loading="{{generating}}" bindtap="onGeneratePlan">
+  <button class="generate-btn" loading="{{generating}}" bindtap="onGeneratePlan" style="position: relative; left: -2rpx; top: -96rpx">
     生成计划
   </button>
 </view>

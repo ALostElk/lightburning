@@ -3,16 +3,16 @@
   <!-- 标题 -->
   <view class="header">
     <text class="title" style="position: relative; left: 75rpx; top: -11rpx">👤 个人信息</text>
-    <text class="subtitle" style="position: relative; left: 0rpx; top: -4rpx">✨ 完善信息后系统将为您生成专属健康计划</text>
+    <text class="subtitle" style="position: relative; left: 0rpx; top: -4rpx">完善信息后系统将为您生成专属健康计划</text>
   </view>
 
   <!-- 基本信息卡片 -->
-  <view class="card card-basic" style="position: relative; left: 7rpx; top: -51rpx; height: 644rpx; display: block; box-sizing: border-box">
+  <view class="card card-basic" style="position: relative; left: 6rpx; top: -50rpx; height: 644rpx; display: block; box-sizing: border-box; width: 613rpx">
     <view class="card-title">📝 基本信息</view>
     
 <!-- 性别 -->
     <view class="form-item">
-      <text class="label">👤 性别</text>
+      <text class="label"> 性别</text>
       <picker mode="selector" range="{{genders}}" value="{{profile.gender === 'male' ? 0 : 1}}" bindchange="onGenderChange">
         <view class="picker" style="width: 87rpx; display: block; box-sizing: border-box; height: 65rpx; font-size: 32rpx">{{profile.gender === 'male' ? '男' : '女'}}</view>
       </picker>
@@ -21,28 +21,28 @@
 
     <!-- 年龄 -->
     <view class="form-item">
-      <text class="label">🎂 年龄</text>
+      <text class="label">年龄</text>
       <input class="input" type="number" placeholder="请输入年龄" value="{{profile.age}}" data-field="age" bindinput="onInputChange" />
       <text class="unit">岁</text>
     </view>
 
     <!-- 身高 -->
     <view class="form-item">
-      <text class="label">📏 身高</text>
+      <text class="label"> 身高</text>
       <input class="input" type="digit" placeholder="请输入身高" value="{{profile.height}}" data-field="height" bindinput="onInputChange" />
       <text class="unit">cm</text>
     </view>
 
     <!-- 体重 -->
     <view class="form-item">
-      <text class="label">⚖️ 当前体重</text>
+      <text class="label"> 当前体重</text>
       <input class="input" type="digit" placeholder="请输入体重" value="{{profile.weight}}" data-field="weight" bindinput="onInputChange" />
       <text class="unit">kg</text>
     </view>
 
     <!-- 目标体重 -->
     <view class="form-item">
-      <text class="label">🎯 目标体重</text>
+      <text class="label"> 目标体重</text>
       <input class="input" type="digit" placeholder="请输入目标体重" value="{{profile.targetWeight}}" data-field="targetWeight" bindinput="onInputChange" />
       <text class="unit">kg</text>
     </view>
@@ -54,7 +54,7 @@
     
     <!-- 健康目标 -->
     <view class="form-item">
-      <text class="label">💪 健康目标</text>
+      <text class="label"> 健康目标</text>
       <picker mode="selector" range="{{goals}}" value="{{goalIndex}}" bindchange="onGoalChange">
         <view class="picker">{{profile.goal}}</view>
       </picker>
@@ -62,7 +62,7 @@
 
     <!-- 活动等级 -->
     <view class="form-item">
-      <text class="label">🏃 活动等级</text>
+      <text class="label"> 活动等级</text>
       <picker mode="selector" range="{{activityLevels}}" range-key="label" value="{{activityLevelIndex}}" bindchange="onActivityLevelChange">
         <view class="picker">
           {{activityLevels[activityLevelIndex].label}}
@@ -117,22 +117,22 @@
     <view class="card-title">🥗 每日营养素推荐</view>
     
     <view class="macro-item macro-protein">
-      <text class="macro-label">🥩 蛋白质</text>
+      <text class="macro-label"> 蛋白质</text>
       <text class="macro-value macro-value-protein">{{macros.protein}}g</text>
     </view>
     
     <view class="macro-item macro-carbs">
-      <text class="macro-label">🍞 碳水化合物</text>
+      <text class="macro-label"> 碳水化合物</text>
       <text class="macro-value macro-value-carbs">{{macros.carbs}}g</text>
     </view>
     
     <view class="macro-item macro-fat">
-      <text class="macro-label">🥑 脂肪</text>
+      <text class="macro-label"> 脂肪</text>
       <text class="macro-value macro-value-fat">{{macros.fat}}g</text>
     </view>
     
     <view class="macro-item macro-water">
-      <text class="macro-label">💧 水分</text>
+      <text class="macro-label"> 水分</text>
       <text class="macro-value macro-value-water">{{waterIntake}}ml</text>
     </view>
   </view>

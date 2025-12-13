@@ -99,7 +99,7 @@ Page({
       { icon: '🍽️', title: '记录饮食', url: '/pages/diet/index/index', color: '#FF6B6B' },
       { icon: '💪', title: '记录运动', url: '/pages/exercise/index/index', color: '#4ECDC4' },
       { icon: '📊', title: '每日报告', url: '/pages/report/daily/index', color: '#FFD93D' },
-      { icon: '📝', title: '我的计划', url: '/pages/plan/detail/index', color: '#A78BFA' }
+      { icon: '📝', title: '我的计划', url: '/pages/plan/detail/index', color: '#A78BFA', tabBar: false }
     ],
 
     // 推荐内容
