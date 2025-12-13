@@ -108,9 +108,12 @@
   </view>
 
   <!-- 5. AI 建议条 (悬浮) -->
-  <view class="ai-floating-bar animate-fade-in" wx:if="{{aiInsight.message}}" bindtap="onAISuggestion">
+  <view class="ai-floating-bar animate-fade-in" wx:if="{{aiInsight.message}}">
       <text class="ai-bar-icon">💡</text>
       <text class="ai-bar-text">{{aiInsight.message}}</text>
+      <view class="ai-bar-close" catchtap="closeAISuggestion">
+        <text class="close-icon">✕</text>
+      </view>
   </view>
 
   <!-- ============ 日历选择器弹窗 ============ -->

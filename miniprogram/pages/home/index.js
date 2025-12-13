@@ -624,6 +624,15 @@ Page({
   },
 
   /**
+   * 关闭AI建议条
+   */
+  closeAISuggestion() {
+    this.setData({
+      'aiInsight.message': ''
+    });
+  },
+
+  /**
    * 日期导航 - 前一天
    */
   goToPrevDay() {
