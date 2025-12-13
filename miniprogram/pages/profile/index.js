@@ -15,13 +15,7 @@ Page({
       
     },
     
-    // 计算结果
-    bmi: 0,
-    bmiCategory: {},
-    bmr: 0,
-    tdee: 0,
-    macros: {},
-    waterIntake: 0,
+    
     
     // 活动等级选项
     activityLevels: [],
@@ -73,24 +67,15 @@ Page({
         
         this.setData({
           profile: newProfile,
-          bmi: profile.bmi || 0,
-          bmr: profile.bmr || 0,
-          tdee: profile.tdee || 0,
           activityLevelIndex: this.findActivityLevelIndex(this.data.activityLevels, newProfile.activityLevel),
           goalIndex: this.data.goals.indexOf(newProfile.goal)
         });
-        
-        this.calculateHealth();
-      } else {
-        // 首次使用，显示默认数据
-        this.calculateHealth();
       }
       
       wx.hideLoading();
     } catch (error) {
       console.error('加载个人信息失败:', error);
       wx.hideLoading();
-      this.calculateHealth();
     }
   },
 
@@ -146,9 +131,6 @@ Page({
     this.setData({
       [`profile.${field}`]: field === 'gender' || field === 'goal' ? value : Number(value)
     });
-    
-    // 实时计算
-    this.calculateHealth();
   },
 
   /**
@@ -159,7 +141,6 @@ Page({
     this.setData({
       'profile.gender': value === 0 ? 'male' : 'female'
     });
-    this.calculateHealth();
   },
 
   /**

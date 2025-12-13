@@ -2,19 +2,19 @@
 <view class="container">
   <!-- 标题 -->
   <view class="header">
-    <text class="title" style="position: relative; left: 75rpx; top: -11rpx">👤 个人信息</text>
+    <text class="title" style="position: relative; left: 110rpx; top: -10rpx"> 个人信息</text>
     <text class="subtitle" style="position: relative; left: 0rpx; top: -4rpx">完善信息后系统将为您生成专属健康计划</text>
   </view>
 
   <!-- 基本信息卡片 -->
   <view class="card card-basic" style="position: relative; left: 6rpx; top: -50rpx; height: 644rpx; display: block; box-sizing: border-box; width: 613rpx">
-    <view class="card-title">📝 基本信息</view>
+    <view class="card-title"> 基本信息</view>
     
 <!-- 性别 -->
     <view class="form-item">
       <text class="label"> 性别</text>
       <picker mode="selector" range="{{genders}}" value="{{profile.gender === 'male' ? 0 : 1}}" bindchange="onGenderChange">
-        <view class="picker" style="width: 87rpx; display: block; box-sizing: border-box; height: 65rpx; font-size: 32rpx">{{profile.gender === 'male' ? '男' : '女'}}</view>
+        <view class="picker" style="width: 87rpx; display: block; box-sizing: border-box; height: 65rpx; font-size: 32rpx; position: relative; left: 2rpx; top: 3rpx">{{profile.gender === 'male' ? '男' : '女'}}</view>
       </picker>
     </view>
 
@@ -50,7 +50,7 @@
 
   <!-- 目标与活动 -->
   <view class="card card-goal" style="width: 618rpx; display: block; box-sizing: border-box; position: relative; left: 10rpx; top: -51rpx">
-    <view class="card-title">🎯 目标与活动</view>
+    <view class="card-title"> 目标与活动</view>
     
     <!-- 健康目标 -->
     <view class="form-item">
@@ -71,76 +71,9 @@
     </view>
   </view>
 
-  <!-- 健康指标卡片 -->
-  <view class="card card-health" style="width: 614rpx; display: block; box-sizing: border-box; position: relative; left: 9rpx; top: -51rpx">
-    <view class="card-title">💊 健康指标</view>
-    
-    <!-- BMI -->
-    <view class="indicator indicator-bmi">
-      <view class="indicator-label">
-        <text>📊 BMI</text>
-        <text class="indicator-desc">身体质量指数</text>
-      </view>
-      <view class="indicator-value">
-        <text class="value value-bmi">{{bmi}}</text>
-        <text class="category" style="color: {{bmiCategory.color}}">{{bmiCategory.category}}</text>
-      </view>
-    </view>
-
-    <!-- BMR -->
-    <view class="indicator indicator-bmr">
-      <view class="indicator-label">
-        <text>🔥 BMR</text>
-        <text class="indicator-desc">基础代谢率</text>
-      </view>
-      <view class="indicator-value">
-        <text class="value value-bmr">{{bmr}}</text>
-        <text class="unit-text">kcal/天</text>
-      </view>
-    </view>
-
-    <!-- TDEE -->
-    <view class="indicator indicator-tdee">
-      <view class="indicator-label">
-        <text>⚡ TDEE</text>
-        <text class="indicator-desc">每日总消耗</text>
-      </view>
-      <view class="indicator-value">
-        <text class="value value-tdee">{{tdee}}</text>
-        <text class="unit-text">kcal/天</text>
-      </view>
-    </view>
-  </view>
-
-  <!-- 营养素推荐 -->
-  <view class="card card-macro" style="width: 611rpx; display: block; box-sizing: border-box; position: relative; left: 12rpx; top: -56rpx">
-    <view class="card-title">🥗 每日营养素推荐</view>
-    
-    <view class="macro-item macro-protein">
-      <text class="macro-label"> 蛋白质</text>
-      <text class="macro-value macro-value-protein">{{macros.protein}}g</text>
-    </view>
-    
-    <view class="macro-item macro-carbs">
-      <text class="macro-label"> 碳水化合物</text>
-      <text class="macro-value macro-value-carbs">{{macros.carbs}}g</text>
-    </view>
-    
-    <view class="macro-item macro-fat">
-      <text class="macro-label"> 脂肪</text>
-      <text class="macro-value macro-value-fat">{{macros.fat}}g</text>
-    </view>
-    
-    <view class="macro-item macro-water">
-      <text class="macro-label"> 水分</text>
-      <text class="macro-value macro-value-water">{{waterIntake}}ml</text>
-    </view>
-  </view>
-
   <!-- 操作按钮 -->
   <view class="button-group">
-    <button class="btn-secondary" bindtap="onReset">🔄 重置</button>
-    <button class="btn-primary" loading="{{loading}}" bindtap="onSave">✅ 保存</button>
+    <button class="btn-secondary" bindtap="onReset"> 重置</button>
+    <button class="btn-primary" loading="{{loading}}" bindtap="onSave" style="position: relative; left: 0rpx; top: -1rpx"> 保存</button>
   </view>
 </view>
-

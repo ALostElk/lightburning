@@ -17,39 +17,6 @@
     </view>
   </view>
 
-  <!-- 身体指标 (氛围卡片) -->
-  <view class="stats-row">
-    <!-- BMI 卡片 (动态颜色) -->
-    <view class="stat-card" data-status="{{userStats.bmiStatus}}">
-      <view class="stat-glow"></view> <!-- 氛围光效 -->
-      <view class="stat-content">
-        <text class="stat-label">BMI</text>
-        <text class="stat-value">{{userStats.bmi}}</text>
-        <view class="stat-dot"></view>
-      </view>
-    </view>
-
-    <!-- BMR 卡片 (默认绿色) -->
-    <view class="stat-card" data-status="green">
-      <view class="stat-glow"></view>
-      <view class="stat-content">
-        <text class="stat-label">BMR</text>
-        <text class="stat-value">{{userStats.bmr}}</text>
-        <view class="stat-dot"></view>
-      </view>
-    </view>
-
-    <!-- TDEE 卡片 (默认绿色) -->
-    <view class="stat-card" data-status="green">
-      <view class="stat-glow"></view>
-      <view class="stat-content">
-        <text class="stat-label">TDEE</text>
-        <text class="stat-value">{{userStats.tdee}}</text>
-        <view class="stat-dot"></view>
-      </view>
-    </view>
-  </view>
-
   <!-- 功能区 (无图标极简设计) -->
   <view class="minimal-grid">
     <!-- 我的计划 -->

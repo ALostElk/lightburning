@@ -34,13 +34,6 @@ Page({
       gender: 'male'
     },
 
-    // 用户统计数据
-    userStats: {
-      bmi: 0,
-      bmr: 0,
-      tdee: 0
-    },
-
     // 今日数据
     todayIntake: 0,
     todayConsume: 0,
@@ -189,11 +182,6 @@ Page({
             age: 30,
             gender: 'male'
           },
-          userStats: {
-            bmi: this.calculateBMI(180, 70),
-            bmr: this.calculateBMR('male', 30, 70, 180),
-            tdee: this.calculateTDEE(this.calculateBMR('male', 30, 70, 180))
-          },
           todayIntake: 0,
           todayConsume: 0,
           recordCount: 0
@@ -225,10 +213,6 @@ Page({
         const age = userData.age || 25;
         const gender = userData.gender || 'male';
 
-        // 计算BMI和BMR
-        const bmi = userData.bmi || this.calculateBMI(height, weight);
-        const bmr = userData.bmr || this.calculateBMR(gender, age, weight, height);
-
         const userInfo = {
           avatarUrl: userData.avatarUrl || '/images/default-avatar.png',
           nickName: userData.nickName || '微信用户',
@@ -239,17 +223,9 @@ Page({
           gender
         };
 
-        const userStats = {
-          bmi,
-          bmr,
-          tdee: userData.tdee || this.calculateTDEE(bmr, userData.activityLevel),
-          bmiStatus: this.getBMIStatus(bmi) // 新增：BMI状态
-        };
-
-        this.setData({ userInfo, userStats });
+        this.setData({ userInfo });
         // 缓存数据
         wx.setStorageSync('userInfo', userInfo);
-        wx.setStorageSync('userStats', userStats);
         wx.setStorageSync('userInfoUpdateTime', new Date().getTime());
 
       } else {
@@ -317,10 +293,10 @@ Page({
 
   // 计算热量结余
   calculateCalorieBalance() {
-    const { userStats, todayConsume, todayIntake, userInfo } = this.data;
+    const { todayConsume, todayIntake, userInfo } = this.data;
 
-    // 热量结余 = 基础代谢 + 运动消耗 - 今日摄入
-    const balance = userStats.bmr + todayConsume - todayIntake;
+    // 热量结余 = 运动消耗 - 今日摄入（不再包含基础代谢）
+    const balance = todayConsume - todayIntake;
 
     // 根据目标调整显示逻辑（减脂需要热量赤字，增肌需要热量盈余）
     let ringColor, balanceLabel;
@@ -335,7 +311,7 @@ Page({
     }
 
     // 计算环形图角度（最大360度）
-    const maxDisplayValue = userStats.bmr * 0.5; // 最大显示值为基础代谢的50%
+    const maxDisplayValue = 1000; // 最大显示值设置为1000卡路里
     const displayValue = Math.min(Math.abs(balance), maxDisplayValue);
     const ringDegrees = (displayValue / maxDisplayValue) * 360;
 
@@ -356,49 +332,14 @@ Page({
     return `${year}-${month}-${day}`;
   },
 
-  // 计算BMI
-  calculateBMI(height, weight) {
-    // BMI = 体重(kg) / 身高(m)^2
-    const heightM = height / 100;
-    return Number((weight / (heightM * heightM)).toFixed(1));
-  },
-
-  // 计算BMR (基础代谢率)
-  calculateBMR(gender, age, weight, height) {
-    // 使用Mifflin-St Jeor公式
-    if (gender === 'male') {
-      // 男性: BMR = 10 × 体重(kg) + 6.25 × 身高(cm) - 5 × 年龄(岁) + 5
-      return Math.round(10 * weight + 6.25 * height - 5 * age + 5);
-    } else {
-      // 女性: BMR = 10 × 体重(kg) + 6.25 × 身高(cm) - 5 × 年龄(岁) - 161
-      return Math.round(10 * weight + 6.25 * height - 5 * age - 161);
-    }
-  },
-
-  // 计算TDEE (总能量消耗)
-  calculateTDEE(bmr, activityLevel = 'moderate') {
-    // 活动水平系数
-    const activityFactors = {
-      'sedentary': 1.2,       // 久坐不动
-      'light': 1.375,         // 轻度活动
-      'moderate': 1.55,       // 中度活动
-      'active': 1.725,        // 高度活动
-      'veryActive': 1.9       // 极度活动
-    };
-
-    const factor = activityFactors[activityLevel] || activityFactors.moderate;
-    return Math.round(bmr * factor);
-  },
-
   // 加载缓存的用户信息
   loadCachedUserInfo() {
     const userInfo = wx.getStorageSync('userInfo');
-    const userStats = wx.getStorageSync('userStats');
     const updateTime = wx.getStorageSync('userInfoUpdateTime');
 
     // 检查缓存是否存在且在24小时内
-    if (userInfo && userStats && updateTime && (new Date().getTime() - updateTime < 86400000)) {
-      this.setData({ userInfo, userStats });
+    if (userInfo && updateTime && (new Date().getTime() - updateTime < 86400000)) {
+      this.setData({ userInfo });
     }
   },
 
@@ -511,13 +452,5 @@ Page({
 
   goToHelp() {
     wx.navigateTo({ url: '/pages/help/index' }); // 使用帮助页
-  },
-
-  // 计算BMI状态颜色
-  getBMIStatus(bmi) {
-    if (bmi < 18.5) return 'yellow'; // 偏瘦
-    if (bmi < 24) return 'green';    // 正常
-    if (bmi < 28) return 'yellow';   // 超重
-    return 'red';                    // 肥胖
   }
 });
