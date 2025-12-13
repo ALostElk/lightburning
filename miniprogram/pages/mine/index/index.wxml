@@ -1,196 +1,93 @@
 <!-- pages/mine/index/index.wxml -->
 <view class="page">
-  <!-- 粘性头部（用户信息区） -->
-  <view class="sticky-header">
-    <view class="header-content">
-      <view class="user-info">
-        <view class="avatar-wrapper" bindtap="chooseAvatar">
-          <image class="user-avatar" src="{{userInfo.avatarUrl}}" mode="aspectFill"></image>
-          <view class="status-dot"></view>
-        </view>
-        <view class="user-text">
-          <text class="greeting">{{greeting}}</text>
-          <text class="user-name">{{userInfo.nickName}}</text>
-          <text class="nickname-edit-tip" bindtap="openNicknameModal">点击编辑昵称</text>
-          <text class="user-basic">{{userInfo.height}}cm · {{userInfo.weight}}kg · {{userInfo.goal}}</text>
-        </view>
-        <button class="edit-btn" bindtap="goToEdit" size="mini">编辑</button>
+  <!-- 极简头部 -->
+  <view class="header-section">
+    <view class="text-area">
+      <text class="greeting-text">{{greeting}}，</text>
+      <text class="name-text">{{userInfo.nickName}}</text>
+      <view class="edit-pill" bindtap="goToEdit">
+        <text>编辑资料</text>
+      </view>
+    </view>
+    
+    <view class="avatar-area" bindtap="chooseAvatar">
+      <!-- 动态呼吸光环 -->
+      <view class="avatar-glow" style="background: {{ringColor}}; box-shadow: 0 0 30rpx {{ringColor}};"></view>
+      <image class="avatar-img" src="{{userInfo.avatarUrl}}" mode="aspectFill"></image>
+    </view>
+  </view>
+
+  <!-- 身体指标 (氛围卡片) -->
+  <view class="stats-row">
+    <!-- BMI 卡片 (动态颜色) -->
+    <view class="stat-card" data-status="{{userStats.bmiStatus}}">
+      <view class="stat-glow"></view> <!-- 氛围光效 -->
+      <view class="stat-content">
+        <text class="stat-label">BMI</text>
+        <text class="stat-value">{{userStats.bmi}}</text>
+        <view class="stat-dot"></view>
+      </view>
+    </view>
+
+    <!-- BMR 卡片 (默认绿色) -->
+    <view class="stat-card" data-status="green">
+      <view class="stat-glow"></view>
+      <view class="stat-content">
+        <text class="stat-label">BMR</text>
+        <text class="stat-value">{{userStats.bmr}}</text>
+        <view class="stat-dot"></view>
+      </view>
+    </view>
+
+    <!-- TDEE 卡片 (默认绿色) -->
+    <view class="stat-card" data-status="green">
+      <view class="stat-glow"></view>
+      <view class="stat-content">
+        <text class="stat-label">TDEE</text>
+        <text class="stat-value">{{userStats.tdee}}</text>
+        <view class="stat-dot"></view>
       </view>
     </view>
   </view>
 
-  <!-- 主内容区 -->
-  <view class="main-content">
-    <!-- 日期切换导航栏 -->
-    <view class="date-nav-bar">
-      <view class="date-nav-arrow">
-        <text class="arrow-icon">◀</text>
-      </view>
-      <view class="date-nav-center">
-        <text class="date-nav-text">今日数据</text>
-      </view>
-      <view class="date-nav-arrow">
-        <text class="arrow-icon">▶</text>
+  <!-- 功能区 (无图标极简设计) -->
+  <view class="minimal-grid">
+    <!-- 我的计划 -->
+    <view class="minimal-item" bindtap="goToPlan">
+      <view class="item-content">
+        <text class="item-title">我的计划</text>
+        <text class="item-desc">管理目标</text>
       </view>
     </view>
 
-    <!-- 仪表盘卡片 -->
-    <view class="dashboard-card">
-      <view class="dashboard-content">
-        <view class="calories-dashboard">
-          <!-- 环形图展示今日核心数据 -->
-          <view class="donut-chart-wrapper">
-            <view class="donut-chart">
-              <view class="donut-ring" style="background: conic-gradient({{ringColor}} 0% {{ringDegrees}}deg, #E5E7EB {{ringDegrees}}deg 360deg);"></view>
-              <view class="donut-center">
-                <view class="donut-value-wrapper">
-                  <text class="donut-value">{{todayIntake}}</text>
-                  <text class="donut-unit">kcal</text>
-                </view>
-                <text class="donut-label">今日摄入</text>
-              </view>
-            </view>
-          </view>
-
-          <!-- 身体指标详细数据 -->
-          <view class="calories-details">
-            <view class="calorie-row">
-              <view class="calorie-indicator bmi"></view>
-              <text class="calorie-label">BMI</text>
-              <view class="calorie-value-wrapper">
-                <text class="calorie-value">{{formatNumber(userStats.BMI)}}</text>
-              </view>
-            </view>
-            <view class="calorie-row">
-              <view class="calorie-indicator bmi-kcal"></view>
-              <text class="calorie-label">BMR</text>
-              <view class="calorie-value-wrapper">
-                <text class="calorie-value">{{formatNumber(userStats.bmr)}}</text>
-                <text class="calorie-unit">kcal</text>
-              </view>
-            </view>
-            <view class="calorie-row">
-              <view class="calorie-indicator tdee"></view>
-              <text class="calorie-label">TDEE</text>
-              <view class="calorie-value-wrapper">
-                <text class="calorie-value">{{formatNumber(userStats.tdee)}}</text>
-                <text class="calorie-unit">kcal</text>
-              </view>
-            </view>
-            <view class="calorie-row">
-              <view class="calorie-indicator bmi-kcal"></view>
-              <text class="calorie-label">今日摄入</text>
-              <view class="calorie-value-wrapper">
-                <text class="calorie-value">{{todayIntake}}</text>
-                <text class="calorie-unit">kcal</text>
-              </view>
-            </view>
-            <view class="calorie-row">
-              <view class="calorie-indicator bmi-kcal"></view>
-              <text class="calorie-label">今日消耗</text>
-              <view class="calorie-value-wrapper">
-                <text class="calorie-value">{{todayConsume}}</text>
-                <text class="calorie-unit">kcal</text>
-              </view>
-            </view>
-          </view>
-        </view>
+    <!-- 自定义菜品 -->
+    <view class="minimal-item" bindtap="goToCustomDishes">
+      <view class="item-content">
+        <text class="item-title">自定义菜品</text>
+        <text class="item-desc">专属菜单</text>
       </view>
     </view>
 
-    <!-- 功能按钮区域 -->
-    <view class="function-section">
-      <view class="section-header">
-        <text class="section-title">功能中心</text>
+    <!-- 收藏食谱 -->
+    <view class="minimal-item" bindtap="goToFavorites">
+      <view class="item-content">
+        <text class="item-title">收藏食谱</text>
+        <text class="item-desc">美味常备</text>
       </view>
-      
-      <view class="function-grid">
-        <!-- 功能项1：我的计划 -->
-        <view class="grid-item" bindtap="goToPlan">
-          <spotlight-card customClass="func-card plan" holo="{{true}}" customStyle="background: linear-gradient(135deg, #FFF7ED 0%, #FFEDD5 100%)">
-            <view class="func-content">
-              <view class="func-icon-wrapper plan">
-                <text class="func-icon">📋</text>
-              </view>
-              <view class="func-info">
-                <text class="func-title">我的计划</text>
-                <text class="func-desc">查看管理计划</text>
-              </view>
-              <view class="func-arrow">→</view>
-            </view>
-          </spotlight-card>
-        </view>
+    </view>
 
-        <!-- 功能项2：自定义菜品管理 -->
-        <view class="grid-item" bindtap="goToCustomDishes">
-          <spotlight-card customClass="func-card dish" holo="{{true}}" customStyle="background: linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%)">
-            <view class="func-content">
-              <view class="func-icon-wrapper dish">
-                <text class="func-icon">🍽️</text>
-              </view>
-              <view class="func-info">
-                <text class="func-title">自定义菜品</text>
-                <text class="func-desc">管理我的菜品</text>
-              </view>
-              <view class="func-arrow">→</view>
-            </view>
-          </spotlight-card>
-        </view>
-
-        <!-- 功能项3：收藏食谱 -->
-        <view class="grid-item" bindtap="goToFavorites">
-          <spotlight-card customClass="func-card fav" holo="{{true}}" customStyle="background: linear-gradient(135deg, #F5F3FF 0%, #EDE9FE 100%)">
-            <view class="func-content">
-              <view class="func-icon-wrapper fav">
-                <text class="func-icon">⭐</text>
-              </view>
-              <view class="func-info">
-                <text class="func-title">收藏食谱</text>
-                <text class="func-desc">我的收藏列表</text>
-              </view>
-              <view class="func-arrow">→</view>
-            </view>
-          </spotlight-card>
-        </view>
-
-        <!-- 功能项4：数据统计 -->
-        <view class="grid-item" bindtap="goToStats">
-          <spotlight-card customClass="func-card stats" holo="{{true}}" customStyle="background: linear-gradient(135deg, #FFF1F2 0%, #FFE4E6 100%)">
-            <view class="func-content">
-              <view class="func-icon-wrapper stats">
-                <text class="func-icon">📊</text>
-              </view>
-              <view class="func-info">
-                <text class="func-title">数据统计</text>
-                <text class="func-desc">查看数据趋势</text>
-              </view>
-              <view class="func-arrow">→</view>
-            </view>
-          </spotlight-card>
-        </view>
-
-        <!-- 功能项5：使用帮助 (横跨两列) -->
-        <view class="grid-item full-width" bindtap="goToHelp">
-          <spotlight-card customClass="func-card help" holo="{{true}}" customStyle="background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%)">
-            <view class="func-content">
-              <view class="func-icon-wrapper help">
-                <text class="func-icon">❓</text>
-              </view>
-              <view class="func-info">
-                <text class="func-title">使用帮助</text>
-                <text class="func-desc">了解如何使用本小程序</text>
-              </view>
-              <view class="func-arrow">→</view>
-            </view>
-          </spotlight-card>
-        </view>
+    <!-- 数据统计 -->
+    <view class="minimal-item" bindtap="goToStats">
+      <view class="item-content">
+        <text class="item-title">数据统计</text>
+        <text class="item-desc">趋势分析</text>
       </view>
     </view>
   </view>
 
-  <!-- 昵称编辑弹窗 -->
+   <!-- 昵称编辑弹窗 -->
   <view class="modal-mask" wx:if="{{isNicknameModalShow}}" bindtap="cancelNicknameEdit"></view>
-  <view class="modal-content" wx:if="{{isNicknameModalShow}}">
+  <view class="modal-content glass-modal" wx:if="{{isNicknameModalShow}}">
     <text class="modal-title">修改昵称</text>
     <input 
       class="nickname-input" 
