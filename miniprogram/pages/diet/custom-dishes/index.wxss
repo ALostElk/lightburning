@@ -1,11 +1,13 @@
-/* 自定义菜品页面样式 - 优化版 */
-
+/* 自定义菜品页面样式 - 清爽淡雅版 (Fresh & Elegant) */
 .page {
-  height: 100vh;
+  min-height: 100vh;
+  /* 天空/云朵白渐变 */
+  background: linear-gradient(180deg, #F5FAFF 0%, #FFFFFF 100%);
   display: flex;
   flex-direction: column;
-  background: linear-gradient(180deg, #FFF5EB 0%, #FEF0E3 15%, #F8F4FF 50%, #EEF4FF 100%);
   position: relative;
+  box-sizing: border-box;
+  color: #334155; /* Slate-700 */
 }
 
 /* ============ 悬浮返回按钮 ============ */
@@ -18,124 +20,100 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.4);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1rpx solid rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(10rpx);
   -webkit-backdrop-filter: blur(10rpx);
-  border-radius: 50%;
-  border: 1rpx solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4rpx 12rpx rgba(148, 163, 184, 0.1);
   transition: all 0.2s ease;
 }
 
 .nav-back-btn:active {
-  background: rgba(0, 0, 0, 0.6);
+  background: #F1F5F9;
   transform: scale(0.95);
 }
 
 .back-arrow {
-  font-size: 48rpx;
-  color: rgba(255, 255, 255, 0.9);
-  font-weight: 300;
+  font-size: 40rpx;
+  color: #64748B; /* Slate-500 */
   line-height: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-  text-align: center;
-  margin: 0;
-  padding: 0;
+  padding-bottom: 4rpx; /* 微调对齐 */
 }
 
-/* 背景装饰 */
+/* 背景装饰 (原有橙色波浪移除，改为无或极简) */
 .page-bg {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 280rpx;
-  background: linear-gradient(135deg, #FF8C42 0%, #FF6B35 50%, #FF9A56 100%);
-  border-radius: 0 0 60rpx 60rpx;
-  z-index: 0;
+  display: none;
 }
 
 /* 头部 */
 .header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center; /* 居中标题 */
   padding: 20rpx 30rpx;
   flex-shrink: 0;
   position: relative;
-  z-index: 1;
-}
-
-.back-btn {
-  width: 70rpx;
-  height: 70rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 40rpx;
-  color: #fff;
-  background: rgba(255,255,255,0.2);
-  border-radius: 50%;
-  backdrop-filter: blur(10rpx);
+  z-index: 10;
+  margin-top: 20rpx; /* 避开状态栏 */
 }
 
 .header-title {
-  font-size: 34rpx;
-  font-weight: 700;
-  color: #fff;
-  text-shadow: 0 2rpx 8rpx rgba(0,0,0,0.1);
+  font-size: 36rpx;
+  font-weight: 500;
+  color: #334155; /* Slate-700 */
+  letter-spacing: 1rpx;
 }
 
 .header-placeholder {
-  width: 70rpx;
+  display: none;
 }
 
-/* 内容区 - 使用 scroll-view */
+/* 内容区 */
 .content {
   flex: 1;
-  padding: 20rpx 30rpx;
-  padding-bottom: 160rpx;
-  overflow: hidden;
+  padding: 32rpx;
+  padding-bottom: 200rpx; /* 底部留白 */
+  overflow-y: auto;
   position: relative;
   z-index: 1;
 }
 
-/* 表单卡片 */
+/* 表单卡片 - 玻璃拟态 */
 .form-card {
-  background: linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%);
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(20rpx);
+  -webkit-backdrop-filter: blur(20rpx);
   border-radius: 32rpx;
-  padding: 32rpx;
-  margin-bottom: 24rpx;
-  box-shadow: 0 8rpx 32rpx rgba(99, 102, 241, 0.08);
-  border: 2rpx solid rgba(99, 102, 241, 0.1);
+  padding: 40rpx;
+  margin-bottom: 32rpx;
+  box-shadow: 0 4rpx 20rpx rgba(148, 163, 184, 0.05); /* 极淡阴影 */
+  border: 1rpx solid rgba(255, 255, 255, 0.8);
 }
 
 .card-title {
   font-size: 30rpx;
-  font-weight: 700;
-  color: #333;
-  margin-bottom: 24rpx;
-  padding-bottom: 16rpx;
-  border-bottom: 2rpx solid #F3F4F6;
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 32rpx;
+  padding-bottom: 20rpx;
+  border-bottom: 1rpx solid #F1F5F9;
   display: flex;
   align-items: center;
-  gap: 12rpx;
+  gap: 16rpx;
 }
 
 .card-title::before {
   content: '';
-  width: 6rpx;
+  width: 8rpx;
   height: 32rpx;
-  background: linear-gradient(180deg, #FF8C42, #FF6B35);
-  border-radius: 3rpx;
+  background: #94A3B8; /* Slate-400 */
+  border-radius: 4rpx;
 }
 
 /* 表单项 */
 .form-item {
-  margin-bottom: 24rpx;
+  margin-bottom: 32rpx;
 }
 
 .form-item:last-child {
@@ -145,276 +123,222 @@
 .form-label {
   display: block;
   font-size: 26rpx;
-  color: #555;
-  margin-bottom: 12rpx;
+  color: #64748B; /* Slate-500 */
+  margin-bottom: 16rpx;
   font-weight: 500;
 }
 
 .required {
   color: #EF4444;
+  margin-left: 4rpx;
 }
 
 .form-input {
   width: 100%;
-  height: 88rpx;
-  padding: 0 24rpx;
-  background: linear-gradient(135deg, #F9FAFB 0%, #F3F4F6 100%);
-  border: 2rpx solid #E5E7EB;
-  border-radius: 20rpx;
+  height: 96rpx;
+  padding: 0 32rpx;
+  background: #F8FAFC; /* Slate-50 */
+  border: 1rpx solid #E2E8F0; /* Slate-200 */
+  border-radius: 24rpx;
   font-size: 28rpx;
-  color: #333;
+  color: #334155;
   box-sizing: border-box;
-  line-height: 88rpx;
   transition: all 0.2s ease;
 }
 
 .form-input:focus {
-  border-color: #FF8C42;
-  background: #fff;
-  box-shadow: 0 0 0 4rpx rgba(255,140,66,0.1);
-}
-
-.form-input::placeholder {
-  color: #999;
+  background: #FFFFFF;
+  border-color: #94A3B8; /* Slate-400 */
+  box-shadow: 0 0 0 4rpx rgba(148, 163, 184, 0.1);
 }
 
 .form-textarea {
   width: 100%;
-  height: 160rpx;
-  padding: 20rpx 24rpx;
-  background: linear-gradient(135deg, #F9FAFB 0%, #F3F4F6 100%);
-  border: 2rpx solid #E5E7EB;
-  border-radius: 20rpx;
+  height: 200rpx;
+  padding: 24rpx 32rpx;
+  background: #F8FAFC;
+  border: 1rpx solid #E2E8F0;
+  border-radius: 24rpx;
   font-size: 28rpx;
-  color: #333;
+  color: #334155;
   box-sizing: border-box;
-  line-height: 1.5;
+  line-height: 1.6;
   transition: all 0.2s ease;
 }
 
 .form-textarea:focus {
-  border-color: #FF8C42;
-  background: #fff;
-  box-shadow: 0 0 0 4rpx rgba(255,140,66,0.1);
-}
-
-.form-textarea::placeholder {
-  color: #999;
+  background: #FFFFFF;
+  border-color: #94A3B8;
+  box-shadow: 0 0 0 4rpx rgba(148, 163, 184, 0.1);
 }
 
 .input-with-unit {
   display: flex;
   align-items: center;
-  gap: 12rpx;
-}
-
-.input-with-unit .form-input {
-  flex: 1;
-}
-
-.input-with-unit .form-input.short {
-  max-width: 200rpx;
+  gap: 16rpx;
 }
 
 .unit {
   font-size: 28rpx;
-  color: #666;
+  color: #94A3B8;
   flex-shrink: 0;
-  font-weight: 500;
+  font-weight: 400;
 }
 
 /* 营养信息网格 */
 .nutrition-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 20rpx;
+  gap: 24rpx;
 }
 
 .nutrition-item {
   border-radius: 24rpx;
   padding: 24rpx;
-  position: relative;
-  overflow: hidden;
-}
-
-.nutrition-item::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4rpx;
-}
-
-.nutrition-item.calories {
-  background: linear-gradient(145deg, #FFF7ED 0%, #FFEDD5 100%);
-}
-.nutrition-item.calories::before {
-  background: linear-gradient(90deg, #FF8C42, #FF6B35);
-}
-
-.nutrition-item.protein {
-  background: linear-gradient(145deg, #EFF6FF 0%, #DBEAFE 100%);
-}
-.nutrition-item.protein::before {
-  background: linear-gradient(90deg, #60A5FA, #3B82F6);
-}
-
-.nutrition-item.carbs {
-  background: linear-gradient(145deg, #FFFBEB 0%, #FEF3C7 100%);
-}
-.nutrition-item.carbs::before {
-  background: linear-gradient(90deg, #FBBF24, #F59E0B);
-}
-
-.nutrition-item.fat {
-  background: linear-gradient(145deg, #F5F3FF 0%, #EDE9FE 100%);
-}
-.nutrition-item.fat::before {
-  background: linear-gradient(90deg, #A78BFA, #8B5CF6);
+  background: #F8FAFC;
+  border: 1rpx solid #F1F5F9;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12rpx;
 }
 
 .nutrition-label {
-  display: block;
   font-size: 24rpx;
-  color: #666;
-  margin-bottom: 12rpx;
+  color: #94A3B8;
   font-weight: 500;
 }
 
 .nutrition-input-wrapper {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   gap: 8rpx;
 }
 
 .nutrition-input {
-  flex: 1;
-  padding: 14rpx 16rpx;
-  background: rgba(255,255,255,0.9);
-  border: 2rpx solid rgba(255,255,255,0.6);
-  border-radius: 14rpx;
+  width: 100rpx;
   font-size: 32rpx;
-  font-weight: 700;
+  font-weight: 600;
+  color: #334155;
   text-align: center;
-  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.04);
+  border-bottom: 2rpx solid transparent;
+  padding-bottom: 4rpx;
+  font-family: 'SF Mono', 'Menlo', sans-serif;
 }
 
 .nutrition-input:focus {
-  border-color: #FF8C42;
-  background: #fff;
+  border-bottom-color: #94A3B8;
 }
 
 .nutrition-unit {
-  font-size: 24rpx;
-  color: #888;
-  min-width: 60rpx;
-  font-weight: 500;
+  font-size: 22rpx;
+  color: #CBD5E1;
 }
 
+/* 提示框 */
 .nutrition-tip {
   display: flex;
-  align-items: center;
-  gap: 12rpx;
-  margin-top: 24rpx;
-  padding: 20rpx;
-  background: linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%);
-  border-radius: 16rpx;
-  border: 2rpx solid rgba(34,197,94,0.2);
+  align-items: flex-start;
+  gap: 16rpx;
+  margin-top: 32rpx;
+  padding: 24rpx;
+  background: rgba(241, 245, 249, 0.5); /* Slate-100 half transparent */
+  border-radius: 20rpx;
 }
 
 .tip-icon {
-  font-size: 28rpx;
-  flex-shrink: 0;
+  font-size: 32rpx;
 }
 
 .tip-text {
   font-size: 24rpx;
-  color: #166534;
+  color: #64748B;
   line-height: 1.5;
 }
 
 /* 图片上传 */
 .image-upload {
   width: 100%;
-  height: 300rpx;
+  height: 320rpx;
   border-radius: 24rpx;
   overflow: hidden;
-  background: linear-gradient(135deg, #F9FAFB 0%, #F3F4F6 100%);
-  border: 3rpx dashed #D1D5DB;
+  background: #F8FAFC;
+  border: 2rpx dashed #E2E8F0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: all 0.2s ease;
 }
 
 .image-upload:active {
-  border-color: #FF8C42;
-  background: linear-gradient(135deg, #FFF7ED 0%, #FFEDD5 100%);
-}
-
-.preview-image {
-  width: 100%;
-  height: 100%;
+  background: #F1F5F9;
+  border-color: #94A3B8;
 }
 
 .upload-placeholder {
-  width: 100%;
-  height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 16rpx;
+  gap: 20rpx;
 }
 
 .upload-icon {
-  font-size: 72rpx;
+  font-size: 64rpx;
+  opacity: 0.4;
+  filter: grayscale(100%);
 }
 
 .upload-text {
   font-size: 26rpx;
-  color: #999;
+  color: #94A3B8;
 }
 
 .remove-image {
+  margin-top: 20rpx;
   text-align: center;
-  margin-top: 16rpx;
-  font-size: 26rpx;
   color: #EF4444;
+  font-size: 26rpx;
   padding: 12rpx;
 }
 
-/* 底部按钮 */
+/* 底部按钮栏 */
 .bottom-bar {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 20rpx 30rpx;
-  padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
-  background: rgba(255,255,255,0.98);
-  box-shadow: 0 -8rpx 30rpx rgba(0,0,0,0.06);
+  padding: 32rpx;
+  padding-bottom: calc(32rpx + env(safe-area-inset-bottom));
+  background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(20rpx);
+  border-top: 1rpx solid rgba(241, 245, 249, 1);
+  z-index: 100;
 }
 
 .save-btn {
   width: 100%;
-  padding: 32rpx;
-  background: linear-gradient(135deg, #FF8C42 0%, #FF6B35 50%, #F7931E 100%);
-  color: #fff;
+  height: 96rpx;
+  background: #334155; /* Slate-700 */
+  color: #FFFFFF;
   font-size: 32rpx;
-  font-weight: 700;
-  border-radius: 24rpx;
+  font-weight: 600;
+  border-radius: 48rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8rpx 24rpx rgba(51, 65, 85, 0.25);
   border: none;
-  box-shadow: 0 8rpx 24rpx rgba(255,107,0,0.35),
-              inset 0 2rpx 4rpx rgba(255,255,255,0.2);
   transition: all 0.2s ease;
 }
 
 .save-btn:active {
   transform: scale(0.98);
-  box-shadow: 0 4rpx 16rpx rgba(255,107,0,0.3);
+  background: #1E293B; /* Slate-800 */
 }
 
 .save-btn[disabled] {
-  opacity: 0.5;
+  background: #CBD5E1; /* Slate-300 */
+  color: #F1F5F9;
   box-shadow: none;
+  pointer-events: none;
 }

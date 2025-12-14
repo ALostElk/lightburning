@@ -3,7 +3,7 @@
 -->
 <view class="page">
   <!-- 背景装饰 -->
-  <view class="page-bg"></view>
+
 
   <!-- 悬浮返回按钮 -->
   <view class="nav-back-btn" bindtap="goBack" style="top: {{statusBarHeight}}px">
@@ -11,7 +11,7 @@
   </view>
 
   <!-- 头部 -->
-  <view class="header">
+  <view class="header" style="margin-top: {{statusBarHeight}}px">
     <text class="header-title">{{isEdit ? '编辑菜品' : '添加自定义菜品'}}</text>
     <view class="header-placeholder"></view>
   </view>

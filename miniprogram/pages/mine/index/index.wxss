@@ -5,9 +5,9 @@
  */
 
 .page {
-  min-height: 100vh;
+  min-height: 200vh;
   background: linear-gradient(180deg, #F5FAFF 0%, #FFFFFF 100%);
-  padding: 40rpx 32rpx 200rpx; 
+  padding: 200rpx 32rpx 200rpx; 
   box-sizing: border-box;
   color: #334155;
 }
