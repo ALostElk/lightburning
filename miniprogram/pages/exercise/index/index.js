@@ -519,7 +519,7 @@ Page({
     const todayStr = this.getTodayString();
 
     if (nextDateStr > todayStr) {
-      wx.showToast({ title: '不能选择未来日期', icon: 'none' });
+      wx.showToast({ title: '美好的未来尚未发生', icon: 'none' });
       return;
     }
     this.changeDate(nextDateStr);

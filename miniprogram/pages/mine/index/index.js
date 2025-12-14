@@ -29,6 +29,9 @@ Page({
       nickName: '微信用户',
       height: 180,
       weight: 70,
+      targetWeight: null, // 新增
+      bmi: '--',         // 新增
+      bmiLabel: '',      // 新增
       goal: '减脂',
       age: 0,
       gender: 'male'
@@ -183,6 +186,9 @@ Page({
             nickName: '微信用户',
             height: 180,
             weight: 70,
+            targetWeight: null,
+            bmi: '--',
+            bmiLabel: '',
             goal: '减脂',
             age: 30,
             gender: 'male'
@@ -215,14 +221,32 @@ Page({
         // 确保关键数据有默认值
         const height = userData.height || 170;
         const weight = userData.weight || 60;
+        const targetWeight = userData.targetWeight || null; // 目标体重
         const age = userData.age || 25;
         const gender = userData.gender || 'male';
+
+        // 计算 BMI
+        let bmi = '--';
+        let bmiLabel = '';
+        if (height > 0 && weight > 0) {
+          const hM = height / 100;
+          const bmiVal = weight / (hM * hM);
+          bmi = bmiVal.toFixed(1);
+
+          if (bmiVal < 18.5) bmiLabel = '偏瘦';
+          else if (bmiVal < 24) bmiLabel = '正常';
+          else if (bmiVal < 28) bmiLabel = '超重';
+          else bmiLabel = '肥胖';
+        }
 
         const userInfo = {
           avatarUrl: userData.avatarUrl || '/images/default-avatar.png',
           nickName: userData.nickName || '微信用户',
           height,
           weight,
+          targetWeight,
+          bmi,
+          bmiLabel,
           goal: userData.goal || '减脂',
           age,
           gender

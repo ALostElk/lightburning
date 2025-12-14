@@ -17,6 +17,46 @@
     </view>
   </view>
 
+  <!-- 身体与计划卡片 (极简玻璃态) -->
+  <view class="glass-card stats-card">
+    <!-- 上半部分：身体数据 -->
+    <view class="stats-row">
+      <view class="stat-item">
+        <text class="stat-val">{{userInfo.height}}</text>
+        <text class="stat-label">身高 cm</text>
+      </view>
+      <view class="vertical-line"></view>
+      <view class="stat-item">
+        <text class="stat-val">{{userInfo.weight}}</text>
+        <text class="stat-label">体重 kg</text>
+      </view>
+      <view class="vertical-line"></view>
+      <view class="stat-item">
+        <text class="stat-val">{{userInfo.bmi}}</text>
+        <view class="stat-label-row">
+          <text class="stat-label">BMI</text>
+          <text class="bmi-tag" wx:if="{{userInfo.bmiLabel}}">{{userInfo.bmiLabel}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 分割线 -->
+    <view class="divider-dash"></view>
+
+    <!-- 下半部分：计划目标 -->
+    <view class="plan-row" bindtap="goToPlan">
+      <view class="plan-info">
+        <text class="plan-label">当前目标</text>
+        <view class="plan-val-row">
+          <text class="plan-val">{{userInfo.goal}}</text>
+          <text class="plan-target" wx:if="{{userInfo.targetWeight}}">→ {{userInfo.targetWeight}} kg</text>
+          <text class="plan-target" wx:else>未设置目标体重</text>
+        </view>
+      </view>
+      <view class="plan-arrow">></view>
+    </view>
+  </view>
+
   <!-- 功能区 (无图标极简设计) -->
   <view class="minimal-grid">
     <!-- 我的计划 -->

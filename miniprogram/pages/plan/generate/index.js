@@ -268,10 +268,11 @@ Page({
         console.log('计划生成成功，planId:', planId);
         api.showSuccess('计划生成成功');
         
-        // 跳转到计划详情页，传递 planId
+        // 生成成功后返回首页（避免因数据库写入延迟导致详情页查询失败）
+        // 首页会自动加载活跃计划并显示
         setTimeout(() => {
-          wx.navigateTo({
-            url: `/pages/plan/detail/index?planId=${planId}`
+          wx.switchTab({
+            url: '/pages/home/index'
           });
         }, 1000);
       } else {

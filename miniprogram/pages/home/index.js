@@ -113,7 +113,7 @@ Page({
       { icon: '🍽️', title: '记录饮食', url: '/pages/diet/index/index', color: '#FF6B6B' },
       { icon: '💪', title: '记录运动', url: '/pages/exercise/index/index', color: '#4ECDC4' },
       { icon: '📊', title: '每日报告', url: '/pages/report/daily/index', color: '#FFD93D' },
-      { icon: '📝', title: '我的计划', url: '/pages/plan/detail/index', color: '#A78BFA', tabBar: false }
+      { icon: '📝', title: '我的计划', action: 'viewPlan', color: '#A78BFA', tabBar: false }
     ],
 
     // 推荐内容
@@ -634,7 +634,14 @@ Page({
    * 快捷操作
    */
   onQuickAction(e) {
-    const { url } = e.currentTarget.dataset;
+    const { url, action } = e.currentTarget.dataset;
+    
+    // 如果是特殊操作，调用对应方法
+    if (action === 'viewPlan') {
+      this.onViewPlanDetail();
+      return;
+    }
+    
     if (!url) return;
 
     // 这里写你的 tabBar 页面路径（和 app.json 里保持一致）
@@ -1411,9 +1418,18 @@ Page({
    * 查看计划详情
    */
   onViewPlanDetail() {
-    wx.navigateTo({
-      url: '/pages/plan/detail/index'
-    });
+    const planId = this.data.activePlan?._id;
+    if (planId) {
+      // 如果有活跃计划，传递 planId
+      wx.navigateTo({
+        url: `/pages/plan/detail/index?planId=${planId}`
+      });
+    } else {
+      // 如果没有活跃计划，跳转到详情页让它自己加载
+      wx.navigateTo({
+        url: '/pages/plan/detail/index'
+      });
+    }
   },
 
   /**

@@ -94,7 +94,7 @@
     </view>
 
     <!-- 看计划 -->
-    <view class="action-card" bindtap="onQuickAction" data-url="/pages/plan/detail/index">
+    <view class="action-card" bindtap="onQuickAction" data-action="viewPlan">
         <view class="action-content">
             <text class="action-label">我的计划</text>
         </view>
