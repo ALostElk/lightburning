@@ -63,16 +63,16 @@
       <view class="filter-scroll">
         <view 
           class="filter-chip {{selectedExerciseType === 'aerobic' ? 'active' : ''}}" 
-          bindtap="switchExerciseType" data-type="aerobic">🏃 有氧</view>
+          bindtap="switchExerciseType" data-type="aerobic"> 有氧</view>
         <view 
           class="filter-chip {{selectedExerciseType === 'strength' ? 'active' : ''}}" 
-          bindtap="switchExerciseType" data-type="strength">💪 力量</view>
+          bindtap="switchExerciseType" data-type="strength" style="position: relative; left: 32rpx; top: -1rpx"> 力量</view>
         <view 
           class="filter-chip {{selectedExerciseType === 'flexibility' ? 'active' : ''}}" 
-          bindtap="switchExerciseType" data-type="flexibility">🧘 拉伸</view>
+          bindtap="switchExerciseType" data-type="flexibility" style="position: relative; left: 60rpx; top: -3rpx"> 拉伸</view>
         <view 
           class="filter-chip {{selectedExerciseType === 'sports' ? 'active' : ''}}" 
-          bindtap="switchExerciseType" data-type="sports">⚽ 球类</view>
+          bindtap="switchExerciseType" data-type="sports" style="position: relative; left: 97rpx; top: -3rpx"> 球类</view>
       </view>
 
       <view class="exercise-list animate-fade-in">
@@ -121,8 +121,8 @@
           class="custom-slider" 
           min="5" max="180" step="5" 
           value="{{durationInput}}" 
-          activeColor="#FF6B35" 
-          backgroundColor="#FFF1E7"
+          activeColor="#10B981" 
+          backgroundColor="#ECFDF5"
           block-size="24"
           bindchanging="onDurationChange" 
           bindchange="onDurationChange"
