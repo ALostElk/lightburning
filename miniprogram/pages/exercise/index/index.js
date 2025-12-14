@@ -161,6 +161,11 @@ Page({
   },
 
   onShow() {
+    if (typeof this.getTabBar === 'function' && this.getTabBar()) {
+      this.getTabBar().setData({
+        selected: 2
+      })
+    }
     this.fetchExerciseLogs();
     this.fetchRecordDates();
   },
@@ -562,7 +567,7 @@ Page({
       const exerciseType = log.exerciseType || 'aerobic';
       const duration = log.duration || 0;
       let startTime = '';
-      
+
       // 格式化时间显示
       if (log.startTime) {
         const time = new Date(log.startTime);
@@ -575,7 +580,7 @@ Page({
         const minutes = String(time.getMinutes()).padStart(2, '0');
         startTime = `${hours}:${minutes}`;
       }
-      
+
       return {
         _id: log._id,
         name: log.name,
@@ -672,10 +677,10 @@ Page({
       liquidProgress
     });
 
-    this.setData({ 
-      exerciseTypes, 
-      stats, 
-      consumedDegrees, 
+    this.setData({
+      exerciseTypes,
+      stats,
+      consumedDegrees,
       liquidProgress: liquidProgress,
       exercises,
       summary
@@ -706,7 +711,7 @@ Page({
 
       // 简单的AI分析（如果有AI云函数可以调用）
       let insight = '您近期的运动表现不错，继续保持！';
-      
+
       if (exerciseRecords.length === 0) {
         insight = '本周还未开始运动，让我们动起来吧！';
       } else if (exerciseRecords.length < 3) {
@@ -758,7 +763,7 @@ Page({
     try {
       const db = wx.cloud.database();
       await db.collection('exercise_records').doc(logId).remove();
-      
+
       wx.showToast({ title: '已删除', icon: 'success' });
       this.fetchExerciseLogs();
     } catch (err) {
@@ -771,7 +776,7 @@ Page({
   // 获取运动 Emoji
   getExerciseEmoji(name, type) {
     if (!name) return '🏃';
-    
+
     const emojiMap = {
       // 有氧运动
       '跑步': '🏃', '慢跑': '🏃', '快走': '🚶', '步行': '🚶', '走路': '🚶',

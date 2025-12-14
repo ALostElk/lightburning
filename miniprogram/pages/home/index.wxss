@@ -100,6 +100,125 @@
   opacity: 0.8;
 }
 
+/* 1.5 Weight Card (体重趋势卡片) */
+.weight-card {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(20rpx);
+  -webkit-backdrop-filter: blur(20rpx);
+  border: 1rpx solid rgba(255, 255, 255, 0.8);
+  border-radius: 32rpx;
+  padding: 24rpx 32rpx;
+  margin-bottom: 32rpx;
+  box-shadow: 0 4rpx 16rpx rgba(148, 163, 184, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.weight-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16rpx;
+}
+
+.weight-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.weight-label {
+  font-size: 22rpx;
+  color: #94A3B8;
+  font-weight: 400;
+}
+
+.weight-value-group {
+  display: flex;
+  align-items: baseline;
+  gap: 8rpx;
+}
+
+.weight-value {
+  font-size: 48rpx;
+  font-weight: 200;
+  color: #1E293B;
+  font-family: 'SF Mono', 'Menlo', sans-serif;
+}
+
+.weight-unit {
+  font-size: 24rpx;
+  color: #94A3B8;
+  font-weight: 300;
+}
+
+.weight-change {
+  display: flex;
+  align-items: center;
+  padding: 8rpx 16rpx;
+  border-radius: 20rpx;
+  background: rgba(241, 245, 249, 0.8);
+}
+
+.weight-change.up {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.weight-change.down {
+  background: rgba(16, 185, 129, 0.1);
+}
+
+.weight-change.stable {
+  background: rgba(148, 163, 184, 0.1);
+}
+
+.change-text {
+  font-size: 22rpx;
+  color: #64748B;
+  font-weight: 500;
+}
+
+.weight-change.up .change-text {
+  color: #EF4444;
+}
+
+.weight-change.down .change-text {
+  color: #10B981;
+}
+
+/* 迷你折线图 */
+.mini-chart {
+  height: 120rpx;
+  margin-bottom: 16rpx;
+  position: relative;
+}
+
+.chart-canvas {
+  width: 100%;
+  height: 100%;
+}
+
+/* 添加提示 */
+.add-weight-hint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  padding: 12rpx 0;
+  border-top: 1rpx solid rgba(241, 245, 249, 0.8);
+}
+
+.hint-icon {
+  font-size: 24rpx;
+  color: #94A3B8;
+}
+
+.hint-text {
+  font-size: 22rpx;
+  color: #94A3B8;
+  font-weight: 400;
+}
+
 /* 3. Hero Card (Traffic Light) */
 .hero-section {
   margin-bottom: 40rpx;
@@ -378,13 +497,13 @@
 }
 
 .action-label {
-  font-size: 32rpx; /* Slightly larger text */
+  font-size: 32rpx;
   font-weight: 500;
   color: #475569; /* Slate-600 */
-  letter-spacing: 2rpx; /* Elegant spacing */
+  letter-spacing: 2rpx;
 }
 
-/* Primary Card (拍一拍) - Soft Colorful Gradient */
+/* Primary Card (饮食记录 & 运动记录) - Soft Colorful Gradient */
 .action-card.primary {
   background: linear-gradient(135deg, #FF9A9E 0%, #FECFEF 100%); /* Soft Peach/Pink */
   border: none;
@@ -656,4 +775,282 @@
 .shortcut-btn:active {
   background: #FF6B35;
   color: #FFFFFF;
+}
+
+/* ============ 体重记录弹窗样式 ============ */
+.weight-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: flex-end;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.weight-modal.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.weight-modal-content {
+  width: 100%;
+  background: #FFFFFF;
+  border-radius: 40rpx 40rpx 0 0;
+  padding: 32rpx 32rpx calc(32rpx + env(safe-area-inset-bottom));
+  transform: translateY(100%);
+  transition: transform 0.3s ease;
+}
+
+.weight-modal.show .weight-modal-content {
+  transform: translateY(0);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32rpx;
+}
+
+.modal-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #334155;
+}
+
+.modal-close {
+  width: 48rpx;
+  height: 48rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40rpx;
+  color: #94A3B8;
+  border-radius: 50%;
+  background: rgba(241, 245, 249, 0.8);
+}
+
+/* 体重显示区 */
+.weight-display-section {
+  text-align: center;
+  margin-bottom: 40rpx;
+}
+
+.weight-display-value {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 12rpx;
+  margin-bottom: 16rpx;
+}
+
+.display-number {
+  font-size: 80rpx;
+  font-weight: 200;
+  color: #1E293B;
+  font-family: 'SF Mono', 'Menlo', sans-serif;
+}
+
+.display-unit {
+  font-size: 32rpx;
+  color: #94A3B8;
+  font-weight: 300;
+}
+
+.weight-compare {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+}
+
+.compare-label {
+  font-size: 24rpx;
+  color: #94A3B8;
+}
+
+.compare-value {
+  font-size: 24rpx;
+  color: #64748B;
+  font-weight: 500;
+}
+
+/* 滑动条输入 */
+.slider-input-section {
+  margin-bottom: 32rpx;
+}
+
+.slider-wrapper {
+  position: relative;
+  height: 60rpx;
+  margin-bottom: 16rpx;
+}
+
+.slider-track {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 8rpx;
+  background: #F1F5F9;
+  border-radius: 4rpx;
+  transform: translateY(-50%);
+}
+
+.slider-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #10B981 0%, #059669 100%);
+  border-radius: 4rpx;
+  transition: width 0.1s ease;
+}
+
+.weight-slider {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.slider-thumb {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  transition: left 0.1s ease;
+}
+
+.thumb-dot {
+  width: 32rpx;
+  height: 32rpx;
+  background: #FFFFFF;
+  border: 4rpx solid #10B981;
+  border-radius: 50%;
+  box-shadow: 0 4rpx 12rpx rgba(16, 185, 129, 0.3);
+}
+
+.slider-marks {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 16rpx;
+}
+
+.mark {
+  font-size: 20rpx;
+  color: #CBD5E1;
+}
+
+/* 快捷输入 */
+.quick-weights {
+  margin-bottom: 32rpx;
+}
+
+.quick-label {
+  font-size: 24rpx;
+  color: #64748B;
+  margin-bottom: 16rpx;
+  font-weight: 500;
+}
+
+.quick-btns {
+  display: flex;
+  gap: 12rpx;
+  align-items: center;
+}
+
+.quick-btn {
+  flex: 0 0 auto;
+  padding: 12rpx 20rpx;
+  background: rgba(241, 245, 249, 0.8);
+  border-radius: 16rpx;
+  font-size: 24rpx;
+  color: #64748B;
+  font-weight: 500;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.quick-btn:active {
+  background: #10B981;
+  color: #FFFFFF;
+  transform: scale(0.95);
+}
+
+.direct-input {
+  flex: 1;
+  height: 72rpx;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.8);
+  border: 2rpx solid #E2E8F0;
+  border-radius: 16rpx;
+  font-size: 28rpx;
+  color: #334155;
+  font-weight: 600;
+  font-family: 'SF Mono', 'Menlo', sans-serif;
+}
+
+/* 备注输入 */
+.note-section {
+  margin-bottom: 32rpx;
+}
+
+.note-label {
+  font-size: 24rpx;
+  color: #64748B;
+  margin-bottom: 12rpx;
+  font-weight: 500;
+}
+
+.note-input {
+  width: 100%;
+  height: 80rpx;
+  padding: 0 24rpx;
+  background: rgba(241, 245, 249, 0.5);
+  border: 1rpx solid #E2E8F0;
+  border-radius: 20rpx;
+  font-size: 28rpx;
+  color: #334155;
+  box-sizing: border-box;
+}
+
+/* 操作按钮 */
+.modal-actions {
+  display: flex;
+  gap: 16rpx;
+}
+
+.modal-btn {
+  flex: 1;
+  height: 88rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 44rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.modal-btn.cancel {
+  background: rgba(241, 245, 249, 0.8);
+  color: #64748B;
+}
+
+.modal-btn.cancel:active {
+  background: #E2E8F0;
+}
+
+.modal-btn.save {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.9) 0%, rgba(5, 150, 105, 0.95) 100%);
+  color: #FFFFFF;
+  box-shadow: 0 8rpx 24rpx rgba(5, 150, 105, 0.3);
+}
+
+.modal-btn.save:active {
+  transform: scale(0.98);
 }

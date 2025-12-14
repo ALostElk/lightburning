@@ -33,7 +33,7 @@ Page({
     // 环形图/液态球计算值
     consumedDegrees: 0,
     liquidProgress: 0,
-    
+
     // 仪表盘状态（用于动态光晕）
     dashboardStatus: 'status-green', // 默认绿色
 
@@ -167,6 +167,11 @@ Page({
   },
 
   onShow() {
+    if (typeof this.getTabBar === 'function' && this.getTabBar()) {
+      this.getTabBar().setData({
+        selected: 1
+      })
+    }
     this.fetchDietLogs();
     this.fetchRecordDates();
   },

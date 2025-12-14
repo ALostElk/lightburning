@@ -1,0 +1,87 @@
+.tab-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 56px; /* Slightly taller for elegance */
+  background: rgba(255, 255, 255, 0.75); /* More transparent */
+  display: flex;
+  padding-bottom: env(safe-area-inset-bottom);
+  backdrop-filter: blur(28px); /* Deeper blur */
+  -webkit-backdrop-filter: blur(28px);
+  border-top: 1rpx solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 -4rpx 24rpx rgba(0, 0, 0, 0.03); /* Softer shadow */
+  z-index: 9000;
+  transition: all 0.3s ease;
+}
+
+.tab-bar-border {
+  display: none;
+}
+
+.tab-bar-item {
+  flex: 1;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  position: relative;
+}
+
+.icon-container {
+  width: 48rpx;
+  height: 48rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 6rpx;
+  position: relative;
+}
+
+.tab-icon {
+  width: 48rpx;
+  height: 48rpx;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); /* Bouncy spring effect */
+}
+
+.tab-text {
+  font-size: 20rpx;
+  line-height: 1;
+  font-weight: 300; /* Slender font */
+  letter-spacing: 1rpx; /* Airy spacing */
+  transition: all 0.3s ease;
+}
+
+/* Active State Styles */
+.tab-bar-item.active .tab-icon {
+  transform: translateY(-4rpx) scale(1.1); /* Lift and scale */
+  filter: drop-shadow(0 4rpx 8rpx rgba(16, 185, 129, 0.3)); /* Colored glow */
+  animation: elastic-pop 0.5s;
+}
+
+.tab-bar-item.active .tab-text {
+  font-weight: 500;
+  color: #10B981;
+  transform: translateY(-2rpx);
+}
+
+/* Active Indicator "Pill" - Removed as requested */
+/* 
+.tab-bar-item.active::after {
+  display: none;
+} 
+*/
+
+/* Keyframes */
+@keyframes elastic-pop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+  70% { transform: scale(0.95); }
+  100% { transform: scale(1.1) translateY(-4rpx); }
+}
+
+@keyframes fade-in-up {
+  0% { opacity: 0; transform: translateX(-50%) translateY(4rpx); }
+  100% { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
