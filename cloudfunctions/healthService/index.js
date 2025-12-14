@@ -109,6 +109,22 @@ async function generatePlan(openid, targetWeightChange, totalDays) {
   const profile = await getUserProfile(openid);
   if (!profile) throw new Error('请先完善个人信息');
 
+  // 计算目标体重
+  const currentWeight = profile.weight;
+  const targetWeight = Number((currentWeight + targetWeightChange).toFixed(1));
+
+  // 同步更新用户 profile 中的目标体重
+  await db.collection('UserProfiles')
+    .where({ _openid: openid })
+    .update({
+      data: {
+        targetWeight: targetWeight,
+        updatedAt: Date.now()
+      }
+    });
+
+  console.log(`已更新用户目标体重: ${currentWeight}kg -> ${targetWeight}kg (变化: ${targetWeightChange}kg)`);
+
   // 1kg脂肪 ≈ 7700kcal
   const totalDeficit = targetWeightChange * 7700;
   const dailyDeficit = Math.round(totalDeficit / totalDays);
@@ -218,6 +234,26 @@ async function adjustPlan(openid, date, actualDeficit) {
     adjustment,
     nextDayGoal: profile.tdee + plan.dailyDeficit + adjustment
   };
+}
+
+/**
+ * 获取活跃计划
+ */
+async function getActivePlan(openid) {
+  const planRes = await db.collection('health_plans')
+    .where({ 
+      _openid: openid,
+      status: 'active'
+    })
+    .orderBy('createdAt', 'desc')
+    .limit(1)
+    .get();
+
+  if (planRes.data.length === 0) {
+    return null;
+  }
+
+  return planRes.data[0];
 }
 
 // ==================== 每日评价 ====================
@@ -402,12 +438,10 @@ async function recommendExercise(openid) {
  * @returns {Array} 运动记录列表
  */
 async function getExerciseLogs(openid, date) {
-  const db = cloud.database();
-
-  const result = await db.collection('exercise_records')
+  const result = await db.collection('ExerciseLog')
     .where({
       _openid: openid,
-      recordDate: date
+      date: date
     })
     .get();
 
@@ -448,6 +482,8 @@ exports.main = async (event) => {
       // 计划管理
       case 'generatePlan':
         return ok(await generatePlan(OPENID, payload.targetWeightChange, payload.totalDays));
+      case 'getActivePlan':
+        return ok(await getActivePlan(OPENID));
       case 'adjustPlan':
         return ok(await adjustPlan(OPENID, payload.date, payload.actualDeficit));
 

@@ -250,6 +250,8 @@ Page({
         api.getProfile()
       ]);
 
+      console.log('Profile API 响应:', profileRes);
+
       // ✅ 运动
       this.setData(exerciseAgg);
 
@@ -261,10 +263,11 @@ Page({
 
       // ✅ 体重目标差距：只基于 profile（不做折线图）
       const profile = profileRes?.result?.success ? (profileRes.result.data || {}) : {};
+      console.log('解析的 profile 数据:', profile);
       await this.updateGoalDistanceFromProfile(profile);
 
     } catch (err) {
-      console.error(err);
+      console.error('加载统计数据失败:', err);
       wx.showToast({ title: '网络异常', icon: 'none' });
     } finally {
       this.setData({ loading: false });
@@ -363,10 +366,19 @@ Page({
           evaluatedDays++;
           if (isDaySuccess(data)) successDays++;
         }
-      } catch (e) {}
+      } catch (e) {
+        console.error('评估日期失败:', d, e);
+      }
     }
 
     const percent = dates.length > 0 ? Math.round((successDays * 100) / dates.length) : 0;
+
+    console.log('计划完成度计算结果:', {
+      successDays,
+      evaluatedDays,
+      totalDays: dates.length,
+      percent
+    });
 
     return {
       planProgressPercent: percent,
@@ -377,16 +389,21 @@ Page({
   // ===================== 体重：显示距离目标还有多远（不做历史） =====================
 
   async updateGoalDistanceFromProfile(profile) {
+    console.log('更新体重目标数据，profile:', profile);
+    
     const currentWeight = Number(profile.weight) || null;
     const targetWeight = Number(profile.targetWeight) || null;
 
+    console.log('当前体重:', currentWeight, '目标体重:', targetWeight);
+
     if (!currentWeight || !targetWeight) {
       this.setData({
-        currentWeight,
-        targetWeight,
-        weightGoalText: '暂无目标体重',
+        currentWeight: currentWeight || '--',
+        targetWeight: targetWeight || '--',
+        weightGoalText: currentWeight ? '请设置目标体重或生成计划' : '暂无体重数据',
         weightProgressPercent: 0
       });
+      console.log('体重数据不完整，显示默认状态');
       return;
     }
 
@@ -396,12 +413,25 @@ Page({
     const direction = diff < 0 ? '还需减重' : diff > 0 ? '还需增重' : '已达成目标';
     const text = diff === 0 ? '已达成目标 🎉' : `${direction} ${absDiff} kg`;
 
-    // 没有历史时，用“接近度”做进度：<=0.5kg 视作100%，>=10kg 视作0%
+    // 计算完成度：基于起点到目标的进度
+    // <=0.5kg 视作100%，>=10kg 视作0%
     const maxGap = 10;
     let percent = 0;
-    if (absDiff <= 0.5) percent = 100;
-    else if (absDiff >= maxGap) percent = 0;
-    else percent = Math.round((1 - (absDiff - 0.5) / (maxGap - 0.5)) * 100);
+    if (absDiff <= 0.5) {
+      percent = 100;
+    } else if (absDiff >= maxGap) {
+      percent = 0;
+    } else {
+      percent = Math.round((1 - (absDiff - 0.5) / (maxGap - 0.5)) * 100);
+    }
+
+    console.log('体重目标计算结果:', {
+      diff,
+      absDiff,
+      direction,
+      text,
+      percent
+    });
 
     this.setData({
       currentWeight,

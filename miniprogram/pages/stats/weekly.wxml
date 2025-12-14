@@ -1,91 +1,92 @@
 <!-- pages/stats/weekly.wxml -->
 <view class="page">
 
-<!-- 周范围 -->
-<view class="range-bar">
-  <text class="range-text">本周：{{weekRangeText}}</text>
-</view>
-
-<!-- 本周总览卡片 -->
-<view class="card card--primary">
-  <view class="card-header">
-    <text class="card-title">一周饮食总览</text>
-    <text class="card-sub">达标率 {{summary.goalRate}}%</text>
+  <!-- 1. 顶部日期范围 (浮动) -->
+  <view class="header-range">
+    <view class="range-pill">{{weekRangeText}}</view>
   </view>
 
-  <view class="card-body summary-row">
-    <view class="summary-block">
-      <text class="summary-label">达标天数</text>
-      <text class="summary-value">{{summary.goalDays}} / {{summary.totalDays}}</text>
+  <!-- 2. 本周核心数据 (大卡片) -->
+  <view class="glass-card big-stat-card">
+    <view class="card-header-clean">
+      <text class="section-title">本周概览</text>
+      <text class="header-tag">{{summary.goalRate}}% 达标</text>
     </view>
-    <view class="summary-block">
-      <text class="summary-label">日均摄入</text>
-      <text class="summary-value">
-        {{summary.avgTotalCalories != null ? summary.avgTotalCalories : '--'}} kcal
-      </text>
-    </view>
-  </view>
-
-  <view class="card-footer">
-    <text class="tag">{{summary.netCaloriesHint}}</text>
-  </view>
-</view>
-
-<!-- 每日完成度条形图 -->
-<view class="card card--plain">
-  <view class="card-header">
-    <text class="card-title">每日完成度</text>
-    <text class="card-sub">记录越完整，分数越高</text>
-  </view>
-
-  <block wx:if="{{dailyScores.length}}">
-    <view
-      class="day-row"
-      wx:for="{{dailyScores}}"
-      wx:key="date"
-    >
-      <text class="day-label">{{item.label}}</text>
-      <view class="day-progress">
-        <view
-          class="day-progress-inner"
-          style="width: {{item.scoreWidth}};"
-        ></view>
+    
+    <view class="stat-row">
+      <view class="stat-item">
+        <text class="stat-val">{{summary.goalDays}} <text class="stat-unit">天</text></text>
+        <text class="stat-label">达标天数</text>
       </view>
-      <text class="day-score">{{item.score}}</text>
+      <view class="vertical-line"></view>
+      <view class="stat-item">
+        <text class="stat-val">{{summary.avgTotalCalories || '--'}} <text class="stat-unit">kcal</text></text>
+        <text class="stat-label">日均摄入</text>
+      </view>
     </view>
-  </block>
-  <block wx:else>
-    <view class="empty">
-      <text>本周还没有饮食记录，先从今天开始记录吧～</text>
+    
+    <view class="footer-hint">
+       {{summary.netCaloriesHint}}
     </view>
-  </block>
-</view>
+  </view>
 
-<!-- 文案总结：亮点 / 需要改进 / 建议 -->
-<view class="card card--green">
-  <view class="card-header">
-    <text class="card-title">本周亮点</text>
+  <!-- 3. 每日完成度 (极简条形) -->
+  <view class="section-container">
+    <view class="section-title-outer">每日追踪</view>
+    <view class="glass-card list-card">
+      <block wx:if="{{dailyScores.length}}">
+        <view class="day-list">
+          <view class="day-row" wx:for="{{dailyScores}}" wx:key="date">
+             <text class="d-label">{{item.label}}</text>
+             <view class="d-bar-track">
+                <view class="d-bar-fill" style="width: {{item.scoreWidth}};"></view>
+             </view>
+             <text class="d-score">{{item.score}}</text>
+          </view>
+        </view>
+      </block>
+      <block wx:else>
+        <view class="empty-state">本周暂无记录</view>
+      </block>
+    </view>
   </view>
-  <view class="text-block">
-    <text>{{highlights}}</text>
-  </view>
-</view>
 
-<view class="card card--orange">
-  <view class="card-header">
-    <text class="card-title">可以改进的地方</text>
-  </view>
-  <view class="text-block">
-    <text>{{improvements}}</text>
-  </view>
-</view>
+  <!-- 4. 文字报告 (无表情图标设计) -->
+  <view class="section-container">
+    <view class="section-title-outer">详细分析</view>
+    
+    <view class="glass-card text-report-card">
+      <!-- 亮点 -->
+      <view class="report-block">
+        <view class="rb-header">
+           <view class="indicator-dot highlight-bg"></view>
+           <text class="rb-title-text">本周亮点</text>
+        </view>
+        <view class="rb-text">{{highlights}}</view>
+      </view>
+      
+      <view class="divider-dash"></view>
 
-<view class="card card--blue">
-  <view class="card-header">
-    <text class="card-title">下周小建议</text>
+      <!-- 改进 -->
+      <view class="report-block">
+        <view class="rb-header">
+           <view class="indicator-dot improve-bg"></view>
+           <text class="rb-title-text">可以改进</text>
+        </view>
+        <view class="rb-text">{{improvements}}</view>
+      </view>
+      
+      <view class="divider-dash"></view>
+
+      <!-- 建议 -->
+      <view class="report-block">
+        <view class="rb-header">
+           <view class="indicator-dot suggest-bg"></view>
+           <text class="rb-title-text">下周建议</text>
+        </view>
+        <view class="rb-text">{{suggestions}}</view>
+      </view>
+    </view>
   </view>
-  <view class="text-block">
-    <text>{{suggestions}}</text>
-  </view>
-</view>
+
 </view>

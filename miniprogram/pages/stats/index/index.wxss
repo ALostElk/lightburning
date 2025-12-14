@@ -1,386 +1,292 @@
 /* pages/stats/index.wxss */
-/* Match Home: low-saturation + glass + soft glow */
 
+/* ===== 全局: 低密度 (Low Density) & 清新淡雅 ===== */
 .page {
-  padding: 20rpx 28rpx 48rpx;
+  padding: 24rpx 40rpx 100rpx; /* Increased padding */
   min-height: 100vh;
   box-sizing: border-box;
-  color: #334155; /* Slate-700 */
-  /* 和 home 一致的“天空白”淡渐变 */
-  background: linear-gradient(180deg, #F5FAFF 0%, #FFFFFF 100%);
+  color: #2F3E33;
+  /* 极简灰绿渐变背景 */
+  background: linear-gradient(180deg, #F8FDF9 0%, #FFFFFF 100%);
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, sans-serif;
 }
 
-/* ============ 时间范围卡片（玻璃拟态） ============ */
-.range-tabs-card {
-  margin: 16rpx 0 22rpx;
-  padding: 22rpx 24rpx;
-  border-radius: 32rpx;
-
-  background: rgba(255, 255, 255, 0.70);
-  border: 1rpx solid rgba(255, 255, 255, 0.85);
-  box-shadow:
-    0 16rpx 36rpx rgba(148, 163, 184, 0.10),
-    inset 0 0 0 1rpx rgba(255, 255, 255, 0.55);
-
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+/* 1. 顶部悬浮切换 (Floating Tabs) */
+.header-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 60rpx; /* Huge margin for breathability */
 }
 
-.range-tabs-title {
-  font-size: 26rpx;
-  font-weight: 600;
-  color: #334155;
-  letter-spacing: 1rpx;
-  margin-bottom: 16rpx;
-}
-
-/* pill 容器 */
 .range-tabs {
   display: flex;
-  align-items: center;
-  gap: 14rpx;
-  padding: 6rpx;
-  border-radius: 999rpx;
-  background: rgba(148, 163, 184, 0.12); /* Slate-400 低透明 */
-  border: 1rpx solid rgba(255, 255, 255, 0.65);
+  background: #E8F5E9; /* Very light green pill */
+  padding: 8rpx;
+  border-radius: 100rpx;
+  gap: 8rpx;
 }
 
 .range-tab {
-  flex: 1;
-  text-align: center;
-  padding: 12rpx 0;
-  border-radius: 999rpx;
-  font-size: 24rpx;
-  color: #64748B; /* Slate-500 */
-  background: rgba(255,255,255,0.55);
-  border: 1rpx solid rgba(255,255,255,0.6);
-  transition: transform 0.15s ease;
-}
-
-.range-tab:active {
-  transform: scale(0.98);
+  padding: 12rpx 32rpx;
+  border-radius: 100rpx;
+  font-size: 26rpx;
+  color: #557C58;
+  font-weight: 500;
+  transition: all 0.3s ease;
 }
 
 .range-tab.active {
-  color: #1E293B; /* Slate-800 */
-  font-weight: 700;
-  background: rgba(255, 255, 255, 0.92);
-  border: 1rpx solid rgba(255,255,255,0.95);
-  box-shadow: 0 10rpx 22rpx rgba(148, 163, 184, 0.18);
+  background: #FFFFFF;
+  color: #1B5E20;
+  font-weight: 600;
+  box-shadow: 0 4rpx 12rpx rgba(0,0,0,0.05);
 }
 
 .range-text {
-  margin-top: 12rpx;
+  margin-top: 16rpx;
   font-size: 22rpx;
-  color: #94A3B8; /* Slate-400 */
-}
-
-/* ============ 通用卡片（玻璃 + 内发光） ============ */
-.card {
-  position: relative;
-  overflow: hidden;
-
-  border-radius: 32rpx;
-  padding: 22rpx 24rpx;
-  margin-bottom: 18rpx;
-
-  background: rgba(255, 255, 255, 0.70);
-  border: 1rpx solid rgba(255, 255, 255, 0.85);
-  box-shadow:
-    0 18rpx 40rpx rgba(148, 163, 184, 0.10),
-    inset 0 0 0 1rpx rgba(255, 255, 255, 0.55);
-
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  color: #334155;
-}
-
-/* 顶部柔和光晕：用变量控制每张卡的“主题色” */
-.card::before {
-  content: "";
-  position: absolute;
-  left: -20%;
-  top: -25%;
-  width: 140%;
-  height: 140%;
-  border-radius: 50%;
-  filter: blur(60rpx);
-  opacity: 0.22;
-  background: radial-gradient(circle, var(--glow, rgba(110, 231, 183, 1)) 0%, transparent 70%);
-  z-index: 0;
-}
-
-/* WXSS 兼容写法：不要用通配选择器 * */
-.card-header,
-.card-body,
-.card-footer,
-.summary-row,
-.summary-block,
-.chart-wrapper,
-.divider,
-.progress-section,
-.progress-row,
-.progress-bar,
-.macro-row,
-.macro-item,
-.daily-item,
-.daily-main,
-.daily-sub,
-.empty {
-  position: relative;
-  z-index: 1;
-}
-
-
-/* 各卡主题光晕（低饱和） */
-.card--primary { --glow: rgba(93, 173, 255, 1); }  /* 淡蓝 */
-.card--pink    { --glow: rgba(255, 154, 158, 1); } /* 柔粉 */
-.card--green   { --glow: rgba(110, 231, 183, 1); } /* 薄荷 */
-.card--blue    { --glow: rgba(94, 234, 212, 1); }  /* 青蓝 */
-.card--orange  { --glow: rgba(253, 186, 116, 1); } /* 柔橙 */
-.card--plain   { --glow: rgba(148, 163, 184, 1); } /* 灰蓝 */
-
-/* ============ 卡片排版 ============ */
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  margin-bottom: 12rpx;
-}
-
-.card-title {
-  font-size: 30rpx;
-  font-weight: 700;
-  color: #1E293B;
+  color: #8D9E90;
   letter-spacing: 1rpx;
 }
 
-.card-sub {
-  font-size: 22rpx;
-  color: #64748B;
-}
-
-.card-body {
-  margin-top: 6rpx;
-}
-
-/* 两列摘要 */
-.summary-row {
-  display: flex;
-  justify-content: space-between;
-  gap: 18rpx;
-}
-
-.summary-block {
-  flex: 1;
-}
-
-.summary-block:nth-child(2) {
-  text-align: right;
-}
-
-.summary-label {
-  font-size: 22rpx;
-  color: #94A3B8;
-}
-
-.summary-value {
-  margin-top: 6rpx;
-  font-size: 34rpx;
-  font-weight: 700;
-  color: #0F172A;
-  font-family: 'SF Mono', 'Menlo', monospace;
-}
-
-/* tag：轻玻璃胶囊 */
-.card-footer {
-  margin-top: 14rpx;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10rpx;
-}
-
-.tag {
-  font-size: 20rpx;
-  padding: 6rpx 12rpx;
-  border-radius: 999rpx;
-  background: rgba(255, 255, 255, 0.55);
-  border: 1rpx solid rgba(255, 255, 255, 0.70);
-  color: #475569;
-}
-
-/* ============ 图表区域 ============ */
-.chart-wrapper {
-  margin-top: 10rpx;
-  padding: 14rpx;
-  border-radius: 24rpx;
-  background: rgba(255, 255, 255, 0.40);
-  border: 1rpx solid rgba(255, 255, 255, 0.65);
-}
-
-.weight-chart {
-  width: 100%;
-  height: 120px;
-}
-
-.divider {
-  height: 1px;
-  margin: 16rpx 0;
-  background: rgba(148, 163, 184, 0.20);
-}
-
-/* ============ 进度条（更“干净”的 home 风） ============ */
-.progress-section {
-  margin-top: 4rpx;
-}
-
-.progress-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.progress-row--bottom {
-  margin-top: 8rpx;
-}
-
-.progress-label {
-  font-size: 22rpx;
-  color: #475569;
-}
-
-.progress-desc {
-  font-size: 22rpx;
-  color: #64748B;
-}
-
-.progress-percent {
+/* 2. 通用: 标题 (Small Caps Style) */
+.section-title {
   font-size: 24rpx;
-  font-weight: 700;
-  color: #1E293B;
-  font-family: 'SF Mono', 'Menlo', monospace;
+  color: #8D9E90;
+  font-weight: 500;
+  letter-spacing: 2rpx;
+  margin-bottom: 24rpx;
+  padding-left: 8rpx;
+  text-transform: uppercase;
 }
 
-.progress-bar {
-  margin-top: 10rpx;
-  height: 14rpx;
+/* 3. 通用: 玻璃卡片 (Clean) */
+.glass-card {
+  background: rgba(255, 255, 255, 0.85); /* Highly opaque */
+  border-radius: 40rpx; /* Softer corners */
+  /* No borders, just soft shadow */
+  box-shadow: 0 10rpx 40rpx rgba(46, 125, 50, 0.05); /* Greenish shadow */
+  margin-bottom: 40rpx; /* Spacing */
+  padding: 40rpx;
+  backdrop-filter: blur(20px);
+}
+
+/* 4. 核心大数据卡片 */
+.big-stat-card {
+  padding: 48rpx 40rpx;
+}
+
+.stat-row-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Spread evenly */
+  margin-bottom: 32rpx;
+}
+
+.stat-block {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.vertical-divider {
+  width: 1rpx;
+  height: 60rpx;
+  background: #E8F5E9;
+}
+
+.stat-label {
+  font-size: 24rpx;
+  color: #8D9E90;
+}
+
+.stat-val {
+  font-size: 40rpx;
+  color: #2F3E33;
+  font-weight: 500;
+  font-family: 'Helvetica Neue', sans-serif;
+}
+
+.stat-val.big {
+  font-size: 56rpx;
+  font-weight: 400; /* Lighter weight for big numbers */
+  color: #1B5E20;
+}
+
+.stat-unit {
+  font-size: 24rpx;
+  color: #A5D6A7;
+  margin-left: 8rpx;
+  font-weight: 400;
+}
+
+.stat-row-sub {
+  display: flex;
+  gap: 16rpx;
+  flex-wrap: wrap;
+}
+
+.sub-pill {
+  font-size: 22rpx;
+  padding: 8rpx 20rpx;
+  background: #F1F8E9;
+  color: #557C58;
   border-radius: 999rpx;
-  background: rgba(255, 255, 255, 0.55);
-  border: 1rpx solid rgba(255, 255, 255, 0.70);
+}
+
+/* 5. 极简卡片 (Minimal) */
+.minimal-card {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.card-header-min {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.min-title {
+  font-size: 30rpx;
+  color: #2F3E33;
+  font-weight: 500;
+}
+
+.min-sub {
+  font-size: 24rpx;
+  color: #8D9E90;
+}
+
+.progress-track {
+  height: 12rpx;
+  background: #F1F8E9;
+  border-radius: 999rpx;
   overflow: hidden;
 }
 
-.progress-inner {
+.progress-fill {
   height: 100%;
   border-radius: 999rpx;
-  /* 柔橙（体重） */
-  background: linear-gradient(90deg, rgba(253,186,116,1), rgba(255,154,158,1));
 }
 
-.progress-inner--green {
-  /* 薄荷（计划） */
-  background: linear-gradient(90deg, rgba(110,231,183,1), rgba(94,234,212,1));
-}
+.fill-orange { background: #FFB74D; } /* Soft Orange */
+.fill-green { background: #66BB6A; } /* Fresh Green */
 
-/* ============ 运动状态文字 ============ */
-.exercise-status {
-  margin-top: 12rpx;
-  font-size: 22rpx;
-  color: #475569;
-}
-
-/* ============ 营养结构 ============ */
-.macro-row {
-  margin-top: 14rpx;
+.progress-meta {
   display: flex;
   justify-content: space-between;
-  gap: 10rpx;
-}
-
-.macro-item {
-  flex: 1;
-  text-align: center;
-  padding: 12rpx 0;
-  border-radius: 22rpx;
-  background: rgba(255, 255, 255, 0.35);
-  border: 1rpx solid rgba(255, 255, 255, 0.60);
-}
-
-.macro-label {
   font-size: 22rpx;
-  color: #94A3B8;
+  color: #8D9E90;
 }
 
-.macro-val {
-  margin-top: 6rpx;
-  font-size: 30rpx;
-  font-weight: 800;
-  color: #0F172A;
-  display: block;
-  font-family: 'SF Mono', 'Menlo', monospace;
+/* 6. 双列布局 (Dual Grid) */
+.dual-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24rpx;
+  margin-bottom: 40rpx;
 }
 
-/* ============ 每日记录列表（更“轻”的分割线） ============ */
-.daily-item {
-  padding: 16rpx 0;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.16);
-}
-
-.daily-main {
+.small-card {
+  margin-bottom: 0; /* Override default */
+  padding: 32rpx;
+  height: 200rpx;
   display: flex;
-  justify-content: space-between;
-  margin-bottom: 6rpx;
+  flex-direction: column;
+  justify-content: center;
 }
 
-.daily-date {
-  font-size: 26rpx;
-  color: #334155;
+.small-header {
+  font-size: 24rpx;
+  color: #8D9E90;
+  margin-bottom: 12rpx;
 }
 
-.daily-cal {
-  font-size: 26rpx;
-  font-weight: 700;
-  color: #FF6B35;
-  font-family: 'SF Mono', 'Menlo', monospace;
+.small-val {
+  font-size: 40rpx;
+  color: #2F3E33;
+  font-family: 'Helvetica Neue', sans-serif;
+  margin-bottom: 8rpx;
 }
 
-.daily-sub {
-  font-size: 22rpx;
-  color: #64748B;
+.small-desc {
+  font-size: 20rpx;
+  color: #A5D6A7;
+}
+
+.macro-mini-row {
   display: flex;
-  gap: 20rpx;
-  flex-wrap: wrap;
-}
-
-.empty {
-  padding: 18rpx 0 4rpx;
+  align-items: center;
   font-size: 22rpx;
-  color: #94A3B8;
+  color: #557C58;
+  margin-bottom: 8rpx;
 }
 
-/* ============ 周报入口（像 home 的轻玻璃按钮） ============ */
-.weekly-entry {
-  margin-top: 10rpx;
-  padding: 22rpx 24rpx;
+.macro-dot {
+  width: 12rpx; height: 12rpx;
+  border-radius: 50%;
+  margin-right: 12rpx;
+}
+.carbs { background: #E8F5E9; border: 2rpx solid #66BB6A; }
+.protein { background: #E8F5E9; border: 2rpx solid #FFB74D; }
+.fat { background: #E8F5E9; border: 2rpx solid #ef5350; }
+
+/* 7. 每日记录 (Clean List) */
+.section-container {
+  margin-bottom: 40rpx;
+}
+
+.daily-list {
+  background: #FFFFFF;
   border-radius: 32rpx;
+  padding: 0 32rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0,0,0,0.02); /* Very subtle */
+}
 
-  background: rgba(255, 255, 255, 0.80);
-  border: 1rpx solid rgba(255, 255, 255, 0.90);
-  box-shadow: 0 14rpx 34rpx rgba(148, 163, 184, 0.12);
-
+.daily-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 32rpx 0;
+  border-bottom: 1rpx solid #F1F8E9;
+}
 
-  color: #334155;
+.daily-row:last-child {
+  border-bottom: none;
+}
+
+.date-big {
+  font-size: 28rpx;
+  color: #2F3E33;
+}
+
+.d-cal {
+  font-size: 32rpx;
+  font-family: 'Helvetica Neue', sans-serif;
+  color: #1B5E20;
+  font-weight: 500;
+}
+
+.d-unit {
+  font-size: 22rpx;
+  color: #8D9E90;
+  margin-left: 4rpx;
+}
+
+.empty-state {
+  text-align: center;
+  color: #ccc;
+  padding: 40rpx;
+  font-size: 24rpx;
+}
+
+/* 底部入口 */
+.footer-action {
+  text-align: center;
   font-size: 26rpx;
-}
-
-.weekly-entry:active {
-  transform: scale(0.99);
-}
-
-.weekly-arrow {
-  font-size: 34rpx;
-  color: #FF6B35;
+  color: #557C58;
+  padding: 20rpx;
+  opacity: 0.8;
 }

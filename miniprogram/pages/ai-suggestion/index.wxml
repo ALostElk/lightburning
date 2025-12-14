@@ -77,7 +77,7 @@
       </view>
     </view>
 
-    <!-- 推荐食谱 (无图标) -->
+    <!-- 推荐食谱 - Text Only Design -->
     <view class="section-container">
       <view class="section-header row-between">
          <text class="section-title">推荐食谱</text>
@@ -88,18 +88,35 @@
         <view 
           wx:for="{{recommendedRecipes}}" 
           wx:key="id" 
-          class="glass-card recipe-card"
+          class="glass-card recipe-card text-only"
           bindtap="onRecipeClick"
           data-id="{{item.id}}"
         >
-          <image class="recipe-img" src="{{item.image}}" mode="aspectFill" />
-          <view class="recipe-content">
-             <text class="recipe-name">{{item.name}}</text>
-             <view class="recipe-meta">
-               <text class="meta-text">{{item.calories}} kcal</text>
-               <text class="meta-dot">·</text>
-               <text class="meta-text">蛋白质 {{item.protein}}g</text>
-             </view>
+          <view class="card-main">
+            <text class="recipe-name">{{item.name}}</text>
+            <view class="recipe-tags">
+               <!-- 如果后端有难度字段则显示，否则 mock 一个 -->
+               <text class="tag">{{item.cookingTime || 15}}分钟</text>
+               <text class="tag">{{item.difficulty || '简单'}}</text>
+            </view>
+          </view>
+          
+          <!-- 核心数据网格 -->
+          <view class="data-grid">
+            <view class="data-item">
+              <text class="data-val">{{item.calories || 0}}</text>
+              <text class="data-label">千卡</text>
+            </view>
+            <view class="data-div"></view>
+            <view class="data-item">
+              <text class="data-val">{{item.protein || 0}}</text>
+              <text class="data-label">蛋白质</text>
+            </view>
+            <view class="data-div"></view>
+            <view class="data-item">
+              <text class="data-val">{{item.carbs || 0}}</text>
+              <text class="data-label">碳水</text>
+            </view>
           </view>
         </view>
       </scroll-view>
