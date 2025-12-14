@@ -128,7 +128,7 @@
               <text>✏️</text>
             </view>
             <view class="action-btn delete" catchtap="deleteDish" data-id="{{item._id}}">
-              <text>🗑️</text>
+              <text>删除</text>
             </view>
           </view>
         </view>

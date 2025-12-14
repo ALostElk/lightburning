@@ -203,14 +203,14 @@
   
   /* 2. 移除导致"浓郁"的背景图片设置 */
   background-image: none !important;
-  
+
   /* 3. 保持质感：强磨砂 + 高亮边框 */
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1rpx solid rgba(255, 255, 255, 0.85) !important;
-  
+
   /* 4. 核心修改：添加立体弥散阴影 */
-  box-shadow: 
+  box-shadow:
     /* 1. 主阴影：大半径、低透明度、向下偏移，模拟悬浮感 */
     /* === 选项 A: 如果球体是淡绿色 (推荐) === */
     0 30rpx 60rpx -15rpx rgba(16, 185, 129, 0.15), 

@@ -10,7 +10,7 @@ Page({
     name: '',
     description: '',
     servingSize: '1份',
-    gramsPerServing: 100,
+    gramsPerServing: '',
     calories: '',
     protein: '',
     carbs: '',
@@ -18,7 +18,14 @@ Page({
     imageUrl: '',
     isSaving: false,
     targetDate: '',
-    selectedMealType: 'snack'
+    selectedMealType: 'snack',
+    addToMeal: '', // '' | 'breakfast' | 'lunch' | 'dinner' | 'snack'
+    mealOptions: [
+      { key: 'breakfast', label: '早餐' },
+      { key: 'lunch', label: '午餐' },
+      { key: 'dinner', label: '晚餐' },
+      { key: 'snack', label: '加餐' }
+    ]
   },
 
   onLoad(options) {
@@ -40,7 +47,7 @@ Page({
           name: dish.name || '',
           description: dish.description || '',
           servingSize: dish.servingSize || '1份',
-          gramsPerServing: dish.gramsPerServing || 100,
+          gramsPerServing: dish.gramsPerServing || '',
           calories: dish.calories || '',
           protein: dish.protein || '',
           carbs: dish.carbs || '',
@@ -71,7 +78,8 @@ Page({
   },
 
   onGramsInput(e) {
-    this.setData({ gramsPerServing: Number(e.detail.value) || 100 });
+    const value = e.detail.value;
+    this.setData({ gramsPerServing: value === '' ? '' : Number(value) || '' });
   },
 
   onNutritionInput(e) {
@@ -116,9 +124,18 @@ Page({
     this.setData({ imageUrl: '' });
   },
 
+  // 切换"添加到餐次"
+  selectMealToAdd(e) {
+    const meal = e.currentTarget.dataset.meal;
+    // 如果点击已选中的，则取消选中（即不添加）
+    this.setData({
+      addToMeal: this.data.addToMeal === meal ? '' : meal
+    });
+  },
+
   // 保存
   async save() {
-    const { name, description, servingSize, gramsPerServing, calories, protein, carbs, fat, imageUrl, isEdit, dishId } = this.data;
+    const { name, description, servingSize, gramsPerServing, calories, protein, carbs, fat, imageUrl, isEdit, dishId, addToMeal, targetDate } = this.data;
 
     if (!name.trim()) {
       wx.showToast({ title: '请输入菜品名称', icon: 'none' });
@@ -132,7 +149,7 @@ Page({
         name: name.trim(),
         description: description.trim(),
         servingSize: servingSize || '1份',
-        gramsPerServing: Number(gramsPerServing) || 100,
+        gramsPerServing: gramsPerServing === '' ? 0 : (Number(gramsPerServing) || 0),
         calories: Number(calories) || 0,
         protein: Number(protein) || 0,
         carbs: Number(carbs) || 0,
@@ -140,6 +157,9 @@ Page({
         imageUrl: imageUrl || ''
       };
 
+      let finalDishId = dishId;
+
+      // 1. 保存/更新自定义菜品
       if (isEdit) {
         // 更新
         await wx.cloud.callFunction({
@@ -155,14 +175,42 @@ Page({
         wx.showToast({ title: '保存成功', icon: 'success' });
       } else {
         // 新增
-        await wx.cloud.callFunction({
+        const res = await wx.cloud.callFunction({
           name: 'dietService',
           data: {
             action: 'addCustomDish',
             payload: dishData
           }
         });
+        // 获取新创建的菜品ID
+        finalDishId = res.result?._id || res.result?.data?._id;
         wx.showToast({ title: '添加成功', icon: 'success' });
+      }
+
+      // 2. [新增] 如果选了餐次，自动添加饮食记录
+      if (addToMeal && finalDishId) {
+        const grams = gramsPerServing === '' ? 100 : (Number(gramsPerServing) || 100);
+        await wx.cloud.callFunction({
+          name: 'dietService',
+          data: {
+            action: 'addDietLog',
+            payload: {
+              foodId: finalDishId,
+              foodSource: 'UserDishes',
+              name: dishData.name,
+              calories: dishData.calories,
+              protein: dishData.protein,
+              carbs: dishData.carbs,
+              fat: dishData.fat,
+              grams: grams,
+              unit: 'g',
+              mealType: addToMeal,
+              recordDate: targetDate || this.getTodayString(),
+              imageUrl: dishData.imageUrl || ''
+            }
+          }
+        });
+        wx.showToast({ title: '已添加到' + this.getMealLabel(addToMeal), icon: 'success' });
       }
 
       setTimeout(() => wx.navigateBack(), 1500);
@@ -172,6 +220,12 @@ Page({
     } finally {
       this.setData({ isSaving: false });
     }
+  },
+
+  // 获取餐次标签
+  getMealLabel(mealKey) {
+    const meal = this.data.mealOptions.find(m => m.key === mealKey);
+    return meal ? meal.label : '';
   },
 
   // 返回

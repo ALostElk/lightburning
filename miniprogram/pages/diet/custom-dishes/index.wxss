@@ -1,420 +1,415 @@
-/* 自定义菜品页面样式 - 优化版 */
-
+/* === 全局容器 === */
 .page {
   height: 100vh;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(180deg, #FFF5EB 0%, #FEF0E3 15%, #F8F4FF 50%, #EEF4FF 100%);
-  position: relative;
+  background: linear-gradient(180deg, #F5FAFF 0%, #FFFFFF 100%);
 }
 
-/* ============ 悬浮返回按钮 ============ */
-.nav-back-btn {
-  position: fixed;
-  left: 32rpx;
+/* === 1. 顶部导航 (Sticky Glass) === */
+.header-glass {
+  padding-top: env(safe-area-inset-top);
+  height: 88rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-left: 32rpx;
+  padding-right: 32rpx;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20rpx);
+  -webkit-backdrop-filter: blur(20rpx);
+  position: sticky;
+  top: 0;
   z-index: 100;
+  border-bottom: 1rpx solid rgba(0, 0, 0, 0.05);
+}
+
+.nav-back-btn {
   width: 72rpx;
   height: 72rpx;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1rpx solid rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(10rpx);
-  -webkit-backdrop-filter: blur(10rpx);
-  border-radius: 50%;
-  border: 1rpx solid rgba(255, 255, 255, 0.2);
-  transition: all 0.2s ease;
-}
-
-.nav-back-btn:active {
-  background: rgba(0, 0, 0, 0.6);
-  transform: scale(0.95);
 }
 
 .back-arrow {
-  font-size: 48rpx;
-  color: rgba(255, 255, 255, 0.9);
-  font-weight: 300;
-  line-height: 1;
+  font-size: 40rpx;
+  color: #334155;
+  margin-top: -4rpx;
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
   height: 100%;
-  text-align: center;
-  margin: 0;
-  padding: 0;
-}
-
-/* 背景装饰 */
-.page-bg {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 280rpx;
-  background: linear-gradient(135deg, #FF8C42 0%, #FF6B35 50%, #FF9A56 100%);
-  border-radius: 0 0 60rpx 60rpx;
-  z-index: 0;
-}
-
-/* 头部 */
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20rpx 30rpx;
-  flex-shrink: 0;
-  position: relative;
-  z-index: 1;
-}
-
-.back-btn {
-  width: 70rpx;
-  height: 70rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 40rpx;
-  color: #fff;
-  background: rgba(255,255,255,0.2);
-  border-radius: 50%;
-  backdrop-filter: blur(10rpx);
 }
 
 .header-title {
-  font-size: 34rpx;
-  font-weight: 700;
-  color: #fff;
-  text-shadow: 0 2rpx 8rpx rgba(0,0,0,0.1);
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #334155;
 }
 
-.header-placeholder {
-  width: 70rpx;
-}
-
-/* 内容区 - 使用 scroll-view */
+/* === 2. 内容区 === */
 .content {
   flex: 1;
-  padding: 20rpx 30rpx;
-  padding-bottom: 160rpx;
-  overflow: hidden;
-  position: relative;
-  z-index: 1;
+  padding: 32rpx;
+  padding-bottom: 300rpx; /* 增加底部 padding，防止被底部栏遮挡 */
+  box-sizing: border-box;
 }
 
-/* 表单卡片 */
+/* 玻璃表单卡片 */
 .form-card {
-  background: linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%);
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(16rpx);
+  -webkit-backdrop-filter: blur(16rpx);
+  border: 1rpx solid rgba(255, 255, 255, 0.8);
   border-radius: 32rpx;
   padding: 32rpx;
-  margin-bottom: 24rpx;
-  box-shadow: 0 8rpx 32rpx rgba(99, 102, 241, 0.08);
-  border: 2rpx solid rgba(99, 102, 241, 0.1);
+  margin-bottom: 32rpx;
+  box-shadow: 0 4rpx 20rpx rgba(148, 163, 184, 0.05);
+}
+
+.card-header {
+  display: flex;
+  align-items: baseline;
+  margin-bottom: 30rpx;
 }
 
 .card-title {
   font-size: 30rpx;
   font-weight: 700;
-  color: #333;
-  margin-bottom: 24rpx;
-  padding-bottom: 16rpx;
-  border-bottom: 2rpx solid #F3F4F6;
+  color: #334155;
+  margin-right: 16rpx;
+}
+
+.card-subtitle {
+  font-size: 22rpx;
+  color: #94A3B8;
+  font-weight: 400;
+}
+
+/* 输入行 */
+.input-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-row {
   display: flex;
   align-items: center;
-  gap: 12rpx;
+  padding: 24rpx 0;
+  border-bottom: 1rpx solid rgba(241, 245, 249, 0.8);
 }
 
-.card-title::before {
-  content: '';
-  width: 6rpx;
-  height: 32rpx;
-  background: linear-gradient(180deg, #FF8C42, #FF6B35);
-  border-radius: 3rpx;
+.form-row:last-child {
+  border-bottom: none;
 }
 
-/* 表单项 */
-.form-item {
-  margin-bottom: 24rpx;
-}
-
-.form-item:last-child {
-  margin-bottom: 0;
-}
-
-.form-label {
-  display: block;
-  font-size: 26rpx;
-  color: #555;
-  margin-bottom: 12rpx;
-  font-weight: 500;
-}
-
-.required {
-  color: #EF4444;
-}
-
-.form-input {
-  width: 100%;
-  height: 88rpx;
-  padding: 0 24rpx;
-  background: linear-gradient(135deg, #F9FAFB 0%, #F3F4F6 100%);
-  border: 2rpx solid #E5E7EB;
-  border-radius: 20rpx;
+.label {
+  width: 100rpx;
   font-size: 28rpx;
-  color: #333;
-  box-sizing: border-box;
-  line-height: 88rpx;
-  transition: all 0.2s ease;
-}
-
-.form-input:focus {
-  border-color: #FF8C42;
-  background: #fff;
-  box-shadow: 0 0 0 4rpx rgba(255,140,66,0.1);
-}
-
-.form-input::placeholder {
-  color: #999;
-}
-
-.form-textarea {
-  width: 100%;
-  height: 160rpx;
-  padding: 20rpx 24rpx;
-  background: linear-gradient(135deg, #F9FAFB 0%, #F3F4F6 100%);
-  border: 2rpx solid #E5E7EB;
-  border-radius: 20rpx;
-  font-size: 28rpx;
-  color: #333;
-  box-sizing: border-box;
-  line-height: 1.5;
-  transition: all 0.2s ease;
-}
-
-.form-textarea:focus {
-  border-color: #FF8C42;
-  background: #fff;
-  box-shadow: 0 0 0 4rpx rgba(255,140,66,0.1);
-}
-
-.form-textarea::placeholder {
-  color: #999;
-}
-
-.input-with-unit {
-  display: flex;
-  align-items: center;
-  gap: 12rpx;
-}
-
-.input-with-unit .form-input {
-  flex: 1;
-}
-
-.input-with-unit .form-input.short {
-  max-width: 200rpx;
-}
-
-.unit {
-  font-size: 28rpx;
-  color: #666;
+  color: #64748B;
   flex-shrink: 0;
-  font-weight: 500;
 }
 
-/* 营养信息网格 */
-.nutrition-grid {
+.glass-input {
+  flex: 1;
+  font-size: 28rpx;
+  color: #334155;
+  height: 48rpx;
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+.ph-style {
+  color: #CBD5E1;
+  font-weight: 300;
+}
+
+.input-right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.align-right {
+  text-align: right;
+  margin-right: 8rpx;
+}
+
+.suffix {
+  font-size: 24rpx;
+  color: #94A3B8;
+}
+
+/* === 3. 营养网格 (Minimal Grid) === */
+.macro-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 20rpx;
+  gap: 24rpx;
 }
 
-.nutrition-item {
+.macro-item {
+  background: rgba(255, 255, 255, 0.5);
   border-radius: 24rpx;
   padding: 24rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 1rpx solid transparent;
+  transition: all 0.2s;
+}
+
+.macro-item.highlight {
+  background: rgba(255, 107, 53, 0.05);
+  border-color: rgba(255, 107, 53, 0.1);
+}
+
+.macro-item.protein {
+  background: rgba(16, 185, 129, 0.05);
+  border-color: rgba(16, 185, 129, 0.1);
+}
+
+.macro-item.carbs {
+  background: rgba(245, 158, 11, 0.05);
+  border-color: rgba(245, 158, 11, 0.1);
+}
+
+.macro-item.fat {
+  background: rgba(239, 68, 68, 0.05);
+  border-color: rgba(239, 68, 68, 0.1);
+}
+
+.macro-label {
+  font-size: 22rpx;
+  color: #94A3B8;
+  margin-bottom: 8rpx;
+}
+
+.macro-input {
+  font-size: 40rpx;
+  font-weight: 600;
+  color: #334155;
+  height: 60rpx;
+  text-align: center;
+  width: 100%;
+  font-family: 'SF Pro Display', sans-serif;
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+.macro-unit {
+  font-size: 20rpx;
+  color: #CBD5E1;
+  margin-top: 4rpx;
+}
+
+/* === 4. 图片上传 === */
+.upload-area {
+  height: 240rpx;
+  background: rgba(255, 255, 255, 0.4);
+  border: 2rpx dashed #CBD5E1;
+  border-radius: 32rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 32rpx;
+}
+
+/* 紧凑版图片上传 */
+.upload-area.compact {
+  height: 160rpx; /* 减小高度 */
+  margin-bottom: 0; /* 贴底 */
+}
+
+.upload-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16rpx;
+}
+
+/* 横向布局 */
+.upload-placeholder.row-layout {
+  flex-direction: row; /* 改为横向 */
+  gap: 24rpx;
+}
+
+.plus-icon {
+  width: 60rpx;
+  height: 60rpx;
+  border-radius: 50%;
+  background: rgba(255, 107, 53, 0.1);
+  color: #FF6B35;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40rpx;
+  font-weight: 300;
+}
+
+/* 小号图标 */
+.plus-icon.small {
+  width: 48rpx;
+  height: 48rpx;
+  font-size: 32rpx;
+}
+
+.upload-placeholder text {
+  font-size: 24rpx;
+  color: #94A3B8;
+}
+
+.uploaded-img {
+  width: 100%;
+  height: 100%;
+}
+
+.re-upload-mask {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  padding: 8rpx 0;
+  background: rgba(0, 0, 0, 0.4);
+  text-align: center;
+  backdrop-filter: blur(4rpx);
+  -webkit-backdrop-filter: blur(4rpx);
+}
+
+.re-upload-mask text {
+  color: #fff;
+  font-size: 20rpx;
+}
+
+/* === 5. 底部悬浮栏 (升级版) === */
+.bottom-glass-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  /* 增加高度适配两行内容 */
+  padding: 24rpx 32rpx;
+  padding-bottom: calc(24rpx + env(safe-area-inset-bottom));
+  
+  background: rgba(255, 255, 255, 0.9); /* 稍微不透明一点，防干扰 */
+  backdrop-filter: blur(24rpx);
+  -webkit-backdrop-filter: blur(24rpx);
+  border-top: 1rpx solid rgba(255, 255, 255, 1);
+  box-shadow: 0 -10rpx 40rpx rgba(0, 0, 0, 0.05);
+  
+  z-index: 100;
+  box-sizing: border-box;
+  
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx; /* 上下间距 */
+}
+
+/* 新增：快捷添加栏 */
+.quick-add-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.bar-label {
+  font-size: 26rpx;
+  color: #64748B;
+  font-weight: 500;
+}
+
+.meal-pills-row {
+  display: flex;
+  gap: 16rpx;
+}
+
+/* 迷你胶囊 */
+.meal-pill-mini {
+  padding: 10rpx 24rpx;
+  background: rgba(241, 245, 249, 0.8);
+  border-radius: 60rpx;
+  font-size: 24rpx;
+  color: #64748B;
+  transition: all 0.2s;
+  border: 2rpx solid transparent;
+}
+
+.meal-pill-mini.active {
+  background: #ECFDF5; /* 浅翡翠 */
+  color: #059669;
+  border-color: #10B981;
+  font-weight: 600;
+  box-shadow: 0 4rpx 12rpx rgba(16, 185, 129, 0.15);
+}
+
+.save-pill-btn {
+  /* 翡翠绿渐变 + 晶莹剔透效果 */
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.9) 0%, rgba(5, 150, 105, 0.95) 100%);
+  backdrop-filter: blur(10rpx);
+  -webkit-backdrop-filter: blur(10rpx);
+  color: #fff;
+  font-size: 32rpx;
+  font-weight: 600;
+  height: 88rpx;
+  line-height: 88rpx;
+  border-radius: 44rpx;
+  border: 1rpx solid rgba(255, 255, 255, 0.3);
+  box-shadow: 
+    0 8rpx 24rpx rgba(5, 150, 105, 0.3),
+    inset 0 2rpx 8rpx rgba(255, 255, 255, 0.3),
+    inset 0 -2rpx 4rpx rgba(5, 150, 105, 0.2);
+  width: 100%;
   position: relative;
   overflow: hidden;
 }
 
-.nutrition-item::before {
+/* 按钮内部高光效果 */
+.save-pill-btn::before {
   content: '';
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  height: 4rpx;
+  height: 50%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.4) 0%, transparent 100%);
+  border-radius: 44rpx 44rpx 0 0;
+  pointer-events: none;
 }
 
-.nutrition-item.calories {
-  background: linear-gradient(145deg, #FFF7ED 0%, #FFEDD5 100%);
-}
-.nutrition-item.calories::before {
-  background: linear-gradient(90deg, #FF8C42, #FF6B35);
-}
-
-.nutrition-item.protein {
-  background: linear-gradient(145deg, #EFF6FF 0%, #DBEAFE 100%);
-}
-.nutrition-item.protein::before {
-  background: linear-gradient(90deg, #60A5FA, #3B82F6);
-}
-
-.nutrition-item.carbs {
-  background: linear-gradient(145deg, #FFFBEB 0%, #FEF3C7 100%);
-}
-.nutrition-item.carbs::before {
-  background: linear-gradient(90deg, #FBBF24, #F59E0B);
-}
-
-.nutrition-item.fat {
-  background: linear-gradient(145deg, #F5F3FF 0%, #EDE9FE 100%);
-}
-.nutrition-item.fat::before {
-  background: linear-gradient(90deg, #A78BFA, #8B5CF6);
-}
-
-.nutrition-label {
-  display: block;
-  font-size: 24rpx;
-  color: #666;
-  margin-bottom: 12rpx;
-  font-weight: 500;
-}
-
-.nutrition-input-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 8rpx;
-}
-
-.nutrition-input {
-  flex: 1;
-  padding: 14rpx 16rpx;
-  background: rgba(255,255,255,0.9);
-  border: 2rpx solid rgba(255,255,255,0.6);
-  border-radius: 14rpx;
-  font-size: 32rpx;
-  font-weight: 700;
-  text-align: center;
-  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.04);
-}
-
-.nutrition-input:focus {
-  border-color: #FF8C42;
-  background: #fff;
-}
-
-.nutrition-unit {
-  font-size: 24rpx;
-  color: #888;
-  min-width: 60rpx;
-  font-weight: 500;
-}
-
-.nutrition-tip {
-  display: flex;
-  align-items: center;
-  gap: 12rpx;
-  margin-top: 24rpx;
-  padding: 20rpx;
-  background: linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%);
-  border-radius: 16rpx;
-  border: 2rpx solid rgba(34,197,94,0.2);
-}
-
-.tip-icon {
-  font-size: 28rpx;
-  flex-shrink: 0;
-}
-
-.tip-text {
-  font-size: 24rpx;
-  color: #166534;
-  line-height: 1.5;
-}
-
-/* 图片上传 */
-.image-upload {
-  width: 100%;
-  height: 300rpx;
-  border-radius: 24rpx;
-  overflow: hidden;
-  background: linear-gradient(135deg, #F9FAFB 0%, #F3F4F6 100%);
-  border: 3rpx dashed #D1D5DB;
-  transition: all 0.2s ease;
-}
-
-.image-upload:active {
-  border-color: #FF8C42;
-  background: linear-gradient(135deg, #FFF7ED 0%, #FFEDD5 100%);
-}
-
-.preview-image {
-  width: 100%;
-  height: 100%;
-}
-
-.upload-placeholder {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 16rpx;
-}
-
-.upload-icon {
-  font-size: 72rpx;
-}
-
-.upload-text {
-  font-size: 26rpx;
-  color: #999;
-}
-
-.remove-image {
-  text-align: center;
-  margin-top: 16rpx;
-  font-size: 26rpx;
-  color: #EF4444;
-  padding: 12rpx;
-}
-
-/* 底部按钮 */
-.bottom-bar {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 20rpx 30rpx;
-  padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
-  background: rgba(255,255,255,0.98);
-  box-shadow: 0 -8rpx 30rpx rgba(0,0,0,0.06);
-  backdrop-filter: blur(20rpx);
-}
-
-.save-btn {
-  width: 100%;
-  padding: 32rpx;
-  background: linear-gradient(135deg, #FF8C42 0%, #FF6B35 50%, #F7931E 100%);
-  color: #fff;
-  font-size: 32rpx;
-  font-weight: 700;
-  border-radius: 24rpx;
-  border: none;
-  box-shadow: 0 8rpx 24rpx rgba(255,107,0,0.35),
-              inset 0 2rpx 4rpx rgba(255,255,255,0.2);
-  transition: all 0.2s ease;
-}
-
-.save-btn:active {
-  transform: scale(0.98);
-  box-shadow: 0 4rpx 16rpx rgba(255,107,0,0.3);
-}
-
-.save-btn[disabled] {
-  opacity: 0.5;
+.save-pill-btn[disabled] {
+  background: #E2E8F0;
+  color: #94A3B8;
   box-shadow: none;
+  border: 1rpx solid rgba(226, 232, 240, 0.5);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.save-pill-btn[disabled]::before {
+  display: none;
+}
+
+
+/* 动画 */
+.animate-slide-up {
+  animation: slideUp 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

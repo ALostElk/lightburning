@@ -27,8 +27,8 @@
   <scroll-view scroll-y class="search-body">
     
     <view class="result-list" wx:if="{{searchResults.length > 0}}">
-      <block wx:for="{{searchResults}}" wx:key="id">
-        <view class="food-card" bindtap="selectFood" data-item="{{item}}">
+      <block wx:for="{{searchResults}}" wx:key="id" wx:for-index="idx">
+        <view class="food-card" bindtap="selectFood" data-item="{{item}}" data-index="{{idx}}">
           <view class="food-info">
             <text class="food-name">{{item.name}}</text>
             <view class="food-meta">
@@ -37,7 +37,7 @@
             </view>
           </view>
           
-          <view class="add-btn-circle" catchtap="addFoodDirect" data-item="{{item}}">
+          <view class="add-btn-circle" catchtap="addFoodDirect" data-index="{{idx}}">
             <view class="plus-icon"></view>
           </view>
         </view>

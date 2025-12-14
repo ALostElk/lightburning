@@ -524,7 +524,15 @@ Page({
 
   // 选择食物（打开编辑弹窗）
   selectFood(e) {
-    const item = e.currentTarget.dataset.item;
+    // 优先使用索引获取数据，更可靠
+    const index = e.currentTarget.dataset.index;
+    const item = index !== undefined ? this.data.searchResults[index] : e.currentTarget.dataset.item;
+    
+    if (!item) {
+      console.error('[selectFood] item 为空');
+      return;
+    }
+    
     // 预处理数据：计算每100g基准值
     // 常用食物的数据已经是每100g的，直接使用
     const per100 = {
@@ -537,40 +545,71 @@ Page({
     this.setData({
       showFoodEditModal: true,
       editingFood: {
-        ...item,
-        grams: item.grams || 100, // 使用原有份量或默认100g
+        name: item.name || '',
         calories: item.calories || 0,
         protein: item.protein || 0,
         carbs: item.carbs || 0,
         fat: item.fat || 0,
+        grams: item.grams || 100, // 使用原有份量或默认100g
+        emoji: item.emoji || '🍽️',
         // 缓存基准值用于计算
         _per100: per100,
         // 保留完整数据
-        _fullData: item
+        _fullData: item._fullData || item
       }
     });
   },
 
-  // 直接添加食物（从相机页面调用时使用）
+  // 直接添加食物（统一打开调整份量弹窗）
   addFoodDirect(e) {
-    const item = e.currentTarget.dataset.item;
-    const food = item._fullData || item;
-    
-    // 如果是从相机页面跳转过来的，需要触发事件回调
-    const pages = getCurrentPages();
-    const prevPage = pages[pages.length - 2];
-    
-    if (prevPage && prevPage.route === 'pages/diet/camera/index') {
-      // 触发事件回调
-      const eventChannel = prevPage.getOpenerEventChannel();
-      if (eventChannel) {
-        eventChannel.emit('acceptFoodFromSearch', food);
-      }
-      wx.navigateBack();
-    } else {
-      // 否则打开编辑弹窗
-      this.selectFood({ currentTarget: { dataset: { item } } });
+    if (e && e.stopPropagation) {
+      e.stopPropagation(); // 阻止事件冒泡，避免触发 selectFood
     }
+    
+    // 获取索引，然后从 searchResults 中获取完整数据
+    const index = e.currentTarget.dataset.index;
+    const item = index !== undefined ? this.data.searchResults[index] : e.currentTarget.dataset.item;
+    
+    console.log('[addFoodDirect] 点击+号，index:', index, 'item:', item);
+    
+    if (!item) {
+      console.error('[addFoodDirect] item 为空，无法打开弹窗');
+      wx.showToast({ title: '数据错误', icon: 'none' });
+      return;
+    }
+    
+    // 统一打开编辑弹窗，让用户在弹窗中调整份量后确认添加
+    // 计算每100g基准值
+    const per100 = {
+      cal: item.calories || 0,
+      pro: item.protein || 0,
+      car: item.carbs || 0,
+      fat: item.fat || 0
+    };
+    
+    // 设置编辑数据
+    const editingFood = {
+      name: item.name || '',
+      calories: item.calories || 0,
+      protein: item.protein || 0,
+      carbs: item.carbs || 0,
+      fat: item.fat || 0,
+      grams: item.grams || 100, // 使用原有份量或默认100g
+      emoji: item.emoji || '🍽️',
+      // 缓存基准值用于计算
+      _per100: per100,
+      // 保留完整数据
+      _fullData: item._fullData || item
+    };
+    
+    console.log('[addFoodDirect] 准备打开弹窗，editingFood:', editingFood);
+    
+    this.setData({
+      showFoodEditModal: true,
+      editingFood: editingFood
+    });
+    
+    console.log('[addFoodDirect] 已设置 showFoodEditModal: true');
   },
 
   // 实时计算
@@ -599,16 +638,50 @@ Page({
         // 在微信小程序中，目标页面通过 this.getOpenerEventChannel() 获取
         const eventChannel = this.getOpenerEventChannel ? this.getOpenerEventChannel() : null;
         if (eventChannel && eventChannel.emit) {
-          eventChannel.emit('acceptFoodFromSearch', food);
-          wx.navigateBack();
+          // 构造返回数据，确保格式符合相机页面的期望
+          // 相机页面期望：每100g的营养数据，以及实际份量（grams）
+          // 注意：相机页面会根据 grams 和每100g数据重新计算营养值
+          const per100Cal = food._per100?.cal || food.calories || 0;
+          const per100Pro = food._per100?.pro || food.protein || 0;
+          const per100Car = food._per100?.car || food.carbs || 0;
+          const per100Fat = food._per100?.fat || food.fat || 0;
+          const grams = food.grams || 100;
+          
+          const returnData = {
+            name: food.name,
+            calories: per100Cal,  // 每100g的热量（相机页面会重新计算）
+            protein: per100Pro,   // 每100g的蛋白质
+            carbs: per100Car,     // 每100g的碳水
+            fat: per100Fat,       // 每100g的脂肪
+            grams: grams,         // 实际份量（克）- 相机页面会使用这个值
+            emoji: food.emoji || '🍽️',
+            // 兼容字段：相机页面可能使用这些字段名作为份量
+            amount: grams,
+            weight: grams,
+            estimatedWeight: grams,
+            servingSize: grams,
+            portion: grams,
+            // 保留完整数据
+            _fullData: food._fullData || food
+          };
+          
+          eventChannel.emit('acceptFoodFromSearch', returnData);
+          // 关闭弹窗
+          this.setData({ showFoodEditModal: false });
+          // 延迟返回，让用户看到反馈
+          setTimeout(() => {
+            wx.navigateBack();
+          }, 300);
           return;
         } else {
           // 如果无法获取 eventChannel，直接返回上一页
+          this.setData({ showFoodEditModal: false });
           wx.navigateBack();
         }
       } catch (err) {
         console.error('事件通道错误:', err);
         // 即使出错也返回上一页
+        this.setData({ showFoodEditModal: false });
         wx.navigateBack();
       }
     } 

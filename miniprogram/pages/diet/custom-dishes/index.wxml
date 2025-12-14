@@ -1,152 +1,101 @@
-<!--
-  自定义菜品页面 - diet-custom/index
--->
 <view class="page">
-  <!-- 背景装饰 -->
-  <view class="page-bg"></view>
-
-  <!-- 悬浮返回按钮 -->
-  <view class="nav-back-btn" bindtap="goBack" style="top: {{statusBarHeight}}px">
-    <text class="back-arrow">‹</text>
+  <view class="header-glass">
+    <view class="nav-back-btn" bindtap="goBack">
+      <text class="back-arrow">‹</text>
+    </view>
+    <text class="header-title">{{isEdit ? '编辑菜品' : '添加新菜品'}}</text>
+    <view style="width: 72rpx;"></view>
   </view>
-
-  <!-- 头部 -->
-  <view class="header">
-    <text class="header-title">{{isEdit ? '编辑菜品' : '添加自定义菜品'}}</text>
-    <view class="header-placeholder"></view>
-  </view>
-
   <scroll-view class="content" scroll-y="true">
-    <!-- 基本信息 -->
-    <view class="form-card">
-      <view class="card-title">基本信息</view>
-
-      <view class="form-item">
-        <text class="form-label">菜品名称 <text class="required">*</text></text>
-        <input class="form-input"
-               value="{{name}}"
-               placeholder="输入菜品名称"
-               bindinput="onNameInput" />
+    
+    <view class="form-card animate-slide-up">
+      <view class="card-header">
+        <text class="card-title">基本信息</text>
+        <text class="card-subtitle">Basic Info</text>
       </view>
-
-      <view class="form-item">
-        <text class="form-label">描述</text>
-        <textarea class="form-textarea"
-                  value="{{description}}"
-                  placeholder="添加描述(选填)"
-                  bindinput="onDescInput" />
-      </view>
-
-      <view class="form-item">
-        <text class="form-label">份量单位</text>
-        <input class="form-input"
-               value="{{servingSize}}"
-               placeholder="如: 1碗, 1份"
-               bindinput="onServingSizeInput" />
-      </view>
-
-      <view class="form-item">
-        <text class="form-label">每份克数</text>
-        <view class="input-with-unit">
-          <input class="form-input short"
-                 type="digit"
-                 value="{{gramsPerServing}}"
-                 placeholder="100"
-                 bindinput="onGramsInput" />
-          <text class="unit">克</text>
+      <view class="input-group">
+        <view class="form-row">
+          <text class="label">名称</text>
+          <input class="glass-input" value="{{name}}" placeholder="例如：自制鸡胸肉沙拉" placeholder-class="ph-style" bindinput="onNameInput" />
+        </view>
+        
+        <view class="form-row">
+          <text class="label">份量</text>
+          <input class="glass-input" value="{{servingSize}}" placeholder="例如：1 碗" placeholder-class="ph-style" bindinput="onServingSizeInput" />
+        </view>
+        <view class="form-row">
+          <text class="label">克数</text>
+          <view class="input-right">
+            <input class="glass-input align-right" type="digit" value="{{gramsPerServing}}" placeholder="100" bindinput="onGramsInput" />
+            <text class="suffix">g</text>
+          </view>
         </view>
       </view>
     </view>
-
-    <!-- 营养信息 -->
-    <view class="form-card">
-      <view class="card-title">营养信息(每份)</view>
-
-      <view class="nutrition-grid">
-        <view class="nutrition-item calories">
-          <text class="nutrition-label">热量</text>
-          <view class="nutrition-input-wrapper">
-            <input class="nutrition-input"
-                   type="digit"
-                   value="{{calories}}"
-                   placeholder="0"
-                   data-field="calories"
-                   bindinput="onNutritionInput" />
-            <text class="nutrition-unit">千卡</text>
-          </view>
-        </view>
-
-        <view class="nutrition-item protein">
-          <text class="nutrition-label">蛋白质</text>
-          <view class="nutrition-input-wrapper">
-            <input class="nutrition-input"
-                   type="digit"
-                   value="{{protein}}"
-                   placeholder="0"
-                   data-field="protein"
-                   bindinput="onNutritionInput" />
-            <text class="nutrition-unit">克</text>
-          </view>
-        </view>
-
-        <view class="nutrition-item carbs">
-          <text class="nutrition-label">碳水</text>
-          <view class="nutrition-input-wrapper">
-            <input class="nutrition-input"
-                   type="digit"
-                   value="{{carbs}}"
-                   placeholder="0"
-                   data-field="carbs"
-                   bindinput="onNutritionInput" />
-            <text class="nutrition-unit">克</text>
-          </view>
-        </view>
-
-        <view class="nutrition-item fat">
-          <text class="nutrition-label">脂肪</text>
-          <view class="nutrition-input-wrapper">
-            <input class="nutrition-input"
-                   type="digit"
-                   value="{{fat}}"
-                   placeholder="0"
-                   data-field="fat"
-                   bindinput="onNutritionInput" />
-            <text class="nutrition-unit">克</text>
-          </view>
-        </view>
+    <view class="form-card animate-slide-up" style="animation-delay: 0.1s;">
+      <view class="card-header">
+        <text class="card-title">营养成分</text>
+        <text class="card-subtitle">每份含量</text>
       </view>
-
-      <view class="nutrition-tip">
-        <text class="tip-icon">💡</text>
-        <text class="tip-text">可参考食品包装或搜索类似食物</text>
+      <view class="macro-grid">
+        <view class="macro-item highlight">
+          <text class="macro-label">热量</text>
+          <input class="macro-input" type="digit" value="{{calories}}" placeholder="0" data-field="calories" bindinput="onNutritionInput" />
+          <text class="macro-unit">kcal</text>
+        </view>
+        
+        <view class="macro-item protein">
+          <text class="macro-label">蛋白质</text>
+          <input class="macro-input" type="digit" value="{{protein}}" placeholder="0" data-field="protein" bindinput="onNutritionInput" />
+          <text class="macro-unit">g</text>
+        </view>
+        <view class="macro-item carbs">
+          <text class="macro-label">碳水</text>
+          <input class="macro-input" type="digit" value="{{carbs}}" placeholder="0" data-field="carbs" bindinput="onNutritionInput" />
+          <text class="macro-unit">g</text>
+        </view>
+        <view class="macro-item fat">
+          <text class="macro-label">脂肪</text>
+          <input class="macro-input" type="digit" value="{{fat}}" placeholder="0" data-field="fat" bindinput="onNutritionInput" />
+          <text class="macro-unit">g</text>
+        </view>
       </view>
     </view>
-
-    <!-- 图片上传 -->
-    <view class="form-card">
-      <view class="card-title">菜品图片(选填)</view>
-
-      <view class="image-upload" bindtap="chooseImage">
-        <image wx:if="{{imageUrl}}" src="{{imageUrl}}" class="preview-image" mode="aspectFill" />
-        <view wx:else class="upload-placeholder">
-          <text class="upload-icon">📷</text>
-          <text class="upload-text">点击上传</text>
+    <view class="upload-area compact" bindtap="chooseImage">
+      <block wx:if="{{imageUrl}}">
+        <image src="{{imageUrl}}" class="uploaded-img" mode="aspectFill" />
+        <view class="re-upload-mask">
+          <text>更换图片</text>
         </view>
-      </view>
-      <view wx:if="{{imageUrl}}" class="remove-image" bindtap="removeImage">
-        <text>删除图片</text>
-      </view>
+      </block>
+      <block wx:else>
+        <view class="upload-placeholder row-layout">
+          <view class="plus-icon small">+</view>
+          <text>上传图片 (选填)</text>
+        </view>
+      </block>
     </view>
 
-    <!-- 占位，防止被底部按钮遮挡 -->
-    <view style="height: 40rpx;"></view>
+    <view style="height: 300rpx;"></view>
   </scroll-view>
+  <view class="bottom-glass-bar">
+    <view class="quick-add-bar">
+      <text class="bar-label">添加到：</text>
+      <view class="meal-pills-row">
+        <block wx:for="{{mealOptions}}" wx:key="key">
+          <view 
+            class="meal-pill-mini {{addToMeal === item.key ? 'active' : ''}}" 
+            bindtap="selectMealToAdd" 
+            data-meal="{{item.key}}"
+          >
+            {{item.label}}
+          </view>
+        </block>
+      </view>
+    </view>
 
-  <!-- 底部按钮 -->
-  <view class="bottom-bar">
-    <button class="save-btn" bindtap="save" disabled="{{isSaving || !name}}">
-      <text wx:if="{{isSaving}}">保存中...</text>
-      <text wx:else>{{isEdit ? '保存修改' : '添加菜品'}}</text>
+    <button class="save-pill-btn" bindtap="save" disabled="{{isSaving || !name}}">
+      {{isSaving ? '保存中...' : (isEdit ? '保存修改' : '确认添加')}}
     </button>
   </view>
 </view>
