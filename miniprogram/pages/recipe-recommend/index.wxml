@@ -1,18 +1,17 @@
 <!--pages/recipe-recommend/index.wxml-->
 <view class="container">
   
-  <!-- 标签切换 (Floating Pills) -->
+  <!-- 标签切换 -->
   <view class="tabs-wrapper">
     <view class="tabs-list">
-      <view 
-        wx:for="{{tabs}}" 
-        wx:key="key"
-        class="tab-pill {{recommendType === item.key ? 'active' : ''}}"
-        data-type="{{item.key}}"
-        bindtap="onTabChange"
-      >
-        <text class="tab-icon">{{item.icon}}</text>
-        <text class="tab-label">{{item.label}}</text>
+      <view class="tab-pill {{recommendType === 'goal' ? 'active' : ''}}" data-type="goal" bindtap="onTabChange">
+        <text class="tab-label">目标推荐</text>
+      </view>
+      <view class="tab-pill {{recommendType === 'preference' ? 'active' : ''}}" data-type="preference" bindtap="onTabChange">
+        <text class="tab-label">口味偏好</text>
+      </view>
+      <view class="tab-pill {{recommendType === 'ai' ? 'active' : ''}}" data-type="ai" bindtap="onTabChange">
+        <text class="tab-label">AI 甄选</text>
       </view>
     </view>
   </view>
@@ -21,18 +20,18 @@
   <view class="content-area">
     
     <!-- AI智能建议 -->
-    <view wx:if="{{recommendType === 'ai' && aiSuggestions.length > 0}}" class="glass-card ai-section">
+    <view wx:if="{{recommendType === 'ai' && aiSuggestions.length > 0}}" class="ai-section">
       <view class="ai-header">
-        <text class="ai-icon">🤖</text>
-        <text class="ai-title">AI 营养分析</text>
+        <view class="ai-dot"></view>
+        <text class="ai-title">营养师建议</text>
       </view>
       <view class="ai-list">
         <view 
           wx:for="{{aiSuggestions}}" 
           wx:key="type"
-          class="ai-item {{item.severity}}"
+          class="ai-item"
         >
-          <text class="ai-msg">{{item.message}}</text>
+          <text>{{item.message}}</text>
         </view>
       </view>
     </view>
@@ -40,65 +39,91 @@
     <!-- 加载中 -->
     <view wx:if="{{loading}}" class="loading-state">
       <view class="loading-spinner"></view>
-      <text class="loading-text">正在为您生成个性化推荐...</text>
+      <text class="loading-text">正在为您定制食谱...</text>
     </view>
 
     <!-- 食谱列表 -->
     <view wx:else class="recipe-list">
-      <view 
-        wx:for="{{recipes}}" 
-        wx:key="id"
-        class="glass-card recipe-card"
-        data-id="{{item.id}}"
-        bindtap="onRecipeClick"
-      >
-        <!-- 图片区 -->
-        <view class="card-image-box">
-          <image class="card-img" src="{{item.image}}" mode="aspectFill" />
-          <view class="score-badge">
-            <text class="score-star">⭐</text>
-            <text class="score-val">{{item.recommendScore}}</text>
+      <block wx:if="{{recipes.length > 0}}">
+        <view 
+          wx:for="{{recipes}}" 
+          wx:key="id"
+          class="recipe-card"
+          data-id="{{item.id}}"
+          bindtap="onRecipeClick"
+        >
+          <!-- 顶部：标题与分数 -->
+          <view class="card-header">
+            <view class="header-main">
+              <text class="card-title">{{item.name}}</text>
+              <view class="score-badge">
+                 <text class="score-val">{{item.recommendScore}}</text>
+                 <text class="score-unit">分</text>
+              </view>
+            </view>
+            
+            <!-- 收藏按钮 (右上角) -->
+            <view class="fav-btn" catchtap="onFavoriteClick" data-id="{{item.id}}" data-index="{{index}}">
+               <text class="fav-icon {{item.isFavorited ? 'active' : ''}}">{{item.isFavorited ? '❤' : '♡'}}</text>
+            </view>
           </view>
-          <view class="fav-btn" catchtap="onFavoriteClick" data-id="{{item.id}}" data-index="{{index}}">
-             <text class="fav-icon">{{item.isFavorited ? '❤️' : '🤍'}}</text>
-          </view>
-        </view>
 
-        <!-- 内容区 -->
-        <view class="card-content">
-          <text class="card-title">{{item.name}}</text>
-          
-          <!-- 标签行 (Flex Layou, fixed bug) -->
+          <!-- 中部：标签 -->
           <view class="tags-row">
             <view 
               wx:for="{{item.tags}}" 
               wx:key="*this"
               wx:for-item="tag"
-              class="tag-pill"
+              class="tag-item"
             >
               {{tag}}
             </view>
-            <view class="meta-item">⏱️ {{item.cookingTime}}m</view>
-            <view class="meta-item">🔥 {{item.calories}}kcal</view>
+          </view>
+          
+          <!-- 核心数据展示 (Grid Layout) -->
+          <view class="data-grid">
+            <view class="data-item">
+              <text class="data-value">{{item.calories}}</text>
+              <text class="data-label">千卡</text>
+            </view>
+            <view class="data-divider"></view>
+            <view class="data-item">
+              <text class="data-value">{{item.cookingTime}}</text>
+              <text class="data-label">分钟</text>
+            </view>
+             <block wx:if="{{item.protein}}">
+              <view class="data-divider"></view>
+              <view class="data-item">
+                <text class="data-value">{{item.protein}}</text>
+                <text class="data-label">蛋白质(g)</text>
+              </view>
+             </block>
           </view>
 
-          <text class="card-desc">{{item.description}}</text>
+          <!-- 推荐理由/描述 -->
+          <view wx:if="{{item.recommendReason || item.description}}" class="desc-box">
+            <text class="desc-text">{{item.recommendReason || item.description}}</text>
+          </view>
+
         </view>
-      </view>
 
-      <!-- 换一批按钮 -->
-      <view class="refresh-footer">
-        <button class="glass-btn refresh-btn" bindtap="onRefresh">
-          <text>🔄 换一批推荐</text>
-        </button>
-      </view>
+        <!-- 换一批按钮 -->
+        <view class="refresh-footer">
+          <button class="glass-btn refresh-btn" bindtap="onRefresh">
+            <text>换一批推荐</text>
+          </button>
+        </view>
+
+      </block>
       
-    </view>
+      <!-- 空状态 -->
+      <view wx:else class="empty-state">
+        <view class="empty-circle">
+          <text class="empty-icon-text">🥗</text>
+        </view>
+        <text class="empty-text">暂无符合条件的食谱</text>
+      </view>
 
-    <!-- 空状态 -->
-    <view wx:if="{{!loading && recipes.length === 0}}" class="empty-state">
-      <text class="empty-icon">🍽️</text>
-      <text class="empty-text">暂无推荐食谱</text>
     </view>
 
   </view>

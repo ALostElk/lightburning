@@ -7,11 +7,6 @@ Page({
     recipes: [],
     loading: true,
     aiSuggestions: [],
-    tabs: [
-      { key: 'goal', label: '基于目标', icon: '🎯' },
-      { key: 'preference', label: '基于偏好', icon: '❤️' },
-      { key: 'ai', label: '智能推荐', icon: '🤖' }
-    ],
     userInfo: null
   },
 
@@ -41,7 +36,7 @@ Page({
     this.setData({ loading: true });
 
     const type = this.data.recommendType;
-    wx.showLoading({ 
+    wx.showLoading({
       title: type === 'ai' ? 'AI智能分析中...' : '正在生成推荐...'
     });
 
@@ -69,7 +64,7 @@ Page({
     } catch (error) {
       console.error('推荐失败:', error);
       wx.hideLoading();
-      
+
       // 降级处理
       const recipes = this.engine.getRecommendedRecipes({
         type,
@@ -118,12 +113,12 @@ Page({
   onFavoriteClick(e) {
     const recipeId = e.currentTarget.dataset.id;
     const index = e.currentTarget.dataset.index;
-    
+
     // 获取当前收藏列表
     let favorites = wx.getStorageSync('favoriteRecipes') || [];
-    
+
     const isFavorited = favorites.includes(recipeId);
-    
+
     if (isFavorited) {
       // 取消收藏
       favorites = favorites.filter(id => id !== recipeId);
@@ -133,9 +128,9 @@ Page({
       favorites.push(recipeId);
       wx.showToast({ title: '收藏成功', icon: 'success' });
     }
-    
+
     wx.setStorageSync('favoriteRecipes', favorites);
-    
+
     // 更新UI
     const recipes = this.data.recipes;
     recipes[index].isFavorited = !isFavorited;
@@ -147,12 +142,12 @@ Page({
    */
   onShareClick(e) {
     const recipe = e.currentTarget.dataset.recipe;
-    
+
     wx.showShareMenu({
       withShareTicket: true,
       menus: ['shareAppMessage', 'shareTimeline']
     });
-    
+
     // 小程序分享
     return {
       title: `推荐一道健康食谱：${recipe.name}`,
@@ -184,4 +179,3 @@ Page({
     return tagMap[tag] || 'tag';
   }
 });
-

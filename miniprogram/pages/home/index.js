@@ -657,10 +657,15 @@ Page({
    * 打开体重记录弹窗
    */
   openWeightModal() {
+    // 获取当前体重作为初始值
     const currentWeight = this.data.weightData.current || this.data.profile?.weight || 60.0;
+    const initialWeight = currentWeight ? parseFloat(currentWeight) : 60.0;
+    
+    console.log('打开体重弹窗，初始体重:', initialWeight);
+    
     this.setData({
       showWeightModal: true,
-      inputWeight: parseFloat(currentWeight),
+      inputWeight: initialWeight,
       weightNote: ''
     });
   },
@@ -743,25 +748,37 @@ Page({
     wx.showLoading({ title: '保存中...' });
 
     try {
-      // 获取当前日期
-      const today = new Date().toISOString().slice(0, 10);
+      console.log('保存体重:', inputWeight);
       
       // 调用云函数保存体重记录
-      await api.updateProfile({
+      const res = await api.updateProfile({
         weight: inputWeight
       });
 
-      wx.hideLoading();
-      wx.showToast({
-        title: '保存成功',
-        icon: 'success'
-      });
+      console.log('保存体重返回:', res);
 
-      // 重新加载数据
-      await this.loadWeightData();
+      wx.hideLoading();
       
-      this.closeWeightModal();
+      // 检查保存结果
+      if (res && res.result && res.result.success) {
+        wx.showToast({
+          title: '保存成功',
+          icon: 'success'
+        });
+
+        // 重新加载数据
+        await this.loadWeightData();
+        
+        this.closeWeightModal();
+      } else {
+        const errorMsg = res?.result?.error || '保存失败';
+        wx.showToast({
+          title: errorMsg,
+          icon: 'none'
+        });
+      }
     } catch (error) {
+      console.error('保存体重失败:', error);
       wx.hideLoading();
       api.handleError(error, '保存失败');
     }
@@ -775,16 +792,52 @@ Page({
       // 获取用户资料（包含最新体重）
       const profileRes = await api.getProfile();
       
-      if (!profileRes || !profileRes.result || !profileRes.result.success) {
-        console.log('获取用户资料失败');
+      console.log('获取用户资料返回:', profileRes);
+      
+      // 正确解析返回数据结构
+      if (!profileRes || !profileRes.result) {
+        console.log('返回数据格式错误');
         return;
       }
 
-      const profile = profileRes.result.data;
+      const result = profileRes.result;
+      
+      // 检查是否成功
+      if (!result.success) {
+        console.log('获取用户资料失败:', result.error);
+        return;
+      }
+
+      const profile = result.data;
+      
+      // 检查是否有profile数据
+      if (!profile) {
+        console.log('用户资料为空');
+        this.setData({
+          'weightData.current': null,
+          'weightData.changeText': '暂无数据',
+          'weightData.trend': 'stable',
+          'weightData.history': []
+        });
+        return;
+      }
+
       const currentWeight = profile.weight || null;
       
+      console.log('当前体重:', currentWeight);
+      
+      // 如果没有体重数据，显示空状态
+      if (!currentWeight) {
+        this.setData({
+          'weightData.current': null,
+          'weightData.changeText': '暂无记录',
+          'weightData.trend': 'stable',
+          'weightData.history': []
+        });
+        return;
+      }
+      
       // 生成模拟历史数据用于展示趋势
-      // TODO: 后续需要云函数支持获取真实的体重历史记录
       const weightHistory = this.generateMockWeightHistory(currentWeight);
       
       // 计算变化（使用模拟数据的前一个值）
@@ -805,6 +858,15 @@ Page({
         changeText = `${change} kg`;
       }
 
+      console.log('体重数据:', {
+        current: currentWeight,
+        previous,
+        change,
+        trend,
+        changeText,
+        historyLength: weightHistory.length
+      });
+
       this.setData({
         'weightData.current': currentWeight,
         'weightData.previous': previous,
@@ -814,14 +876,19 @@ Page({
         'weightData.history': weightHistory
       });
 
-      // 绘制折线图
-      if (currentWeight) {
-        setTimeout(() => {
-          this.drawWeightChart();
-        }, 300);
-      }
+      // 绘制折线图（延迟确保DOM渲染完成）
+      setTimeout(() => {
+        this.drawWeightChart();
+      }, 500);
     } catch (error) {
       console.error('加载体重数据失败:', error);
+      // 设置默认空状态
+      this.setData({
+        'weightData.current': null,
+        'weightData.changeText': '加载失败',
+        'weightData.trend': 'stable',
+        'weightData.history': []
+      });
     }
   },
 
@@ -835,7 +902,7 @@ Page({
     }
 
     const mockData = [];
-    const days = 14;
+    const days = 7; // 减少到7天，显示最近一周数据
     
     // 生成一个平滑的趋势曲线
     for (let i = days; i >= 0; i--) {
@@ -899,9 +966,12 @@ Page({
       
       const width = rect.width;
       const height = rect.height;
-      const padding = 10;
-      const chartWidth = width - padding * 2;
-      const chartHeight = height - padding * 2;
+      const leftPadding = 35; // 增加左侧空间用于Y轴标签
+      const rightPadding = 10;
+      const topPadding = 15; // 增加顶部空间用于数值标签
+      const bottomPadding = 10;
+      const chartWidth = width - leftPadding - rightPadding;
+      const chartHeight = height - topPadding - bottomPadding;
       
       // 获取数据范围
       const weights = history.map(item => item.weight);
@@ -909,16 +979,33 @@ Page({
       const maxWeight = Math.max(...weights) + 1;
       const weightRange = maxWeight - minWeight;
       
-      // 绘制背景网格（淡化）
+      // 计算Y轴刻度（3条稀疏线：最大值、中间值、最小值）
+      const yAxisValues = [
+        maxWeight,
+        (maxWeight + minWeight) / 2,
+        minWeight
+      ];
+      
+      // 绘制Y轴网格线和标签
       ctx.setStrokeStyle('#F1F5F9');
       ctx.setLineWidth(0.5);
-      for (let i = 0; i <= 4; i++) {
-        const y = padding + (chartHeight / 4) * i;
+      ctx.setFillStyle('#94A3B8');
+      ctx.setFontSize(10);
+      ctx.setTextAlign('right');
+      ctx.setTextBaseline('middle');
+      
+      yAxisValues.forEach((value, index) => {
+        const y = topPadding + (chartHeight / 2) * index;
+        
+        // 绘制网格线
         ctx.beginPath();
-        ctx.moveTo(padding, y);
-        ctx.lineTo(width - padding, y);
+        ctx.moveTo(leftPadding, y);
+        ctx.lineTo(width - rightPadding, y);
         ctx.stroke();
-      }
+        
+        // 绘制Y轴数值标签
+        ctx.fillText(value.toFixed(1), leftPadding - 5, y);
+      });
       
       // 绘制折线
       ctx.setStrokeStyle('#10B981');
@@ -928,8 +1015,8 @@ Page({
       
       ctx.beginPath();
       history.forEach((point, index) => {
-        const x = padding + (chartWidth / (history.length - 1)) * index;
-        const y = padding + chartHeight - ((point.weight - minWeight) / weightRange) * chartHeight;
+        const x = leftPadding + (chartWidth / (history.length - 1)) * index;
+        const y = topPadding + chartHeight - ((point.weight - minWeight) / weightRange) * chartHeight;
         
         if (index === 0) {
           ctx.moveTo(x, y);
@@ -942,19 +1029,33 @@ Page({
       // 绘制数据点
       ctx.setFillStyle('#10B981');
       history.forEach((point, index) => {
-        const x = padding + (chartWidth / (history.length - 1)) * index;
-        const y = padding + chartHeight - ((point.weight - minWeight) / weightRange) * chartHeight;
+        const x = leftPadding + (chartWidth / (history.length - 1)) * index;
+        const y = topPadding + chartHeight - ((point.weight - minWeight) / weightRange) * chartHeight;
         
         ctx.beginPath();
         ctx.arc(x, y, 3, 0, 2 * Math.PI);
         ctx.fill();
       });
       
+      // 绘制数据点上的数值标签
+      ctx.setFillStyle('#334155');
+      ctx.setFontSize(9);
+      ctx.setTextAlign('center');
+      ctx.setTextBaseline('bottom');
+      
+      history.forEach((point, index) => {
+        const x = leftPadding + (chartWidth / (history.length - 1)) * index;
+        const y = topPadding + chartHeight - ((point.weight - minWeight) / weightRange) * chartHeight;
+        
+        // 在点上方显示体重数值
+        ctx.fillText(point.weight.toFixed(1), x, y - 6);
+      });
+      
       // 高亮最后一个点
       if (history.length > 0) {
         const lastPoint = history[history.length - 1];
-        const x = padding + chartWidth;
-        const y = padding + chartHeight - ((lastPoint.weight - minWeight) / weightRange) * chartHeight;
+        const x = leftPadding + chartWidth;
+        const y = topPadding + chartHeight - ((lastPoint.weight - minWeight) / weightRange) * chartHeight;
         
         ctx.setFillStyle('#FFFFFF');
         ctx.beginPath();

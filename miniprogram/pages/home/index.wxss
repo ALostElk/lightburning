@@ -416,7 +416,7 @@
   border: 1rpx solid rgba(255, 255, 255, 0.8);
   border-radius: 32rpx;
   padding: 24rpx 32rpx;
-  margin-bottom: 32rpx;
+  margin-bottom: 200rpx;
   box-shadow: 0 4rpx 16rpx rgba(148, 163, 184, 0.05);
   position: relative;
   overflow: hidden;
