@@ -1,0 +1,28 @@
+<!-- 沉浸式运动计时页面 -->
+<view class="timer-page">
+  <!-- 头部信息区 -->
+  <view class="timer-header">
+    <text class="exercise-name">{{exerciseName}} {{exerciseEmoji}}</text>
+    <view class="calorie-pill">{{currentCalories}} kcal</view>
+  </view>
+  
+  <!-- 核心计时器 -->
+  <view class="timer-display">{{formattedTime}}</view>
+  
+  <!-- 动态波浪层 -->
+  <view class="wave-container">
+    <view class="wave wave-1"></view>
+    <view class="wave wave-2"></view>
+  </view>
+  
+  <!-- 控制栏 -->
+  <view class="control-bar">
+    <view class="btn-glass pause" bindtap="togglePause">
+      <text class="btn-icon">{{isPaused ? '▶' : '⏸'}}</text>
+    </view>
+    <view class="btn-glass stop" bindtap="finishExercise">
+      <text class="btn-text">结束</text>
+    </view>
+  </view>
+</view>
+

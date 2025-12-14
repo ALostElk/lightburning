@@ -292,9 +292,29 @@
   color: #94A3B8;
 }
 
+/* === 图片上传动效 === */
 .uploaded-img {
   width: 100%;
   height: 100%;
+  /* 吸入/凝结动画 */
+  animation: image-absorb 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  /* 初始状态不可见，防止闪烁 */
+  opacity: 0;
+  transform-origin: center center;
+}
+
+/* 吸入/凝结动画 */
+@keyframes image-absorb {
+  0% {
+    opacity: 0;
+    transform: scale(1.15); /* 稍微放大 */
+    filter: blur(8rpx) brightness(1.2); /* 模糊且高亮，像一团光 */
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1); /* 归位 */
+    filter: blur(0) brightness(1); /* 清晰 */
+  }
 }
 
 .re-upload-mask {
@@ -306,6 +326,19 @@
   text-align: center;
   backdrop-filter: blur(4rpx);
   -webkit-backdrop-filter: blur(4rpx);
+  /* 遮罩层延迟显示，增加层次感 */
+  animation: fade-in 0.4s ease 0.4s forwards;
+  opacity: 0;
+}
+
+/* 遮罩层淡入动画 */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .re-upload-mask text {
