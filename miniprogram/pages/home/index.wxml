@@ -125,7 +125,7 @@
     
     <!-- 迷你折线图 -->
     <view class="mini-chart">
-      <canvas canvas-id="weightChart" id="weightChart" class="chart-canvas" disable-scroll="true"></canvas>
+      <canvas type="2d" id="weightChart" class="chart-canvas" disable-scroll="true"></canvas>
     </view>
     
     <!-- 添加按钮 -->

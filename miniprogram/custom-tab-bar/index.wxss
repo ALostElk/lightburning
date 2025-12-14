@@ -3,14 +3,14 @@
   bottom: 0;
   left: 0;
   right: 0;
-  height: 56px; /* Slightly taller for elegance */
-  background: rgba(255, 255, 255, 0.75); /* More transparent */
+  height: 78px; /* Further increased height (was 68px) */
+  background: rgba(255, 255, 255, 0.98);
   display: flex;
   padding-bottom: env(safe-area-inset-bottom);
-  backdrop-filter: blur(28px); /* Deeper blur */
-  -webkit-backdrop-filter: blur(28px);
-  border-top: 1rpx solid rgba(255, 255, 255, 0.4);
-  box-shadow: 0 -4rpx 24rpx rgba(0, 0, 0, 0.03); /* Softer shadow */
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  /* Soft shadow for depth */
+  box-shadow: 0 -4rpx 16rpx rgba(0, 0, 0, 0.04);
   z-index: 9000;
   transition: all 0.3s ease;
 }
@@ -35,28 +35,28 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 6rpx;
+  margin-bottom: 8rpx;
   position: relative;
 }
 
 .tab-icon {
   width: 48rpx;
   height: 48rpx;
-  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); /* Bouncy spring effect */
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .tab-text {
   font-size: 20rpx;
   line-height: 1;
-  font-weight: 300; /* Slender font */
-  letter-spacing: 1rpx; /* Airy spacing */
+  font-weight: 300;
+  letter-spacing: 1rpx;
   transition: all 0.3s ease;
 }
 
 /* Active State Styles */
 .tab-bar-item.active .tab-icon {
-  transform: translateY(-4rpx) scale(1.1); /* Lift and scale */
-  filter: drop-shadow(0 4rpx 8rpx rgba(16, 185, 129, 0.3)); /* Colored glow */
+  transform: translateY(-4rpx) scale(1.1);
+  filter: drop-shadow(0 4rpx 8rpx rgba(16, 185, 129, 0.3));
   animation: elastic-pop 0.5s;
 }
 
@@ -66,14 +66,6 @@
   transform: translateY(-2rpx);
 }
 
-/* Active Indicator "Pill" - Removed as requested */
-/* 
-.tab-bar-item.active::after {
-  display: none;
-} 
-*/
-
-/* Keyframes */
 @keyframes elastic-pop {
   0% { transform: scale(1); }
   50% { transform: scale(1.15); }

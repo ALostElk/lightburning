@@ -102,9 +102,10 @@ Page({
 
     // ========== AI 分析洞察（增强版）==========
     aiInsight: {
-      message: '建议多摄入蛋白质，保持运动习惯！',
+      message: '',  // 初始为空，由 generateAIInsight 动态生成
       priority: 'normal',      // high/medium/normal
-      type: 'general'          // diet/exercise/balance/general
+      type: 'general',         // diet/exercise/balance/general
+      closed: false            // 是否已被用户关闭
     },
 
     // 快捷操作 - 优化后的设计
@@ -272,6 +273,13 @@ Page({
       // 更新红绿灯状态
       this.updateHeroStatus(calorieBalance);
 
+      console.log('今日数据加载完成:', {
+        dietCalories,
+        exerciseCalories,
+        calorieBalance,
+        progressMetrics
+      });
+
       this.setData({
         'todayData.dietCalories': Math.round(dietCalories),
         'todayData.exerciseCalories': Math.round(exerciseCalories),
@@ -287,6 +295,14 @@ Page({
       });
     } catch (error) {
       console.error('加载今日数据失败:', error);
+      // 即使数据加载失败，也尝试生成一个通用的AI建议
+      if (!this.data.aiInsight.closed) {
+        this.setData({
+          'aiInsight.message': '开始记录今天的饮食和运动吧！',
+          'aiInsight.priority': 'normal',
+          'aiInsight.type': 'general'
+        });
+      }
     }
   },
 
@@ -477,11 +493,19 @@ Page({
    * 生成AI洞察
    */
   generateAIInsight(progressMetrics, calorieBalance) {
-    let message = '今日表现不错，继续保持！';
+    // 如果用户已关闭建议，本次会话不再显示
+    if (this.data.aiInsight.closed) {
+      console.log('用户已关闭AI建议，跳过生成');
+      return;
+    }
+
+    let message = '';
     let priority = 'normal';
     let type = 'general';
 
-    // 基于进度和平衡度生成洞察
+    console.log('生成AI建议，输入参数:', { progressMetrics, calorieBalance });
+
+    // 基于进度和平衡度生成洞察（按优先级排序）
     if (progressMetrics.dietProgress < 50) {
       message = '今日饮食摄入不足，建议适当增加健康食物';
       priority = 'high';
@@ -491,21 +515,30 @@ Page({
       priority = 'medium';
       type = 'exercise';
     } else if (Math.abs(calorieBalance) > 500) {
-      message = `热量${calorieBalance > 0 ? '盈余' : '赤字'}较大，建议调整饮食和运动平衡`;
+      message = `热量${calorieBalance > 0 ? '赤字' : '盈余'}较大，建议调整饮食和运动平衡`;
       priority = 'medium';
       type = 'balance';
+    } else if (progressMetrics.dietProgress > 120) {
+      message = '饮食摄入超标，注意控制热量摄入';
+      priority = 'medium';
+      type = 'diet';
     } else if (progressMetrics.balanceScore > 80) {
       message = '饮食和运动搭配很均衡，保持这个好习惯！';
       priority = 'normal';
       type = 'general';
+    } else {
+      // 默认情况：给出通用的积极建议
+      message = '今日表现不错，继续保持健康的生活方式！';
+      priority = 'normal';
+      type = 'general';
     }
 
+    console.log('生成的AI建议:', { message, priority, type });
+
     this.setData({
-      aiInsight: {
-        message,
-        priority,
-        type
-      }
+      'aiInsight.message': message,
+      'aiInsight.priority': priority,
+      'aiInsight.type': type
     });
   },
 
@@ -647,7 +680,8 @@ Page({
    */
   closeAISuggestion() {
     this.setData({
-      'aiInsight.message': ''
+      'aiInsight.message': '',
+      'aiInsight.closed': true  // 标记用户已关闭，本次会话不再显示
     });
   },
 
@@ -949,128 +983,148 @@ Page({
   },
 
   /**
-   * 绘制体重折线图
+   * 绘制体重折线图 (使用 Canvas 2D API)
    */
   drawWeightChart() {
     const { history } = this.data.weightData;
     
     if (!history || history.length === 0) {
+      console.log('没有体重历史数据，跳过绘图');
       return;
     }
 
-    const ctx = wx.createCanvasContext('weightChart', this);
     const query = wx.createSelectorQuery().in(this);
     
-    query.select('.chart-canvas').boundingClientRect(rect => {
-      if (!rect) return;
-      
-      const width = rect.width;
-      const height = rect.height;
-      const leftPadding = 35; // 增加左侧空间用于Y轴标签
-      const rightPadding = 10;
-      const topPadding = 15; // 增加顶部空间用于数值标签
-      const bottomPadding = 10;
-      const chartWidth = width - leftPadding - rightPadding;
-      const chartHeight = height - topPadding - bottomPadding;
-      
-      // 获取数据范围
-      const weights = history.map(item => item.weight);
-      const minWeight = Math.min(...weights) - 1;
-      const maxWeight = Math.max(...weights) + 1;
-      const weightRange = maxWeight - minWeight;
-      
-      // 计算Y轴刻度（3条稀疏线：最大值、中间值、最小值）
-      const yAxisValues = [
-        maxWeight,
-        (maxWeight + minWeight) / 2,
-        minWeight
-      ];
-      
-      // 绘制Y轴网格线和标签
-      ctx.setStrokeStyle('#F1F5F9');
-      ctx.setLineWidth(0.5);
-      ctx.setFillStyle('#94A3B8');
-      ctx.setFontSize(10);
-      ctx.setTextAlign('right');
-      ctx.setTextBaseline('middle');
-      
-      yAxisValues.forEach((value, index) => {
-        const y = topPadding + (chartHeight / 2) * index;
-        
-        // 绘制网格线
-        ctx.beginPath();
-        ctx.moveTo(leftPadding, y);
-        ctx.lineTo(width - rightPadding, y);
-        ctx.stroke();
-        
-        // 绘制Y轴数值标签
-        ctx.fillText(value.toFixed(1), leftPadding - 5, y);
-      });
-      
-      // 绘制折线
-      ctx.setStrokeStyle('#10B981');
-      ctx.setLineWidth(2);
-      ctx.setLineCap('round');
-      ctx.setLineJoin('round');
-      
-      ctx.beginPath();
-      history.forEach((point, index) => {
-        const x = leftPadding + (chartWidth / (history.length - 1)) * index;
-        const y = topPadding + chartHeight - ((point.weight - minWeight) / weightRange) * chartHeight;
-        
-        if (index === 0) {
-          ctx.moveTo(x, y);
-        } else {
-          ctx.lineTo(x, y);
+    query.select('#weightChart')
+      .fields({ node: true, size: true })
+      .exec((res) => {
+        if (!res || !res[0]) {
+          console.error('Canvas 节点获取失败');
+          return;
         }
-      });
-      ctx.stroke();
-      
-      // 绘制数据点
-      ctx.setFillStyle('#10B981');
-      history.forEach((point, index) => {
-        const x = leftPadding + (chartWidth / (history.length - 1)) * index;
-        const y = topPadding + chartHeight - ((point.weight - minWeight) / weightRange) * chartHeight;
+
+        const canvas = res[0].node;
+        const ctx = canvas.getContext('2d');
+        
+        const dpr = wx.getSystemInfoSync().pixelRatio;
+        const width = res[0].width;
+        const height = res[0].height;
+        
+        // 设置 Canvas 实际渲染尺寸
+        canvas.width = width * dpr;
+        canvas.height = height * dpr;
+        ctx.scale(dpr, dpr);
+        
+        const leftPadding = 35;
+        const rightPadding = 10;
+        const topPadding = 15;
+        const bottomPadding = 10;
+        const chartWidth = width - leftPadding - rightPadding;
+        const chartHeight = height - topPadding - bottomPadding;
+        
+        // 获取数据范围
+        const weights = history.map(item => item.weight);
+        const minWeight = Math.min(...weights) - 1;
+        const maxWeight = Math.max(...weights) + 1;
+        const weightRange = maxWeight - minWeight;
+        
+        // 计算Y轴刻度（3条稀疏线）
+        const yAxisValues = [
+          maxWeight,
+          (maxWeight + minWeight) / 2,
+          minWeight
+        ];
+        
+        // 清空画布
+        ctx.clearRect(0, 0, width, height);
+        
+        // 绘制Y轴网格线和标签
+        ctx.strokeStyle = '#F1F5F9';
+        ctx.lineWidth = 0.5;
+        ctx.fillStyle = '#94A3B8';
+        ctx.font = '10px sans-serif';
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'middle';
+        
+        yAxisValues.forEach((value, index) => {
+          const y = topPadding + (chartHeight / 2) * index;
+          
+          // 绘制网格线
+          ctx.beginPath();
+          ctx.moveTo(leftPadding, y);
+          ctx.lineTo(width - rightPadding, y);
+          ctx.stroke();
+          
+          // 绘制Y轴数值标签
+          ctx.fillText(value.toFixed(1), leftPadding - 5, y);
+        });
+        
+        // 绘制折线
+        ctx.strokeStyle = '#10B981';
+        ctx.lineWidth = 2;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
         
         ctx.beginPath();
-        ctx.arc(x, y, 3, 0, 2 * Math.PI);
-        ctx.fill();
-      });
-      
-      // 绘制数据点上的数值标签
-      ctx.setFillStyle('#334155');
-      ctx.setFontSize(9);
-      ctx.setTextAlign('center');
-      ctx.setTextBaseline('bottom');
-      
-      history.forEach((point, index) => {
-        const x = leftPadding + (chartWidth / (history.length - 1)) * index;
-        const y = topPadding + chartHeight - ((point.weight - minWeight) / weightRange) * chartHeight;
-        
-        // 在点上方显示体重数值
-        ctx.fillText(point.weight.toFixed(1), x, y - 6);
-      });
-      
-      // 高亮最后一个点
-      if (history.length > 0) {
-        const lastPoint = history[history.length - 1];
-        const x = leftPadding + chartWidth;
-        const y = topPadding + chartHeight - ((lastPoint.weight - minWeight) / weightRange) * chartHeight;
-        
-        ctx.setFillStyle('#FFFFFF');
-        ctx.beginPath();
-        ctx.arc(x, y, 5, 0, 2 * Math.PI);
-        ctx.fill();
-        
-        ctx.setStrokeStyle('#10B981');
-        ctx.setLineWidth(2);
-        ctx.beginPath();
-        ctx.arc(x, y, 5, 0, 2 * Math.PI);
+        history.forEach((point, index) => {
+          const x = leftPadding + (chartWidth / (history.length - 1)) * index;
+          const y = topPadding + chartHeight - ((point.weight - minWeight) / weightRange) * chartHeight;
+          
+          if (index === 0) {
+            ctx.moveTo(x, y);
+          } else {
+            ctx.lineTo(x, y);
+          }
+        });
         ctx.stroke();
-      }
-      
-      ctx.draw();
-    }).exec();
+        
+        // 绘制数据点
+        ctx.fillStyle = '#10B981';
+        history.forEach((point, index) => {
+          const x = leftPadding + (chartWidth / (history.length - 1)) * index;
+          const y = topPadding + chartHeight - ((point.weight - minWeight) / weightRange) * chartHeight;
+          
+          ctx.beginPath();
+          ctx.arc(x, y, 3, 0, 2 * Math.PI);
+          ctx.fill();
+        });
+        
+        // 绘制数据点上的数值标签
+        ctx.fillStyle = '#334155';
+        ctx.font = '9px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'bottom';
+        
+        history.forEach((point, index) => {
+          const x = leftPadding + (chartWidth / (history.length - 1)) * index;
+          const y = topPadding + chartHeight - ((point.weight - minWeight) / weightRange) * chartHeight;
+          
+          // 在点上方显示体重数值
+          ctx.fillText(point.weight.toFixed(1), x, y - 6);
+        });
+        
+        // 高亮最后一个点
+        if (history.length > 0) {
+          const lastPoint = history[history.length - 1];
+          const x = leftPadding + chartWidth;
+          const y = topPadding + chartHeight - ((lastPoint.weight - minWeight) / weightRange) * chartHeight;
+          
+          // 白色填充
+          ctx.fillStyle = '#FFFFFF';
+          ctx.beginPath();
+          ctx.arc(x, y, 5, 0, 2 * Math.PI);
+          ctx.fill();
+          
+          // 绿色边框
+          ctx.strokeStyle = '#10B981';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.arc(x, y, 5, 0, 2 * Math.PI);
+          ctx.stroke();
+        }
+        
+        console.log('体重图表绘制完成');
+      });
   },
 
   /**
