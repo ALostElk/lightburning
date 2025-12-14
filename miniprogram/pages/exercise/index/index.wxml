@@ -284,7 +284,7 @@
         <text>{{isAllSelected ? '取消全选' : '全选'}}</text>
       </view>
       <view class="batch-btn delete" catchtap="deleteSelectedExercises">
-        <text>🗑️ 删除</text>
+        <text>删除</text>
       </view>
     </view>
   </view>

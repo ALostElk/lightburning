@@ -1,28 +1,41 @@
 /* 自定义菜品页面样式 - 清爽淡雅版 (Fresh & Elegant) */
+
+/* === 全局容器 === */
 .page {
   min-height: 100vh;
   /* 天空/云朵白渐变 */
   background: linear-gradient(180deg, #F5FAFF 0%, #FFFFFF 100%);
   display: flex;
   flex-direction: column;
-  position: relative;
-  box-sizing: border-box;
-  color: #334155; /* Slate-700 */
 }
 
-/* ============ 悬浮返回按钮 ============ */
-.nav-back-btn {
-  position: fixed;
-  left: 32rpx;
+/* === 1. 顶部导航 (Sticky Glass) === */
+.header-glass {
+  padding-top: env(safe-area-inset-top);
+  height: 88rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-left: 32rpx;
+  padding-right: 32rpx;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20rpx);
+  -webkit-backdrop-filter: blur(20rpx);
+  position: sticky;
+  top: 0;
   z-index: 100;
+  border-bottom: 1rpx solid rgba(0, 0, 0, 0.05);
+}
+
+.nav-back-btn {
   width: 72rpx;
   height: 72rpx;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1rpx solid rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.8);
-  border: 1rpx solid rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(10rpx);
   -webkit-backdrop-filter: blur(10rpx);
   box-shadow: 0 4rpx 12rpx rgba(148, 163, 184, 0.1);
@@ -41,11 +54,6 @@
   padding-bottom: 4rpx; /* 微调对齐 */
 }
 
-/* 背景装饰 (原有橙色波浪移除，改为无或极简) */
-.page-bg {
-  display: none;
-}
-
 /* 头部 */
 .header {
   display: flex;
@@ -59,286 +67,373 @@
 }
 
 .header-title {
-  font-size: 36rpx;
-  font-weight: 500;
-  color: #334155; /* Slate-700 */
-  letter-spacing: 1rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #334155;
 }
 
 .header-placeholder {
   display: none;
 }
 
-/* 内容区 */
+/* === 2. 内容区 === */
 .content {
   flex: 1;
   padding: 32rpx;
-  padding-bottom: 200rpx; /* 底部留白 */
-  overflow-y: auto;
-  position: relative;
-  z-index: 1;
+  padding-bottom: 300rpx; /* 增加底部 padding，防止被底部栏遮挡 */
+  box-sizing: border-box;
 }
 
-/* 表单卡片 - 玻璃拟态 */
+/* 玻璃表单卡片 */
 .form-card {
   background: rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(20rpx);
-  -webkit-backdrop-filter: blur(20rpx);
-  border-radius: 32rpx;
-  padding: 40rpx;
-  margin-bottom: 32rpx;
-  box-shadow: 0 4rpx 20rpx rgba(148, 163, 184, 0.05); /* 极淡阴影 */
+  backdrop-filter: blur(16rpx);
+  -webkit-backdrop-filter: blur(16rpx);
   border: 1rpx solid rgba(255, 255, 255, 0.8);
+  border-radius: 32rpx;
+  padding: 32rpx;
+  margin-bottom: 32rpx;
+  box-shadow: 0 4rpx 20rpx rgba(148, 163, 184, 0.05);
+}
+
+.card-header {
+  display: flex;
+  align-items: baseline;
+  margin-bottom: 30rpx;
 }
 
 .card-title {
   font-size: 30rpx;
-  font-weight: 600;
+  font-weight: 700;
   color: #334155;
-  margin-bottom: 32rpx;
-  padding-bottom: 20rpx;
-  border-bottom: 1rpx solid #F1F5F9;
-  display: flex;
-  align-items: center;
-  gap: 16rpx;
+  margin-right: 16rpx;
 }
 
-.card-title::before {
-  content: '';
-  width: 8rpx;
-  height: 32rpx;
-  background: #94A3B8; /* Slate-400 */
-  border-radius: 4rpx;
-}
-
-/* 表单项 */
-.form-item {
-  margin-bottom: 32rpx;
-}
-
-.form-item:last-child {
-  margin-bottom: 0;
-}
-
-.form-label {
-  display: block;
-  font-size: 26rpx;
-  color: #64748B; /* Slate-500 */
-  margin-bottom: 16rpx;
-  font-weight: 500;
-}
-
-.required {
-  color: #EF4444;
-  margin-left: 4rpx;
-}
-
-.form-input {
-  width: 100%;
-  height: 96rpx;
-  padding: 0 32rpx;
-  background: #F8FAFC; /* Slate-50 */
-  border: 1rpx solid #E2E8F0; /* Slate-200 */
-  border-radius: 24rpx;
-  font-size: 28rpx;
-  color: #334155;
-  box-sizing: border-box;
-  transition: all 0.2s ease;
-}
-
-.form-input:focus {
-  background: #FFFFFF;
-  border-color: #94A3B8; /* Slate-400 */
-  box-shadow: 0 0 0 4rpx rgba(148, 163, 184, 0.1);
-}
-
-.form-textarea {
-  width: 100%;
-  height: 200rpx;
-  padding: 24rpx 32rpx;
-  background: #F8FAFC;
-  border: 1rpx solid #E2E8F0;
-  border-radius: 24rpx;
-  font-size: 28rpx;
-  color: #334155;
-  box-sizing: border-box;
-  line-height: 1.6;
-  transition: all 0.2s ease;
-}
-
-.form-textarea:focus {
-  background: #FFFFFF;
-  border-color: #94A3B8;
-  box-shadow: 0 0 0 4rpx rgba(148, 163, 184, 0.1);
-}
-
-.input-with-unit {
-  display: flex;
-  align-items: center;
-  gap: 16rpx;
-}
-
-.unit {
-  font-size: 28rpx;
+.card-subtitle {
+  font-size: 22rpx;
   color: #94A3B8;
-  flex-shrink: 0;
   font-weight: 400;
 }
 
-/* 营养信息网格 */
-.nutrition-grid {
+/* 输入行 */
+.input-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-row {
+  display: flex;
+  align-items: center;
+  padding: 24rpx 0;
+  border-bottom: 1rpx solid rgba(241, 245, 249, 0.8);
+}
+
+.form-row:last-child {
+  border-bottom: none;
+}
+
+.label {
+  width: 100rpx;
+  font-size: 28rpx;
+  color: #64748B;
+  flex-shrink: 0;
+}
+
+.glass-input {
+  flex: 1;
+  font-size: 28rpx;
+  color: #334155;
+  height: 48rpx;
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+.ph-style {
+  color: #CBD5E1;
+  font-weight: 300;
+}
+
+.input-right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.align-right {
+  text-align: right;
+  margin-right: 8rpx;
+}
+
+.suffix {
+  font-size: 24rpx;
+  color: #94A3B8;
+}
+
+/* === 3. 营养网格 (Minimal Grid) === */
+.macro-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 24rpx;
 }
 
-.nutrition-item {
+.macro-item {
+  background: rgba(255, 255, 255, 0.5);
   border-radius: 24rpx;
   padding: 24rpx;
-  background: #F8FAFC;
-  border: 1rpx solid #F1F5F9;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12rpx;
+  border: 1rpx solid transparent;
+  transition: all 0.2s;
 }
 
-.nutrition-label {
-  font-size: 24rpx;
+.macro-item.highlight {
+  background: rgba(255, 107, 53, 0.05);
+  border-color: rgba(255, 107, 53, 0.1);
+}
+
+.macro-item.protein {
+  background: rgba(16, 185, 129, 0.05);
+  border-color: rgba(16, 185, 129, 0.1);
+}
+
+.macro-item.carbs {
+  background: rgba(245, 158, 11, 0.05);
+  border-color: rgba(245, 158, 11, 0.1);
+}
+
+.macro-item.fat {
+  background: rgba(239, 68, 68, 0.05);
+  border-color: rgba(239, 68, 68, 0.1);
+}
+
+.macro-label {
+  font-size: 22rpx;
   color: #94A3B8;
-  font-weight: 500;
+  margin-bottom: 8rpx;
 }
 
-.nutrition-input-wrapper {
-  display: flex;
-  align-items: baseline;
-  gap: 8rpx;
-}
-
-.nutrition-input {
-  width: 100rpx;
-  font-size: 32rpx;
+.macro-input {
+  font-size: 40rpx;
   font-weight: 600;
   color: #334155;
+  height: 60rpx;
   text-align: center;
-  border-bottom: 2rpx solid transparent;
-  padding-bottom: 4rpx;
-  font-family: 'SF Mono', 'Menlo', sans-serif;
-}
-
-.nutrition-input:focus {
-  border-bottom-color: #94A3B8;
-}
-
-.nutrition-unit {
-  font-size: 22rpx;
-  color: #CBD5E1;
-}
-
-/* 提示框 */
-.nutrition-tip {
-  display: flex;
-  align-items: flex-start;
-  gap: 16rpx;
-  margin-top: 32rpx;
-  padding: 24rpx;
-  background: rgba(241, 245, 249, 0.5); /* Slate-100 half transparent */
-  border-radius: 20rpx;
-}
-
-.tip-icon {
-  font-size: 32rpx;
-}
-
-.tip-text {
-  font-size: 24rpx;
-  color: #64748B;
-  line-height: 1.5;
-}
-
-/* 图片上传 */
-.image-upload {
   width: 100%;
-  height: 320rpx;
-  border-radius: 24rpx;
-  overflow: hidden;
-  background: #F8FAFC;
-  border: 2rpx dashed #E2E8F0;
+  font-family: 'SF Pro Display', sans-serif;
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+.macro-unit {
+  font-size: 20rpx;
+  color: #CBD5E1;
+  margin-top: 4rpx;
+}
+
+/* === 4. 图片上传 === */
+.upload-area {
+  height: 240rpx;
+  background: rgba(255, 255, 255, 0.4);
+  border: 2rpx dashed #CBD5E1;
+  border-radius: 32rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 32rpx;
 }
 
-.image-upload:active {
-  background: #F1F5F9;
-  border-color: #94A3B8;
+/* 紧凑版图片上传 */
+.upload-area.compact {
+  height: 160rpx; /* 减小高度 */
+  margin-bottom: 0; /* 贴底 */
 }
 
 .upload-placeholder {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20rpx;
+  gap: 16rpx;
 }
 
-.upload-icon {
-  font-size: 64rpx;
-  opacity: 0.4;
-  filter: grayscale(100%);
+/* 横向布局 */
+.upload-placeholder.row-layout {
+  flex-direction: row; /* 改为横向 */
+  gap: 24rpx;
 }
 
-.upload-text {
-  font-size: 26rpx;
-  color: #94A3B8;
-}
-
-.remove-image {
-  margin-top: 20rpx;
-  text-align: center;
-  color: #EF4444;
-  font-size: 26rpx;
-  padding: 12rpx;
-}
-
-/* 底部按钮栏 */
-.bottom-bar {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 32rpx;
-  padding-bottom: calc(32rpx + env(safe-area-inset-bottom));
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(20rpx);
-  border-top: 1rpx solid rgba(241, 245, 249, 1);
-  z-index: 100;
-}
-
-.save-btn {
-  width: 100%;
-  height: 96rpx;
-  background: #334155; /* Slate-700 */
-  color: #FFFFFF;
-  font-size: 32rpx;
-  font-weight: 600;
-  border-radius: 48rpx;
+.plus-icon {
+  width: 60rpx;
+  height: 60rpx;
+  border-radius: 50%;
+  background: rgba(255, 107, 53, 0.1);
+  color: #FF6B35;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 8rpx 24rpx rgba(51, 65, 85, 0.25);
-  border: none;
-  transition: all 0.2s ease;
+  font-size: 40rpx;
+  font-weight: 300;
 }
 
-.save-btn:active {
-  transform: scale(0.98);
-  background: #1E293B; /* Slate-800 */
+/* 小号图标 */
+.plus-icon.small {
+  width: 48rpx;
+  height: 48rpx;
+  font-size: 32rpx;
 }
 
-.save-btn[disabled] {
-  background: #CBD5E1; /* Slate-300 */
-  color: #F1F5F9;
-  box-shadow: none;
+.upload-placeholder text {
+  font-size: 24rpx;
+  color: #94A3B8;
+}
+
+.uploaded-img {
+  width: 100%;
+  height: 100%;
+}
+
+.re-upload-mask {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  padding: 8rpx 0;
+  background: rgba(0, 0, 0, 0.4);
+  text-align: center;
+  backdrop-filter: blur(4rpx);
+  -webkit-backdrop-filter: blur(4rpx);
+}
+
+.re-upload-mask text {
+  color: #fff;
+  font-size: 20rpx;
+}
+
+/* === 5. 底部悬浮栏 (升级版) === */
+.bottom-glass-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  /* 增加高度适配两行内容 */
+  padding: 24rpx 32rpx;
+  padding-bottom: calc(24rpx + env(safe-area-inset-bottom));
+  
+  background: rgba(255, 255, 255, 0.9); /* 稍微不透明一点，防干扰 */
+  backdrop-filter: blur(24rpx);
+  -webkit-backdrop-filter: blur(24rpx);
+  border-top: 1rpx solid rgba(255, 255, 255, 1);
+  box-shadow: 0 -10rpx 40rpx rgba(0, 0, 0, 0.05);
+  
+  z-index: 100;
+  box-sizing: border-box;
+  
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx; /* 上下间距 */
+}
+
+/* 新增：快捷添加栏 */
+.quick-add-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.bar-label {
+  font-size: 26rpx;
+  color: #64748B;
+  font-weight: 500;
+}
+
+.meal-pills-row {
+  display: flex;
+  gap: 16rpx;
+}
+
+/* 迷你胶囊 */
+.meal-pill-mini {
+  padding: 10rpx 24rpx;
+  background: rgba(241, 245, 249, 0.8);
+  border-radius: 60rpx;
+  font-size: 24rpx;
+  color: #64748B;
+  transition: all 0.2s;
+  border: 2rpx solid transparent;
+}
+
+.meal-pill-mini.active {
+  background: #ECFDF5; /* 浅翡翠 */
+  color: #059669;
+  border-color: #10B981;
+  font-weight: 600;
+  box-shadow: 0 4rpx 12rpx rgba(16, 185, 129, 0.15);
+}
+
+.save-pill-btn {
+  /* 翡翠绿渐变 + 晶莹剔透效果 */
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.9) 0%, rgba(5, 150, 105, 0.95) 100%);
+  backdrop-filter: blur(10rpx);
+  -webkit-backdrop-filter: blur(10rpx);
+  color: #fff;
+  font-size: 32rpx;
+  font-weight: 600;
+  height: 88rpx;
+  line-height: 88rpx;
+  border-radius: 44rpx;
+  border: 1rpx solid rgba(255, 255, 255, 0.3);
+  box-shadow: 
+    0 8rpx 24rpx rgba(5, 150, 105, 0.3),
+    inset 0 2rpx 8rpx rgba(255, 255, 255, 0.3),
+    inset 0 -2rpx 4rpx rgba(5, 150, 105, 0.2);
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 按钮内部高光效果 */
+.save-pill-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.4) 0%, transparent 100%);
+  border-radius: 44rpx 44rpx 0 0;
   pointer-events: none;
+}
+
+.save-pill-btn[disabled] {
+  background: #E2E8F0;
+  color: #94A3B8;
+  box-shadow: none;
+  border: 1rpx solid rgba(226, 232, 240, 0.5);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.save-pill-btn[disabled]::before {
+  display: none;
+}
+
+
+/* 动画 */
+.animate-slide-up {
+  animation: slideUp 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

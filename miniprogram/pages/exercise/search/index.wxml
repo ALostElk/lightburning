@@ -51,7 +51,7 @@
       <view class="history-group" wx:if="{{recentSearches.length > 0}}">
         <view class="group-header">
           <text class="group-title">最近搜索</text>
-          <view class="clear-icon" bindtap="clearRecentSearches">🗑️</view>
+          <view class="clear-icon" bindtap="clearRecentSearches">清除</view>
         </view>
         <view class="tag-cloud">
           <view class="glass-tag" wx:for="{{recentSearches}}" wx:key="*this" bindtap="onRecentSearchTap" data-keyword="{{item}}">

@@ -789,6 +789,52 @@ async function recognizeAndSearch(imageInput, openid = '') {
     const foodName = recognized.name;
     console.log(`[识别+搜索] 处理食物: ${foodName}`);
 
+    // 优先查询用户自定义菜品（如果提供了 openid）
+    if (openid) {
+      const regex = db.RegExp({ regexp: foodName, options: 'i' });
+      const userDishResult = await db.collection('UserDishes')
+        .where({ 
+          _openid: openid,
+          name: regex 
+        })
+        .limit(1)
+        .get()
+        .catch(() => ({ data: [] }));
+
+      if (userDishResult.data && userDishResult.data.length > 0) {
+        // 匹配到用户自定义菜品，优先使用
+        const userDish = userDishResult.data[0];
+        console.log(`[识别+搜索] 用户自定义菜品命中: ${userDish.name}`);
+        
+        // 转换为 FoodDB 格式，方便前端统一处理
+        const customFood = {
+          _id: userDish._id,
+          name: userDish.name,
+          nameEN: '',
+          category: '自定义菜品',
+          calories: userDish.calories || 0,
+          protein: userDish.protein || 0,
+          fat: userDish.fat || 0,
+          carbs: userDish.carbs || 0,
+          fiber: 0,
+          servingSize: userDish.servingSize || '1份',
+          gramsPerServing: userDish.gramsPerServing || 100,
+          description: userDish.description || '',
+          imageUrl: userDish.imageUrl || '',
+          source: 'UserDishes',
+          isCustom: true
+        };
+
+        results.push({
+          recognized,
+          food: customFood,
+          source: 'user_custom',
+          confidence: recognized.confidence || 0.95 // 自定义菜品置信度更高
+        });
+        continue;
+      }
+    }
+
     // 查本地数据库
     const regex = db.RegExp({ regexp: foodName, options: 'i' });
     const localResult = await db.collection('FoodDB')

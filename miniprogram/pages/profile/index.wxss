@@ -1,8 +1,9 @@
 /* pages/profile/index.wxss */
 .container {
   min-height: 100vh;
-  background: linear-gradient(180deg, #f8f9fa 0%, #f0f2f5 100%);
+  background: linear-gradient(180deg, #F5FAFF 0%, #FFFFFF 100%);
   padding: 20rpx 30rpx 40rpx;
+  color: #334155;
 }
 
 /* 标题 */
@@ -14,11 +15,8 @@
 .title {
   display: block;
   font-size: 52rpx;
-  font-weight: 700;
-  background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  font-weight: 300;
+  color: #334155;
   margin-bottom: 12rpx;
   letter-spacing: 1rpx;
 }
@@ -26,24 +24,27 @@
 .subtitle {
   display: block;
   font-size: 26rpx;
-  color: #888;
+  color: #94A3B8;
   line-height: 1.5;
 }
 
 /* 卡片 */
 .card {
-  background: #fff;
-  border-radius: 24rpx;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(20px);
+  border-radius: 40rpx;
   padding: 36rpx;
   margin-bottom: 24rpx;
-  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.06);
+  box-shadow: 0 20rpx 40rpx rgba(148, 163, 184, 0.05);
   transition: all 0.3s ease;
   border: 1rpx solid rgba(255, 255, 255, 0.8);
 }
 
 .card-goal {
+  border: 1rpx solid rgba(173, 216, 230, 0.8);
   border-top: 4rpx solid #4A90E2;
   box-shadow: 0 4rpx 20rpx rgba(74, 144, 226, 0.15);
+  background: linear-gradient(180deg, rgba(219, 234, 254, 0.6) 0%, rgba(255, 255, 255, 0.6) 100%);
 }
 
 .card-health {
@@ -57,35 +58,18 @@
 }
 
 .card-basic {
+  border: 1rpx solid rgba(255, 192, 203, 0.8);
   border-top: 4rpx solid #FF6B6B;
   box-shadow: 0 4rpx 20rpx rgba(255, 107, 107, 0.15);
+  background: linear-gradient(180deg, rgba(252, 231, 243, 0.6) 0%, rgba(255, 255, 255, 0.6) 100%);
 }
 
 .card-title {
   font-size: 34rpx;
-  font-weight: 700;
-  color: #333;
+  font-weight: 600;
+  color: #334155;
   margin-bottom: 30rpx;
-  padding-left: 16rpx;
-  border-left: 6rpx solid #FF6B6B;
   position: relative;
-}
-
-/* 不同卡片的颜色主题 */
-.card-basic .card-title {
-  border-left-color: #FF6B6B;
-}
-
-.card-goal .card-title {
-  border-left-color: #4A90E2;
-}
-
-.card-health .card-title {
-  border-left-color: #9B59B6;
-}
-
-.card-macro .card-title {
-  border-left-color: #51CF66;
 }
 
 /* 表单项 */
@@ -121,7 +105,7 @@
 .label {
   flex: 0 0 180rpx;
   font-size: 28rpx;
-  color: #555;
+  color: #64748B;
   font-weight: 500;
 }
 
@@ -130,23 +114,18 @@
   height: 72rpx;
   padding: 0 24rpx;
   font-size: 28rpx;
-  color: #333;
-  background: #f8f9fa;
-  border-radius: 12rpx;
-  border: 2rpx solid transparent;
+  color: #334155;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 20rpx;
+  border: 1rpx solid rgba(148, 163, 184, 0.2);
   transition: all 0.2s ease;
+  box-shadow: 0 2rpx 8rpx rgba(148, 163, 184, 0.05);
 }
 
-.card-basic .input:focus {
+.input:focus {
   background: #fff;
-  border-color: #FF6B6B;
-  box-shadow: 0 0 0 4rpx rgba(255, 107, 107, 0.1);
-}
-
-.card-goal .input:focus {
-  background: #fff;
-  border-color: #4A90E2;
-  box-shadow: 0 0 0 4rpx rgba(74, 144, 226, 0.1);
+  border-color: #94A3B8;
+  box-shadow: 0 0 0 4rpx rgba(148, 163, 184, 0.1);
 }
 
 .picker {
@@ -155,218 +134,31 @@
   height: 72rpx;
   line-height: 72rpx;
   font-size: 28rpx;
-  color: #333;
-  background: #f8f9fa;
-  border-radius: 12rpx;
-  border: 2rpx solid transparent;
+  color: #334155;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 20rpx;
+  border: 1rpx solid rgba(148, 163, 184, 0.2);
   transition: all 0.2s ease;
   font-weight: 500;
+  box-shadow: 0 2rpx 8rpx rgba(148, 163, 184, 0.05);
 }
 
-.card-basic .picker:active {
+.picker:active {
   background: #fff;
-  border-color: #FF6B6B;
-  box-shadow: 0 0 0 4rpx rgba(255, 107, 107, 0.1);
-}
-
-.card-goal .picker:active {
-  background: #fff;
-  border-color: #4A90E2;
-  box-shadow: 0 0 0 4rpx rgba(74, 144, 226, 0.1);
+  border-color: #94A3B8;
+  box-shadow: 0 0 0 4rpx rgba(148, 163, 184, 0.1);
 }
 
 .unit {
   flex: 0 0 60rpx;
   text-align: right;
   font-size: 26rpx;
-  color: #999;
+  color: #94A3B8;
   font-weight: 500;
   margin-left: 12rpx;
 }
 
-/* 健康指标 */
-.indicator {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 24rpx 0;
-  border-bottom: 1rpx solid #f5f5f5;
-  transition: all 0.2s ease;
-}
 
-.indicator:last-child {
-  border-bottom: none;
-}
-
-.indicator:active {
-  margin: 0 -36rpx;
-  padding-left: 36rpx;
-  padding-right: 36rpx;
-  border-radius: 12rpx;
-}
-
-.indicator-bmi:active {
-  background: rgba(155, 89, 182, 0.05);
-}
-
-.indicator-bmr:active {
-  background: rgba(74, 144, 226, 0.05);
-}
-
-.indicator-tdee:active {
-  background: rgba(255, 107, 107, 0.05);
-}
-
-.indicator-label {
-  display: flex;
-  flex-direction: column;
-}
-
-.indicator-label text:first-child {
-  font-size: 30rpx;
-  color: #333;
-  font-weight: 700;
-  margin-bottom: 8rpx;
-  letter-spacing: 0.5rpx;
-  display: inline-block;
-}
-
-.indicator-bmi .indicator-label text:first-child {
-  background: linear-gradient(135deg, #9B59B6 0%, #8E44AD 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.indicator-bmr .indicator-label text:first-child {
-  background: linear-gradient(135deg, #4A90E2 0%, #3498DB 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.indicator-tdee .indicator-label text:first-child {
-  background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.indicator-desc {
-  font-size: 24rpx;
-  color: #999;
-  line-height: 1.4;
-}
-
-.indicator-value {
-  display: flex;
-  align-items: baseline;
-  gap: 8rpx;
-}
-
-.value {
-  font-size: 40rpx;
-  font-weight: 700;
-  color: #333;
-  letter-spacing: -1rpx;
-}
-
-.value-bmi {
-  color: #333;
-}
-
-.value-bmr {
-  color: #333;
-}
-
-.value-tdee {
-  color: #333;
-}
-
-.category {
-  font-size: 26rpx;
-  font-weight: 600;
-  padding: 4rpx 12rpx;
-  border-radius: 8rpx;
-  background: rgba(255, 107, 107, 0.1);
-}
-
-.unit-text {
-  font-size: 24rpx;
-  color: #999;
-  font-weight: 500;
-}
-
-/* 营养素推荐 */
-.macro-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20rpx 0;
-  border-bottom: 1rpx solid #f5f5f5;
-  transition: all 0.2s ease;
-}
-
-.macro-item:last-child {
-  border-bottom: none;
-}
-
-.macro-item:active {
-  margin: 0 -36rpx;
-  padding-left: 36rpx;
-  padding-right: 36rpx;
-  border-radius: 12rpx;
-}
-
-.macro-protein:active {
-  background: rgba(231, 76, 60, 0.05);
-}
-
-.macro-carbs:active {
-  background: rgba(52, 152, 219, 0.05);
-}
-
-.macro-fat:active {
-  background: rgba(241, 196, 15, 0.05);
-}
-
-.macro-water:active {
-  background: rgba(52, 152, 219, 0.05);
-}
-
-.macro-label {
-  font-size: 28rpx;
-  color: #555;
-  font-weight: 500;
-}
-
-.macro-value {
-  font-size: 32rpx;
-  font-weight: 700;
-  padding: 6rpx 16rpx;
-  border-radius: 12rpx;
-  letter-spacing: 0.5rpx;
-}
-
-.macro-value-protein {
-  color: #333;
-  background: rgba(231, 76, 60, 0.12);
-}
-
-.macro-value-carbs {
-  color: #333;
-  background: rgba(52, 152, 219, 0.12);
-}
-
-.macro-value-fat {
-  color: #333;
-  background: rgba(241, 196, 15, 0.12);
-}
-
-.macro-value-water {
-  color: #333;
-  background: rgba(52, 152, 219, 0.12);
-}
 
 /* 按钮组 */
 .button-group {
@@ -383,34 +175,34 @@
   line-height: 96rpx;
   border-radius: 48rpx;
   font-size: 32rpx;
-  font-weight: 700;
+  font-weight: 500;
   border: none;
   transition: all 0.3s ease;
-  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4rpx 12rpx rgba(148, 163, 184, 0.08);
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
-  color: #fff;
-  box-shadow: 0 6rpx 20rpx rgba(255, 107, 107, 0.35);
+  background: linear-gradient(135deg, #FF9A9E 0%, #FECFEF 100%);
+  color: #881337;
+  box-shadow: 0 8rpx 24rpx rgba(255, 154, 158, 0.25);
 }
 
 .btn-primary:active {
   transform: translateY(2rpx);
-  box-shadow: 0 4rpx 12rpx rgba(255, 107, 107, 0.3);
+  box-shadow: 0 4rpx 12rpx rgba(255, 154, 158, 0.2);
 }
 
 .btn-secondary {
-  background: #fff;
-  color: #666;
-  border: 2rpx solid #e0e0e0;
+  background: rgba(255, 255, 255, 0.8);
+  color: #475569;
+  border: 1rpx solid rgba(148, 163, 184, 0.2);
 }
 
 .btn-secondary:active {
-  background: #f8f9fa;
-  border-color: #d0d0d0;
+  background: #fff;
+  border-color: rgba(148, 163, 184, 0.3);
   transform: translateY(2rpx);
-  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2rpx 8rpx rgba(148, 163, 184, 0.1);
 }
 
 
