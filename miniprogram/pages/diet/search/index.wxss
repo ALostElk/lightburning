@@ -295,18 +295,21 @@
 }
 
 .meal-tab {
-  padding: 12rpx 32rpx;
+  padding: 16rpx 40rpx;
   border-radius: 30rpx;
-  font-size: 26rpx;
+  font-size: 32rpx;
+  font-weight: 600;
   color: #64748B;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   white-space: nowrap;
+  letter-spacing: 2rpx;
 }
 
 .meal-tab.active {
   background: #fff;
   color: #FF6B35;
-  font-weight: 600;
+  font-weight: 700;
+  font-size: 34rpx;
   box-shadow: 0 4rpx 12rpx rgba(255, 107, 53, 0.15);
 }
 

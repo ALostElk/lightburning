@@ -46,10 +46,10 @@ Page({
     // 我的常用 - 餐次切换
     currentMealTab: 'breakfast', // 当前选中的餐次
     mealTabs: [
-      { key: 'breakfast', name: '早餐 🌅' },
-      { key: 'lunch', name: '午餐 ☀️' },
-      { key: 'dinner', name: '晚餐 🌙' },
-      { key: 'snack', name: '加餐 🍬' }
+      { key: 'breakfast', name: '早餐' },
+      { key: 'lunch', name: '午餐' },
+      { key: 'dinner', name: '晚餐' },
+      { key: 'snack', name: '加餐' }
     ],
     
     // 重构：移除静态数据，改为动态容器
