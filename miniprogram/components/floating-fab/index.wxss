@@ -95,6 +95,74 @@
   text-shadow: 0 4rpx 8rpx rgba(0, 0, 0, 0.5);
 }
 
+/* 线条风格放大镜图标 - 使用search-icon-css样式 */
+.fab-line-search {
+  width: 60rpx;
+  height: 60rpx;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.search-circle {
+  width: 32rpx;
+  height: 32rpx;
+  border: 2rpx solid #64748B;
+  border-radius: 50%;
+  position: relative;
+}
+
+.search-circle::after {
+  content: '';
+  position: absolute;
+  bottom: -12rpx;
+  right: -12rpx;
+  width: 16rpx;
+  height: 2rpx;
+  background: #64748B;
+  transform: rotate(45deg);
+}
+
+/* 适配不同尺寸 */
+.fab-button.size-sm .fab-line-search {
+  width: 44rpx;
+  height: 44rpx;
+}
+
+.fab-button.size-sm .search-circle {
+  width: 24rpx;
+  height: 24rpx;
+  border: 1.5rpx solid #64748B;
+}
+
+.fab-button.size-sm .search-circle::after {
+  bottom: -10rpx;
+  right: -10rpx;
+  width: 14rpx;
+  height: 1.5rpx;
+  background: #64748B;
+}
+
+.fab-button.size-lg .fab-line-search {
+  width: 76rpx;
+  height: 76rpx;
+}
+
+.fab-button.size-lg .search-circle {
+  width: 38rpx;
+  height: 38rpx;
+  border: 2.5rpx solid #64748B;
+}
+
+.fab-button.size-lg .search-circle::after {
+  bottom: -14rpx;
+  right: -14rpx;
+  width: 20rpx;
+  height: 2.5rpx;
+  background: #64748B;
+}
+
 /* ============ 尺寸变体 ============ */
 .fab-button.size-sm {
   width: 96rpx;

@@ -16,7 +16,12 @@
     bindtap="onTap"
   >
     <!-- 图标 -->
-    <text class="fab-icon">{{icon}}</text>
+    <text class="fab-icon" wx:if="{{icon !== 'line-search'}}">{{icon}}</text>
+    <!-- 线条风格放大镜图标 -->
+    <view class="fab-line-search" wx:elif="{{icon === 'line-search'}}">
+      <view class="search-circle"></view>
+      <view class="search-handle"></view>
+    </view>
   </view>
 
   <!-- 标签（可选） -->

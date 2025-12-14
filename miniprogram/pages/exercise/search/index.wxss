@@ -47,12 +47,12 @@
 }
 
 .search-icon-css {
-  width: 24rpx; height: 24rpx; border: 3rpx solid #94A3B8;
+  width: 24rpx; height: 24rpx; border: 2rpx solid #64748B;
   border-radius: 50%; position: relative; margin-right: 16rpx;
 }
 .search-icon-css::after {
-  content: ''; position: absolute; bottom: -8rpx; right: -8rpx;
-  width: 10rpx; height: 3rpx; background: #94A3B8; transform: rotate(45deg);
+  content: ''; position: absolute; bottom: -10rpx; right: -10rpx;
+  width: 12rpx; height: 2rpx; background: #64748B; transform: rotate(45deg);
 }
 
 .search-input { flex: 1; font-size: 28rpx; color: #334155; height: 100%; }

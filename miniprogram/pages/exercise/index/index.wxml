@@ -290,8 +290,8 @@
   </view>
 
   <!-- ============ 浮动搜索按钮 ============ -->
-  <floating-fab
-    icon="🔍"
+  <floating-fab style="position: relative; left: 346rpx; top: -255rpx"
+    icon="line-search"
     position="bottom-center"
     theme="glass"
     safeArea="{{true}}"
