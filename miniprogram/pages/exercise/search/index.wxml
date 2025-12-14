@@ -142,8 +142,9 @@
         </view>
       </view>
 
-      <view class="modal-action">
-        <view class="confirm-btn" bindtap="confirmAddExercise">确认记录</view>
+      <view class="modal-action dual-buttons">
+        <view class="secondary-btn" bindtap="confirmAddExercise">补录记录</view>
+        <view class="confirm-btn start-btn" bindtap="goToTimer">开始训练 ▶</view>
       </view>
     </view>
   </view>

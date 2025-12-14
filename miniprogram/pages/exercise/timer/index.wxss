@@ -1,0 +1,164 @@
+/**
+ * 沉浸式运动计时页面样式
+ * 设计语言: Daylight Futurism - Kinetic Aqua (海盐湖水绿)
+ */
+
+/* ============ 页面容器 ============ */
+.timer-page {
+  height: 100vh;
+  width: 100vw;
+  background: linear-gradient(180deg, #F0FDFA 0%, #E0F2FE 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* ============ 头部信息区 ============ */
+.timer-header {
+  position: absolute;
+  top: calc(env(safe-area-inset-top) + 60rpx);
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24rpx;
+  z-index: 20;
+}
+
+.exercise-name {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #0F766E;
+  letter-spacing: 2rpx;
+}
+
+.calorie-pill {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(10rpx);
+  -webkit-backdrop-filter: blur(10rpx);
+  padding: 12rpx 32rpx;
+  border-radius: 100rpx;
+  color: #2DD4BF;
+  font-weight: 600;
+  font-size: 32rpx;
+  box-shadow: 0 4rpx 12rpx rgba(45, 212, 191, 0.1);
+  border: 1rpx solid rgba(255, 255, 255, 0.8);
+  z-index: 10;
+}
+
+/* ============ 核心计时器 ============ */
+.timer-display {
+  font-size: 140rpx;
+  font-weight: 200;
+  color: #0F766E;
+  font-feature-settings: "tnum";
+  text-shadow: 0 8rpx 20rpx rgba(45, 212, 191, 0.2);
+  z-index: 10;
+  letter-spacing: 8rpx;
+  font-family: 'SF Pro Display', -apple-system, sans-serif;
+}
+
+/* ============ 动态波浪层 ============ */
+.wave-container {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 40%;
+  z-index: 0;
+  opacity: 0.6;
+  overflow: hidden;
+}
+
+.wave {
+  position: absolute;
+  bottom: 0;
+  width: 200%;
+  height: 100%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(45, 212, 191, 0.2) 100%);
+  border-radius: 40%;
+  animation: wave-rotate 10s infinite linear;
+}
+
+.wave-1 {
+  left: -50%;
+  animation-duration: 10s;
+  animation-timing-function: linear;
+}
+
+.wave-2 {
+  left: -50%;
+  animation-duration: 15s;
+  animation-timing-function: linear;
+  animation-direction: reverse;
+  opacity: 0.4;
+}
+
+@keyframes wave-rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ============ 控制栏 ============ */
+.control-bar {
+  position: absolute;
+  bottom: calc(100rpx + env(safe-area-inset-bottom));
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 60rpx;
+  z-index: 20;
+}
+
+.btn-glass {
+  width: 140rpx;
+  height: 140rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20rpx);
+  -webkit-backdrop-filter: blur(20rpx);
+  border: 1rpx solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 12rpx 30rpx rgba(45, 212, 191, 0.2);
+  transition: all 0.2s;
+}
+
+.btn-glass:active {
+  transform: scale(0.95);
+}
+
+.btn-glass.pause {
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.btn-glass.stop {
+  background: #FFE4E6;
+  border-color: rgba(225, 29, 72, 0.2);
+}
+
+.btn-icon {
+  font-size: 48rpx;
+  color: #0F766E;
+  font-weight: 300;
+}
+
+.btn-text {
+  font-size: 28rpx;
+  color: #E11D48;
+  font-weight: 600;
+}
+

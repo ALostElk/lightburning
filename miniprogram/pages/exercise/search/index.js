@@ -49,9 +49,14 @@ Page({
 
   onLoad(options) {
     const sys = wx.getSystemInfoSync();
+    
+    // 接收运动类型参数，如果传入了则自动选择对应的类型
+    const exerciseType = options.type || 'aerobic';
+    
     this.setData({ 
       statusBarHeight: sys.statusBarHeight || 44,
-      targetDate: options.date || this.getTodayString()
+      targetDate: options.date || this.getTodayString(),
+      selectedExerciseType: exerciseType // 自动匹配到对应的运动类型
     });
     this.loadRecentSearches();
   },
@@ -218,5 +223,22 @@ Page({
     wx.navigateBack();
   },
   
-  stopPropagation() {}
+  stopPropagation() {},
+
+  // 跳转到计时页面
+  goToTimer() {
+    const exercise = this.data.currentExercise;
+    if (!exercise) {
+      wx.showToast({ title: '数据错误', icon: 'none' });
+      return;
+    }
+    
+    // 关闭弹窗
+    this.closeDurationModal();
+    
+    // 跳转到计时页面
+    wx.navigateTo({
+      url: `/pages/exercise/timer/index?name=${encodeURIComponent(exercise.name)}&emoji=${encodeURIComponent(exercise.emoji || '')}&cal=${exercise.caloriesPerMin || 0}`
+    });
+  }
 });
