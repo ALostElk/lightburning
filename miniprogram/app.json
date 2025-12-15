@@ -30,35 +30,34 @@
     "navigationBarTextStyle": "black"
   },
   "tabBar": {
-    "custom": true,
-    "color": "#999999",
-    "selectedColor": "#FF6B6B",
+    "color": "#B0B8C1",
+    "selectedColor": "#10B981",
     "backgroundColor": "#ffffff",
-    "borderStyle": "black",
+    "borderStyle": "white",
     "list": [
       {
         "pagePath": "pages/home/index",
         "text": "首页",
-        "iconPath": "images/icons/home.png",
-        "selectedIconPath": "images/icons/home-active.png"
+        "iconPath": "images/tabbar/home.png",
+        "selectedIconPath": "images/tabbar/home-active.png"
       },
       {
         "pagePath": "pages/diet/index/index",
         "text": "饮食",
-        "iconPath": "images/icons/goods.png",
-        "selectedIconPath": "images/icons/goods-active.png"
+        "iconPath": "images/tabbar/diet.png",
+        "selectedIconPath": "images/tabbar/diet-active.png"
       },
       {
         "pagePath": "pages/exercise/index/index",
         "text": "运动",
-        "iconPath": "images/icons/business.png",
-        "selectedIconPath": "images/icons/business-active.png"
+        "iconPath": "images/tabbar/exercise.png",
+        "selectedIconPath": "images/tabbar/exercise-active.png"
       },
       {
         "pagePath": "pages/mine/index/index",
         "text": "我的",
-        "iconPath": "images/icons/usercenter.png",
-        "selectedIconPath": "images/icons/usercenter-active.png"
+        "iconPath": "images/tabbar/mine.png",
+        "selectedIconPath": "images/tabbar/mine-active.png"
       }
     ]
   },

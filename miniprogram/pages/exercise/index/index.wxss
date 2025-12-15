@@ -1778,12 +1778,16 @@
   justify-content: space-between;
   box-shadow: 0 -8rpx 32rpx rgba(0, 0, 0, 0.08);
   transform: translateY(100%);
-  transition: transform 0.3s ease;
-  z-index: 100;
+  opacity: 0;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  z-index: 200;
+  pointer-events: none;
 }
 
 .batch-action-bar.show {
   transform: translateY(0);
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .batch-info {
@@ -1862,6 +1866,7 @@
 .food-edit-content {
   width: 100%;
   max-width: 750rpx;
+  max-height: 80vh;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 250, 245, 0.98) 100%);
   backdrop-filter: blur(40rpx);
   -webkit-backdrop-filter: blur(40rpx);
@@ -1871,6 +1876,10 @@
   transform: translateY(100%);
   transition: transform 0.3s ease;
   box-shadow: 0 -16rpx 48rpx rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .food-edit-modal.show .food-edit-content {
@@ -1885,6 +1894,14 @@
   margin-bottom: 24rpx;
   padding-bottom: 20rpx;
   border-bottom: 1rpx solid rgba(94, 234, 212, 0.1);
+  flex-shrink: 0;
+}
+
+/* 可滚动内容区域 */
+.food-edit-scroll {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
 }
 
 .food-edit-title {
@@ -2398,11 +2415,11 @@
 
 /* ============ 相机浮动按钮位置覆盖 ============ */
 .fab-container.bottom-center {
-  bottom: 120rpx !important;
+  bottom: 220rpx !important;
 }
 
 .fab-container.safe-area {
-  bottom: calc(120rpx + env(safe-area-inset-bottom)) !important;
+  bottom: calc(220rpx + env(safe-area-inset-bottom)) !important;
 }
 
 /* ============ 全局字体颜色修正 - 日光未来主义风格 ============ */

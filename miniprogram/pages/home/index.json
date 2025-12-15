@@ -1,5 +1,6 @@
 {
-  "navigationBarTitleText": "轻燃",
+  "navigationStyle": "custom",
+  "navigationBarTextStyle": "black",
   "enablePullDownRefresh": true,
   "usingComponents": {
     "spotlight-card": "/components/spotlight-card/index"

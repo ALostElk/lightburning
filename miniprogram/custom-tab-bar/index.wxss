@@ -11,7 +11,7 @@
   -webkit-backdrop-filter: blur(24px);
   /* Soft shadow for depth */
   box-shadow: 0 -4rpx 16rpx rgba(0, 0, 0, 0.04);
-  z-index: 9000;
+  z-index: 100;
   transition: all 0.3s ease;
 }
 

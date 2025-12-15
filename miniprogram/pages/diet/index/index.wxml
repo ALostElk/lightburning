@@ -294,12 +294,12 @@
       </view>
     </view>
 
-    <!-- 底部安全区域 -->
-    <view class="bottom-spacer"></view>
+    <!-- 底部导航栏安全垫片 -->
+    <view class="tabbar-spacer"></view>
   </view>
 
   <!-- ============ 批量操作栏 ============ -->
-  <view class="batch-action-bar {{(isEditMode || hasAnyMealEditing) && selectedCount > 0 ? 'show' : ''}}">
+  <view class="batch-action-bar {{(isEditMode || hasAnyMealEditing) && selectedCount > 0 ? 'show' : ''}}" wx:if="{{isEditMode || hasAnyMealEditing}}">
     <view class="batch-info">
       <text class="selected-count">已选择 {{selectedCount}} 项</text>
       <text class="selected-calories">共 {{selectedCalories}} kcal</text>
@@ -388,16 +388,18 @@
         </view>
       </view>
 
-      <!-- 食物信息 -->
-      <view class="food-edit-info">
-        <view class="food-edit-avatar">
-          <text class="food-edit-emoji">{{editingFood.emoji || '🍽️'}}</text>
+      <!-- 可滚动内容区 -->
+      <scroll-view scroll-y class="food-edit-scroll">
+        <!-- 食物信息 -->
+        <view class="food-edit-info">
+          <view class="food-edit-avatar">
+            <text class="food-edit-emoji">{{editingFood.emoji || '🍽️'}}</text>
+          </view>
+          <view class="food-edit-name">{{editingFood.name}}</view>
         </view>
-        <view class="food-edit-name">{{editingFood.name}}</view>
-      </view>
 
-      <!-- 克数输入 -->
-      <view class="food-edit-form">
+        <!-- 克数输入 -->
+        <view class="food-edit-form">
         <!-- 份量显示 -->
         <view class="amount-header">
           <text class="form-label">选择份量</text>
@@ -469,6 +471,7 @@
           </view>
         </view>
       </view>
+      </scroll-view>
 
       <!-- 操作按钮 -->
       <view class="food-edit-actions">

@@ -238,7 +238,7 @@ Page({
     
     // 跳转到计时页面
     wx.navigateTo({
-      url: `/pages/exercise/timer/index?name=${encodeURIComponent(exercise.name)}&emoji=${encodeURIComponent(exercise.emoji || '')}&cal=${exercise.caloriesPerMin || 0}`
+      url: `/pages/exercise/timer/index?name=${encodeURIComponent(exercise.name)}&emoji=${encodeURIComponent(exercise.emoji || '')}&cal=${exercise.caloriesPerMin || 0}&type=${encodeURIComponent(exercise.type || this.data.selectedExerciseType || '')}`
     });
   }
 });

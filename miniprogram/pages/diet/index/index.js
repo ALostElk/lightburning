@@ -417,6 +417,8 @@ Page({
   // 显示日历
   showCalendar() {
     const date = new Date(this.data.selectedDate);
+    // 隐藏 TabBar
+    wx.hideTabBar({ animation: true });
     this.setData({
       showCalendarModal: true,
       calendarYear: date.getFullYear(),
@@ -429,6 +431,8 @@ Page({
   // 隐藏日历
   hideCalendar() {
     this.setData({ showCalendarModal: false });
+    // 显示 TabBar
+    wx.showTabBar({ animation: true });
   },
 
   // 阻止事件冒泡
@@ -479,12 +483,16 @@ Page({
     if (!date) return;
 
     this.setData({ showCalendarModal: false });
+    // 显示 TabBar
+    wx.showTabBar({ animation: true });
     this.changeDate(date);
   },
 
   // 快捷选择：今天
   selectToday() {
     this.setData({ showCalendarModal: false });
+    // 显示 TabBar
+    wx.showTabBar({ animation: true });
     this.changeDate(this.getTodayString());
   },
 
@@ -493,6 +501,8 @@ Page({
     const d = new Date();
     d.setDate(d.getDate() - 1);
     this.setData({ showCalendarModal: false });
+    // 显示 TabBar
+    wx.showTabBar({ animation: true });
     this.changeDate(d.toISOString().slice(0, 10));
   },
 
@@ -503,6 +513,8 @@ Page({
     const diff = d.getDate() - day + (day === 0 ? -6 : 1);
     d.setDate(diff);
     this.setData({ showCalendarModal: false });
+    // 显示 TabBar
+    wx.showTabBar({ animation: true });
     this.changeDate(d.toISOString().slice(0, 10));
   },
 
@@ -1258,6 +1270,9 @@ Page({
     const carbsPer100g = food.carbsPer100g || 0;
     const fatPer100g = food.fatPer100g || 0;
 
+    // 隐藏 TabBar
+    wx.hideTabBar({ animation: true });
+
     this.setData({
       showFoodEditModal: true,
       editingFood: {
@@ -1285,6 +1300,8 @@ Page({
   // 关闭食物编辑弹窗
   closeFoodEdit() {
     this.setData({ showFoodEditModal: false });
+    // 显示 TabBar
+    wx.showTabBar({ animation: true });
   },
 
   // 克数输入

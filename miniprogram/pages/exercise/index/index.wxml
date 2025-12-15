@@ -269,12 +269,12 @@
       </view>
     </view>
 
-    <!-- 底部安全区域 -->
-    <view class="bottom-spacer"></view>
+    <!-- 底部导航栏安全垫片 -->
+    <view class="tabbar-spacer"></view>
   </view>
 
   <!-- ============ 批量操作栏 ============ -->
-  <view class="batch-action-bar {{(isEditMode || hasAnyTypeEditing) && selectedCount > 0 ? 'show' : ''}}">
+  <view class="batch-action-bar {{(isEditMode || hasAnyTypeEditing) && selectedCount > 0 ? 'show' : ''}}" wx:if="{{isEditMode || hasAnyTypeEditing}}">
     <view class="batch-info">
       <text class="selected-count">已选择 {{selectedCount}} 项</text>
       <text class="selected-calories">共 {{selectedCalories}} kcal</text>

@@ -202,73 +202,79 @@
         </view>
       </view>
 
-      <!-- 体重显示 -->
-      <view class="weight-display-section">
-        <view class="weight-display-value">
-          <text class="display-number">{{inputWeight || '0.0'}}</text>
-          <text class="display-unit">kg</text>
-        </view>
-        <view class="weight-compare" wx:if="{{weightData.current}}">
-          <text class="compare-label">上次记录：</text>
-          <text class="compare-value">{{weightData.current}} kg</text>
-        </view>
-      </view>
-
-      <!-- 滑动条输入 -->
-      <view class="slider-input-section">
-        <view class="slider-wrapper">
-          <view class="slider-track">
-            <view class="slider-fill" style="width: {{(inputWeight - 30) / 120 * 100}}%"></view>
+      <!-- 可滚动的内容区 -->
+      <scroll-view scroll-y class="modal-scroll-content">
+        <!-- 体重显示 -->
+        <view class="weight-display-section">
+          <view class="weight-display-value">
+            <text class="display-number">{{inputWeight || '0.0'}}</text>
+            <text class="display-unit">kg</text>
           </view>
-          <slider
-            class="weight-slider"
-            min="30"
-            max="150"
-            step="0.1"
-            value="{{inputWeight}}"
-            activeColor="transparent"
-            backgroundColor="transparent"
-            block-size="0"
-            bindchange="onWeightSliderChange"
-            bindchanging="onWeightSliderChanging"
-          />
-          <view class="slider-thumb" style="left: {{(inputWeight - 30) / 120 * 100}}%">
-            <view class="thumb-dot"></view>
+          <view class="weight-compare" wx:if="{{weightData.current}}">
+            <text class="compare-label">上次记录：</text>
+            <text class="compare-value">{{weightData.current}} kg</text>
           </view>
         </view>
-        
-        <!-- 刻度 -->
-        <view class="slider-marks">
-          <text class="mark">30kg</text>
-          <text class="mark">90kg</text>
-          <text class="mark">150kg</text>
+
+        <!-- 滑动条输入 -->
+        <view class="slider-input-section">
+          <view class="slider-wrapper">
+            <view class="slider-track">
+              <view class="slider-fill" style="width: {{(inputWeight - 30) / 120 * 100}}%"></view>
+            </view>
+            <slider
+              class="weight-slider"
+              min="30"
+              max="150"
+              step="0.1"
+              value="{{inputWeight}}"
+              activeColor="transparent"
+              backgroundColor="transparent"
+              block-size="0"
+              bindchange="onWeightSliderChange"
+              bindchanging="onWeightSliderChanging"
+            />
+            <view class="slider-thumb" style="left: {{(inputWeight - 30) / 120 * 100}}%">
+              <view class="thumb-dot"></view>
+            </view>
+          </view>
+
+          <!-- 刻度 -->
+          <view class="slider-marks">
+            <text class="mark">30kg</text>
+            <text class="mark">90kg</text>
+            <text class="mark">150kg</text>
+          </view>
         </view>
-      </view>
 
-      <!-- 快捷输入 -->
-      <view class="quick-weights">
-        <view class="quick-label">快捷输入</view>
-        <view class="quick-btns">
-          <view class="quick-btn" bindtap="adjustWeight" data-delta="-0.5">-0.5</view>
-          <view class="quick-btn" bindtap="adjustWeight" data-delta="-0.1">-0.1</view>
-          <input class="direct-input" type="digit" value="{{inputWeight}}" bindinput="onWeightDirectInput" />
-          <view class="quick-btn" bindtap="adjustWeight" data-delta="0.1">+0.1</view>
-          <view class="quick-btn" bindtap="adjustWeight" data-delta="0.5">+0.5</view>
+        <!-- 快捷输入 -->
+        <view class="quick-weights">
+          <view class="quick-label">快捷输入</view>
+          <view class="quick-btns">
+            <view class="quick-btn" bindtap="adjustWeight" data-delta="-0.5">-0.5</view>
+            <view class="quick-btn" bindtap="adjustWeight" data-delta="-0.1">-0.1</view>
+            <input class="direct-input" type="digit" value="{{inputWeight}}" bindinput="onWeightDirectInput" />
+            <view class="quick-btn" bindtap="adjustWeight" data-delta="0.1">+0.1</view>
+            <view class="quick-btn" bindtap="adjustWeight" data-delta="0.5">+0.5</view>
+          </view>
         </view>
-      </view>
 
-      <!-- 备注输入 -->
-      <view class="note-section">
-        <view class="note-label">备注（选填）</view>
-        <input class="note-input" placeholder="今天感觉不错..." value="{{weightNote}}" bindinput="onNoteInput" />
-      </view>
+        <!-- 备注输入 -->
+        <view class="note-section">
+          <view class="note-label">备注（选填）</view>
+          <input class="note-input" placeholder="今天感觉不错..." value="{{weightNote}}" bindinput="onNoteInput" />
+        </view>
+      </scroll-view>
 
-      <!-- 操作按钮 -->
+      <!-- 操作按钮（固定在底部） -->
       <view class="modal-actions">
         <view class="modal-btn cancel" bindtap="closeWeightModal">取消</view>
         <view class="modal-btn save" bindtap="saveWeight">保存</view>
       </view>
     </view>
   </view>
+
+  <!-- 底部导航栏安全垫片 -->
+  <view class="tabbar-spacer"></view>
 
 </view>

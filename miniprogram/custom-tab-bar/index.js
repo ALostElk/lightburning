@@ -1,4 +1,20 @@
 Component({
+    lifetimes: {
+        attached() {
+            // 强制隐藏系统 tabBar，防止重叠显示
+            wx.hideTabBar({ animation: false });
+        },
+        ready() {
+            // 确保 tabBar 被隐藏
+            wx.hideTabBar({ animation: false });
+        }
+    },
+    pageLifetimes: {
+        show() {
+            // 每次页面显示时也隐藏系统 tabBar
+            wx.hideTabBar({ animation: false });
+        }
+    },
     data: {
         selected: 0,
         color: "#B0B8C1",

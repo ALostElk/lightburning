@@ -767,3 +767,22 @@ view, text, image {
   font-size: var(--font-base);
   text-align: center;
 }
+
+/* ============ 全局：底部导航栏强力防遮挡垫片 ============ */
+/* 用于防止内容被 custom-tab-bar 遮挡 */
+.tabbar-spacer {
+  width: 100%;
+  /* 基础高度提升到 200rpx (约100px)，确保覆盖任何异形导航栏 */
+  min-height: 200rpx;
+  height: calc(200rpx + env(safe-area-inset-bottom));
+  background: transparent; /* 透明 */
+  flex-shrink: 0; /* 禁止被压缩 */
+  display: block; /* 确保占据文档流 */
+  pointer-events: none; /* 避免阻挡点击 */
+}
+
+/* ============ 悬浮按钮避让样式 ============ */
+/* 如果页面有底部悬浮按钮，请添加此类 */
+.fixed-bottom-btn {
+  bottom: calc(220rpx + env(safe-area-inset-bottom)) !important;
+}

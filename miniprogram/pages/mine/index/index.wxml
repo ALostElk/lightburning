@@ -107,4 +107,7 @@
       <button class="modal-btn confirm" bindtap="confirmNicknameEdit">确认</button>
     </view>
   </view>
+
+  <!-- 底部导航栏安全垫片 -->
+  <view class="tabbar-spacer"></view>
 </view>

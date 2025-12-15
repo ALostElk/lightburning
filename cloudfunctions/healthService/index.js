@@ -438,14 +438,61 @@ async function recommendExercise(openid) {
  * @returns {Array} 运动记录列表
  */
 async function getExerciseLogs(openid, date) {
-  const result = await db.collection('ExerciseLog')
-    .where({
-      _openid: openid,
-      date: date
-    })
-    .get();
+  const [exerciseLogRes, exerciseRecordsRes] = await Promise.all([
+    db.collection('ExerciseLog')
+      .where({
+        _openid: openid,
+        date: date
+      })
+      .get(),
+    db.collection('exercise_records')
+      .where({
+        _openid: openid,
+        recordDate: date
+      })
+      .get()
+      .catch(() => ({ data: [] }))
+  ]);
 
-  return result.data || [];
+  const exerciseLogs = exerciseLogRes.data || [];
+  const exerciseRecords = (exerciseRecordsRes && exerciseRecordsRes.data) ? exerciseRecordsRes.data : [];
+
+  const normalizeDate = (d) => {
+    if (!d) return null;
+    if (typeof d === 'string') return d;
+    try {
+      return new Date(d).toISOString().slice(0, 10);
+    } catch (e) {
+      return null;
+    }
+  };
+
+  const normalizeCreatedAt = (value) => {
+    if (!value) return 0;
+    if (typeof value === 'number') return value;
+    try {
+      const ts = new Date(value).getTime();
+      return Number.isFinite(ts) ? ts : 0;
+    } catch (e) {
+      return 0;
+    }
+  };
+
+  const mappedRecords = exerciseRecords.map((r) => ({
+    _id: r._id,
+    _openid: r._openid,
+    name: r.name,
+    duration: Number(r.duration) || 0,
+    calories: Number(r.calories) || 0,
+    date: normalizeDate(r.recordDate) || date,
+    exerciseType: r.exerciseType || 'aerobic',
+    createdAt: normalizeCreatedAt(r.createTime || r.createdAt)
+  }));
+
+  const merged = [...exerciseLogs, ...mappedRecords];
+  merged.sort((a, b) => normalizeCreatedAt(b.createdAt) - normalizeCreatedAt(a.createdAt));
+
+  return merged;
 }
 
 /**
@@ -457,6 +504,7 @@ async function logExercise(openid, data) {
     name: data.name,
     duration: Number(data.duration),
     calories: Number(data.calories),
+    exerciseType: data.exerciseType || 'aerobic',
     date: data.date || todayString(),
     createdAt: Date.now()
   };
@@ -506,4 +554,3 @@ exports.main = async (event) => {
     return fail(error.message || error);
   }
 };
-

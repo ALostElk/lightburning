@@ -701,9 +701,12 @@ Page({
     // 获取当前体重作为初始值
     const currentWeight = this.data.weightData.current || this.data.profile?.weight || 60.0;
     const initialWeight = currentWeight ? parseFloat(currentWeight) : 60.0;
-    
+
     console.log('打开体重弹窗，初始体重:', initialWeight);
-    
+
+    // 隐藏 TabBar
+    wx.hideTabBar({ animation: true });
+
     this.setData({
       showWeightModal: true,
       inputWeight: initialWeight,
@@ -718,6 +721,8 @@ Page({
     this.setData({
       showWeightModal: false
     });
+    // 显示 TabBar
+    wx.showTabBar({ animation: true });
   },
 
   /**
@@ -1173,6 +1178,8 @@ Page({
    */
   showCalendar() {
     const date = new Date(this.data.currentDate);
+    // 隐藏 TabBar
+    wx.hideTabBar({ animation: true });
     this.setData({
       showCalendarModal: true,
       calendarYear: date.getFullYear(),
@@ -1187,6 +1194,8 @@ Page({
    */
   hideCalendar() {
     this.setData({ showCalendarModal: false });
+    // 显示 TabBar
+    wx.showTabBar({ animation: true });
   },
 
   /**
@@ -1245,6 +1254,8 @@ Page({
     if (!date) return;
 
     this.setData({ showCalendarModal: false });
+    // 显示 TabBar
+    wx.showTabBar({ animation: true });
     this.setFormattedDate(new Date(date));
     this.loadData();
   },
@@ -1254,6 +1265,8 @@ Page({
    */
   selectToday() {
     this.setData({ showCalendarModal: false });
+    // 显示 TabBar
+    wx.showTabBar({ animation: true });
     this.setFormattedDate(new Date());
     this.loadData();
   },
@@ -1265,6 +1278,8 @@ Page({
     const d = new Date();
     d.setDate(d.getDate() - 1);
     this.setData({ showCalendarModal: false });
+    // 显示 TabBar
+    wx.showTabBar({ animation: true });
     this.setFormattedDate(d);
     this.loadData();
   },
@@ -1278,6 +1293,8 @@ Page({
     const diff = d.getDate() - day + (day === 0 ? -6 : 1);
     d.setDate(diff);
     this.setData({ showCalendarModal: false });
+    // 显示 TabBar
+    wx.showTabBar({ animation: true });
     this.setFormattedDate(d);
     this.loadData();
   },

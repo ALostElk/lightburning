@@ -1,28 +1,200 @@
-<!-- 沉浸式运动计时页面 -->
-<view class="timer-page">
-  <!-- 头部信息区 -->
-  <view class="timer-header">
-    <text class="exercise-name">{{exerciseName}} {{exerciseEmoji}}</text>
-    <view class="calorie-pill">{{currentCalories}} kcal</view>
-  </view>
-  
-  <!-- 核心计时器 -->
-  <view class="timer-display">{{formattedTime}}</view>
-  
-  <!-- 动态波浪层 -->
-  <view class="wave-container">
-    <view class="wave wave-1"></view>
-    <view class="wave wave-2"></view>
-  </view>
-  
-  <!-- 控制栏 -->
-  <view class="control-bar">
-    <view class="btn-glass pause" bindtap="togglePause">
-      <text class="btn-icon">{{isPaused ? '▶' : '⏸'}}</text>
+<!-- 沉浸式运动计时页面 - 双模式切换 -->
+<view class="page-container">
+  <!-- 基础模式：沉浸式波浪计时器 -->
+  <view class="mode-basic" wx:if="{{!isAIMode}}">
+    <view class="timer-page">
+      <!-- 头部信息区 -->
+      <view class="timer-header">
+        <text class="exercise-name">{{exerciseName}} {{exerciseEmoji}}</text>
+        <view class="calorie-pill">消耗 {{currentCalories}} kcal</view>
+        <!-- AI 计数显示（从 AI 模式带回的数据） -->
+        <view class="ai-count-pill" wx:if="{{aiCount > 0}}">
+          <text class="ai-count-text">AI 计数: {{aiCount}} 次</text>
+        </view>
+      </view>
+
+      <!-- 核心计时器 -->
+      <view class="timer-display">{{formattedTime}}</view>
+
+      <!-- 动态波浪层 -->
+      <view class="wave-container">
+        <view class="wave wave-1"></view>
+        <view class="wave wave-2"></view>
+      </view>
+
+      <!-- 控制栏 -->
+      <view class="control-bar">
+        <view class="btn-glass pause" bindtap="togglePause">
+          <text class="btn-icon">{{isPaused ? '▶' : '⏸'}}</text>
+        </view>
+        <view class="btn-glass stop" bindtap="finishExercise">
+          <text class="btn-text">结束</text>
+        </view>
+      </view>
     </view>
-    <view class="btn-glass stop" bindtap="finishExercise">
-      <text class="btn-text">结束</text>
+
+    <!-- AI 开关按钮（移到 timer-page 外部，确保不被 overflow:hidden 裁剪） -->
+    <view class="ai-toggle-btn" wx:if="{{canUseAI && supportAI}}" bindtap="switchMode">
+      <text class="ai-text">{{aiCount > 0 ? '继续 AI 指导' : '开启 AI 指导'}}</text>
+    </view>
+  </view>
+
+  <!-- AI 模式：全屏摄像头 + VisionKit -->
+  <view class="mode-ai" wx:else>
+    <camera
+      id="vkCamera"
+      class="camera-fullscreen"
+      device-position="{{vkCameraPosition}}"
+      flash="off"
+      frame-size="medium"
+      bindinitdone="onCameraInit"
+      binderror="onCameraError">
+      <canvas
+        type="2d"
+        id="poseCanvas"
+        class="pose-overlay">
+      </canvas>
+    </camera>
+
+    <!-- 点击层：用于简化模式手动计数（不挡 HUD 控件） -->
+    <view class="tap-layer" catchtap="onAIViewTap"></view>
+
+    <!-- AI HUD 覆盖层 -->
+    <view class="ai-hud">
+      <!-- 顶部控制栏 -->
+      <view class="hud-top">
+        <view class="hud-left">
+          <view class="back-pill" catchtap="switchMode">
+            <text class="back-icon">↩</text>
+            <text class="back-text">普通模式</text>
+          </view>
+          <view class="metronome-pill" catchtap="toggleMvpPanel">
+            <text class="metronome-pill-text">{{mvpExpanded ? '收起节拍器' : '展开节拍器'}}</text>
+          </view>
+        </view>
+
+        <view class="hud-right">
+          <view class="debug-pill" wx:if="{{debugEnabled}}" catchtap="toggleVKCamera">
+            <text class="debug-pill-text">切换摄像头</text>
+          </view>
+          <view class="status-pill {{isDetecting ? 'active' : ''}}" catchlongpress="toggleDebugHUD">
+            <text class="status-dot"></text>
+            <text class="status-text">{{isDetecting ? 'AI 识别中' : '准备中...'}}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 调试 HUD（长按右上角状态胶囊开关） -->
+      <view class="debug-hud" wx:if="{{debugEnabled}}">
+        <block wx:for="{{debugLines}}" wx:key="index">
+          <text class="debug-line">{{item}}</text>
+        </block>
+      </view>
+
+      <!-- 中间信息区：计时 + 热量 -->
+      <view class="ai-stats-bar">
+        <view class="ai-stat-item">
+          <text class="ai-stat-value">{{formattedTime}}</text>
+          <text class="ai-stat-label">时长</text>
+        </view>
+        <view class="ai-stat-divider"></view>
+        <view class="ai-stat-item">
+          <text class="ai-stat-value">{{currentCalories}}</text>
+          <text class="ai-stat-label">千卡</text>
+        </view>
+      </view>
+
+      <!-- 反馈区域 -->
+      <view class="feedback-zone">
+        <!-- 计数显示 -->
+        <view class="counter-box">
+          <text class="count-num">{{aiMetricValue}}</text>
+          <text class="count-label">{{aiMetricUnit}}</text>
+        </view>
+
+        <!-- 端侧 MVP：简化模式面板（节拍器 + 要点 + 手动计数） -->
+        <view class="mvp-panel {{metronomeFlash ? 'flash' : ''}}" wx:if="{{mvpExpanded || isFallbackMode}}">
+          <view class="mvp-row">
+            <text class="mvp-badge">{{isFallbackMode ? '简化模式' : '训练助手'}}</text>
+            <text class="mvp-sub">{{isTimeBasedMetric ? '计时/保持模式' : (autoCountEnabled ? '跟节拍自动计数' : (isFallbackMode ? '点击屏幕 +1' : '仅节拍辅助'))}}</text>
+          </view>
+
+          <view class="mvp-tip" wx:if="{{tipText}}">
+            <text class="mvp-tip-title">动作要点</text>
+            <text class="mvp-tip-text">{{tipText}}</text>
+          </view>
+
+        <view class="mvp-metrics">
+          <view class="mvp-metric">
+              <text class="mvp-metric-value">{{isTimeBasedMetric ? aiMetricValue : cadenceRpm}}</text>
+              <text class="mvp-metric-label">{{isTimeBasedMetric ? '已计时(秒)' : (autoCountEnabled ? '目标次/分钟' : '次/分钟')}}</text>
+          </view>
+          <view class="mvp-metric">
+              <text class="mvp-metric-value">{{metronomeBpm}}</text>
+              <text class="mvp-metric-label">BPM</text>
+          </view>
+          <view class="mvp-metric">
+              <text class="mvp-metric-value">{{isTimeBasedMetric ? (metronomeEnabled ? 'ON' : 'OFF') : (autoCountEnabled ? 'AUTO' : 'MAN')}}</text>
+              <text class="mvp-metric-label">{{isTimeBasedMetric ? '节拍器' : '计数模式'}}</text>
+          </view>
+        </view>
+
+          <view class="mvp-controls">
+            <view class="mvp-row-2">
+              <view class="mvp-btn ghost" wx:if="{{!isTimeBasedMetric}}" catchtap="toggleAutoCount">
+                <text class="mvp-btn-text">{{autoCountEnabled ? '关闭自动计数' : '开启自动计数'}}</text>
+              </view>
+              <view class="mvp-phase" wx:if="{{phaseText}}">
+                <text class="mvp-phase-text">{{phaseText}}</text>
+              </view>
+            </view>
+
+            <view class="mvp-bpr" wx:if="{{!isTimeBasedMetric}}">
+              <text class="mvp-bpr-label">每次动作</text>
+              <view class="mvp-bpr-options">
+                <view class="mvp-bpr-opt {{beatsPerRep==2 ? 'active' : ''}}" catchtap="setBeatsPerRep" data-bpr="2"><text>2拍/次</text></view>
+                <view class="mvp-bpr-opt {{beatsPerRep==4 ? 'active' : ''}}" catchtap="setBeatsPerRep" data-bpr="4"><text>4拍/次</text></view>
+              </view>
+            </view>
+
+            <view class="mvp-btn" catchtap="toggleMetronome">
+              <text class="mvp-btn-text">{{metronomeEnabled ? '关闭节拍器' : '开启节拍器'}}</text>
+            </view>
+            <view class="mvp-stepper">
+              <view class="mvp-step" catchtap="adjustMetronomeBpm" data-delta="-5"><text>-5</text></view>
+              <view class="mvp-step" catchtap="adjustMetronomeBpm" data-delta="-1"><text>-1</text></view>
+              <view class="mvp-step" catchtap="adjustMetronomeBpm" data-delta="1"><text>+1</text></view>
+              <view class="mvp-step" catchtap="adjustMetronomeBpm" data-delta="5"><text>+5</text></view>
+            </view>
+            <slider
+              class="mvp-slider"
+              min="20"
+              max="200"
+              step="1"
+              value="{{metronomeBpm}}"
+              activeColor="#2DD4BF"
+              backgroundColor="rgba(255,255,255,0.2)"
+              blockColor="#2DD4BF"
+              bindchange="changeMetronomeBpm"
+            />
+          </view>
+        </view>
+
+        <!-- 指导气泡 -->
+        <view class="guide-bubble" wx:if="{{guideText}}">
+          <text class="guide-text">{{guideText}}</text>
+        </view>
+      </view>
+
+      <!-- 底部控制栏 -->
+      <view class="ai-control-bar">
+        <view class="ai-btn pause" catchtap="togglePause">
+          <text class="ai-btn-icon">{{isPaused ? '▶' : '⏸'}}</text>
+        </view>
+        <view class="ai-btn finish" catchtap="finishExercise">
+          <text class="ai-btn-text">结束运动</text>
+        </view>
+      </view>
     </view>
   </view>
 </view>
-

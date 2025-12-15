@@ -7,6 +7,7 @@
   /* 天空白渐变 - 极淡 */
   background: linear-gradient(180deg, #F5FAFF 0%, #FFFFFF 100%);
   padding: 0 32rpx 40rpx; /* Added bottom padding */
+  padding-top: calc(env(safe-area-inset-top) + 88rpx); /* 状态栏 + 导航栏高度 */
   box-sizing: border-box;
   color: #334155; /* Slate-700 */
 }
@@ -800,22 +801,37 @@
 
 .weight-modal-content {
   width: 100%;
+  max-height: 70vh;
   background: #FFFFFF;
   border-radius: 40rpx 40rpx 0 0;
   padding: 32rpx 32rpx calc(32rpx + env(safe-area-inset-bottom));
   transform: translateY(100%);
   transition: transform 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .weight-modal.show .weight-modal-content {
   transform: translateY(0);
 }
 
+/* 可滚动内容区 */
+.modal-scroll-content {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  max-height: calc(70vh - 200rpx);
+  padding-bottom: 16rpx;
+}
+
 .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 32rpx;
+  margin-bottom: 20rpx;
+  flex-shrink: 0;
 }
 
 .modal-title {
@@ -839,7 +855,7 @@
 /* 体重显示区 */
 .weight-display-section {
   text-align: center;
-  margin-bottom: 40rpx;
+  margin-bottom: 24rpx;
 }
 
 .weight-display-value {
@@ -847,18 +863,18 @@
   align-items: baseline;
   justify-content: center;
   gap: 12rpx;
-  margin-bottom: 16rpx;
+  margin-bottom: 8rpx;
 }
 
 .display-number {
-  font-size: 80rpx;
+  font-size: 72rpx;
   font-weight: 200;
   color: #1E293B;
   font-family: 'SF Mono', 'Menlo', sans-serif;
 }
 
 .display-unit {
-  font-size: 32rpx;
+  font-size: 28rpx;
   color: #94A3B8;
   font-weight: 300;
 }
@@ -883,13 +899,13 @@
 
 /* 滑动条输入 */
 .slider-input-section {
-  margin-bottom: 32rpx;
+  margin-bottom: 24rpx;
 }
 
 .slider-wrapper {
   position: relative;
-  height: 60rpx;
-  margin-bottom: 16rpx;
+  height: 48rpx;
+  margin-bottom: 12rpx;
 }
 
 .slider-track {
@@ -947,13 +963,13 @@
 
 /* 快捷输入 */
 .quick-weights {
-  margin-bottom: 32rpx;
+  margin-bottom: 20rpx;
 }
 
 .quick-label {
   font-size: 24rpx;
   color: #64748B;
-  margin-bottom: 16rpx;
+  margin-bottom: 12rpx;
   font-weight: 500;
 }
 
@@ -965,10 +981,10 @@
 
 .quick-btn {
   flex: 0 0 auto;
-  padding: 12rpx 20rpx;
+  padding: 10rpx 16rpx;
   background: rgba(241, 245, 249, 0.8);
-  border-radius: 16rpx;
-  font-size: 24rpx;
+  border-radius: 12rpx;
+  font-size: 22rpx;
   color: #64748B;
   font-weight: 500;
   text-align: center;
@@ -983,12 +999,12 @@
 
 .direct-input {
   flex: 1;
-  height: 72rpx;
+  height: 64rpx;
   text-align: center;
   background: rgba(255, 255, 255, 0.8);
   border: 2rpx solid #E2E8F0;
-  border-radius: 16rpx;
-  font-size: 28rpx;
+  border-radius: 12rpx;
+  font-size: 26rpx;
   color: #334155;
   font-weight: 600;
   font-family: 'SF Mono', 'Menlo', sans-serif;
@@ -996,24 +1012,24 @@
 
 /* 备注输入 */
 .note-section {
-  margin-bottom: 32rpx;
+  margin-bottom: 24rpx;
 }
 
 .note-label {
   font-size: 24rpx;
   color: #64748B;
-  margin-bottom: 12rpx;
+  margin-bottom: 8rpx;
   font-weight: 500;
 }
 
 .note-input {
   width: 100%;
-  height: 80rpx;
+  height: 72rpx;
   padding: 0 24rpx;
   background: rgba(241, 245, 249, 0.5);
   border: 1rpx solid #E2E8F0;
-  border-radius: 20rpx;
-  font-size: 28rpx;
+  border-radius: 16rpx;
+  font-size: 26rpx;
   color: #334155;
   box-sizing: border-box;
 }
@@ -1022,16 +1038,20 @@
 .modal-actions {
   display: flex;
   gap: 16rpx;
+  flex-shrink: 0;
+  padding-top: 16rpx;
+  margin-top: auto;
+  background: #FFFFFF;
 }
 
 .modal-btn {
   flex: 1;
-  height: 88rpx;
+  height: 84rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 44rpx;
-  font-size: 32rpx;
+  border-radius: 42rpx;
+  font-size: 30rpx;
   font-weight: 600;
   transition: all 0.2s ease;
 }
